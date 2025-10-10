@@ -94310,10 +94310,6 @@ class GuestService extends GuestSocket {
       });
     }
     try {
-      await navigator.mediaDevices.getUserMedia({
-        video: (option == null ? void 0 : option.enableVideo) ?? false,
-        audio: true
-      });
       const response = await postExtMakeCall({ phone_number: phone });
       if (!((_a = response.data) == null ? void 0 : _a.data)) {
         return Promise.reject({
