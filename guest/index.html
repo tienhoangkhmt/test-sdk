@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tư Vấn Bảo Hiểm Trực Tuyến</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+
+    <style>
+      :root {
+        --primary-color: #0066cc;
+        --primary-dark: #004d99;
+        --secondary-color: #28a745;
+        --danger-color: #dc3545;
+        --warning-color: #ffc107;
+        --light-bg: #f8f9fa;
+        --dark-bg: #343a40;
+        --border-color: #dee2e6;
+        --text-dark: #212529;
+        --text-muted: #6c757d;
+        --white: #ffffff;
+        --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        --gradient-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      }
+
+      * { 
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: var(--gradient-bg);
+        color: var(--text-dark);
+        min-height: 100vh;
+        line-height: 1.6;
+      }
+
+      .container { 
+        max-width: 1080px; 
+        padding: 20px; 
+        margin: 0 auto; 
+      }
+
+      /* Header */
+      .header {
+        background: var(--white);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: var(--shadow);
+        text-align: center;
+      }
+
+      .logo-section {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+        margin-bottom: 15px;
+      }
+
+      .logo {
+        width: 60px;
+        height: 60px;
+        background: var(--primary-color);
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 24px;
+      }
+
+      .company-info h1 {
+        font-size: 24px;
+        color: var(--primary-color);
+        margin-bottom: 5px;
+      }
+
+      .company-info p {
+        color: var(--text-muted);
+        font-size: 14px;
+      }
+
+      .welcome-text {
+        background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 10px;
+      }
+
+      .subtitle {
+        color: var(--text-muted);
+        font-size: 14px;
+        max-width: 500px;
+        margin: 0 auto;
+      }
+
+      /* Call Section */
+      .call-section {
+        background: var(--white);
+        border-radius: 15px;
+        padding: 40px;
+        margin-bottom: 30px;
+        box-shadow: var(--shadow);
+        text-align: center;
+      }
+
+      .call-section h2 {
+        color: var(--primary-color);
+        font-size: 28px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+      }
+
+      .customer-form {
+        max-width: 500px;
+        margin: 0 auto;
+      }
+
+      .form-group {
+        margin-bottom: 25px;
+        text-align: left;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--text-dark);
+        font-weight: 600;
+        font-size: 16px;
+      }
+
+      .form-group input {
+        width: 100%;
+        padding: 15px 20px;
+        border: 2px solid var(--border-color);
+        border-radius: 12px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        background: var(--white);
+      }
+
+      .form-group input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+      }
+
+      .call-btn {
+        background: linear-gradient(45deg, var(--primary-color), var(--primary-dark));
+        color: white;
+        border: none;
+        padding: 18px 40px;
+        border-radius: 12px;
+        font-size: 18px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 20px;
+        box-shadow: var(--shadow);
+      }
+
+      .call-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 102, 204, 0.3);
+      }
+
+      .call-btn:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      /* Video Section */
+      .video-section {
+        background: var(--white);
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: var(--shadow);
+      }
+
+      .video-section h2 {
+        color: var(--primary-color);
+        font-size: 24px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .video-container {
+        position: relative;
+        background: #000;
+        border-radius: 15px;
+        overflow: hidden;
+        margin-bottom: 20px;
+        min-height: 400px;
+      }
+
+      .remote-video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        /* background: linear-gradient(45deg, #1a1a1a, #2d2d2d); */
+      }
+
+      .local-video {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 200px;
+        height: 150px;
+        border-radius: 12px;
+        border: 3px solid var(--white);
+        object-fit: cover;
+        box-shadow: var(--shadow);
+        background: #333;
+      }
+
+      /* Controls */
+      .controls-section {
+        background: var(--white);
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: var(--shadow);
+      }
+
+      .controls-section h2 {
+        color: var(--primary-color);
+        font-size: 24px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .control-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+      }
+
+      .control-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 15px 20px;
+        border: 2px solid var(--border-color);
+        border-radius: 12px;
+        background: var(--white);
+        color: var(--text-dark);
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .control-btn:hover {
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow);
+      }
+
+      .control-btn.active {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+      }
+
+      .control-btn.danger {
+        background: var(--danger-color);
+        color: white;
+        border-color: var(--danger-color);
+      }
+
+      .control-btn.danger:hover {
+        background: #c82333;
+        border-color: #c82333;
+        color: white;
+      }
+
+      /* Status Indicator */
+      .status-bar {
+        background: var(--white);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: var(--shadow);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+      }
+
+      .status-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--danger-color);
+        animation: pulse 2s infinite;
+      }
+
+      .status-dot.connected {
+        background: var(--secondary-color);
+      }
+
+      @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.5; }
+        100% { opacity: 1; }
+      }
+
+      .status-text {
+        font-weight: 600;
+        color: var(--text-dark);
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .container {
+          padding: 10px;
+        }
+
+        .header {
+          padding: 12px;
+          margin-bottom: 12px;
+        }
+
+        .logo-section {
+          flex-direction: row;
+          gap: 12px;
+          margin-bottom: 8px;
+        }
+
+        .logo {
+          width: 45px;
+          height: 45px;
+          font-size: 18px;
+        }
+
+        .company-info h1 {
+          font-size: 18px;
+          margin-bottom: 3px;
+        }
+
+        .company-info p {
+          font-size: 12px;
+        }
+
+        .welcome-text {
+          font-size: 16px;
+          margin-bottom: 8px;
+        }
+
+        .subtitle {
+          font-size: 12px;
+          margin-bottom: 0;
+        }
+
+        .video-section, .controls-section {
+          padding: 15px;
+          margin-bottom: 15px;
+          width: 100%;
+        }
+
+        .video-section > div:first-child {
+          flex-direction: row !important;
+          justify-content: space-between !important;
+          align-items: center !important;
+          gap: 10px !important;
+        }
+
+        .video-section > div:first-child > div {
+          flex-shrink: 0;
+          justify-content: flex-end;
+          flex-wrap: nowrap;
+        }
+
+        .video-section h2 {
+          font-size: 20px;
+          flex-shrink: 0;
+          min-width: 0;
+        }
+
+        .video-container {
+          min-height: 250px;
+          height: 50vh;
+        }
+
+        .local-video {
+          width: 100px;
+          height: 100px;
+          top: 10px;
+          right: 10px;
+          border-width: 2px;
+        }
+
+        .control-grid {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 10px;
+        }
+
+        .control-btn {
+          padding: 12px 15px;
+          font-size: 14px;
+        }
+
+        .controls-section h2 {
+          font-size: 18px;
+          margin-bottom: 15px;
+        }
+
+        /* Full screen mobile optimization */
+        body {
+          padding: 0;
+        }
+
+        .container {
+          min-height: 100vh;
+          max-width: 100%;
+        }
+
+        /* AppId input responsive */
+        .video-section > div:first-child > div {
+          gap: 8px !important;
+          min-width: 0;
+          flex-shrink: 0;
+        }
+
+        .video-section > div:first-child > div input {
+          width: 100px !important;
+          font-size: 12px;
+          flex-shrink: 0;
+        }
+
+        .video-section > div:first-child > div button {
+          font-size: 12px !important;
+          padding: 6px 12px !important;
+          flex-shrink: 0;
+          white-space: nowrap;
+        }
+
+        .video-section > div:first-child > div label {
+          font-size: 12px !important;
+          flex-shrink: 0;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .header {
+          padding: 8px;
+          margin-bottom: 8px;
+        }
+
+        .logo {
+          width: 35px;
+          height: 35px;
+          font-size: 14px;
+        }
+
+        .company-info h1 {
+          font-size: 16px;
+        }
+
+        .company-info p {
+          font-size: 11px;
+        }
+
+        .welcome-text {
+          font-size: 14px;
+          margin-bottom: 5px;
+        }
+
+        .subtitle {
+          font-size: 11px;
+        }
+
+        .video-section h2 {
+          font-size: 18px !important;
+        }
+
+        .video-section > div:first-child > div input {
+          width: 80px !important;
+          font-size: 11px !important;
+        }
+
+        .video-section > div:first-child > div button {
+          font-size: 11px !important;
+          padding: 5px 8px !important;
+        }
+
+        .video-section > div:first-child > div label {
+          font-size: 11px !important;
+        }
+
+        .video-container {
+          min-height: 200px;
+          height: 45vh;
+        }
+
+        .local-video {
+          width: 80px;
+          height: 100px;
+        }
+
+        .control-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .control-btn {
+          padding: 15px;
+          font-size: 16px;
+        }
+      }
+
+      /* Page Screens */
+      .call-screen, .connecting-screen, .video-screen, .call-ended-screen {
+        background: var(--white);
+        border-radius: 15px;
+        padding: 40px;
+        box-shadow: var(--shadow);
+        min-height: 500px;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* Call Screen */
+      .call-content {
+        text-align: center;
+        max-width: 500px;
+        margin: auto;
+      }
+
+      .call-header {
+        margin-bottom: 40px;
+      }
+
+      .advisor-avatar {
+        width: 120px;
+        height: 120px;
+        background: var(--primary-color);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 48px;
+        margin: 0 auto 20px;
+      }
+
+      .call-header h2 {
+        color: var(--primary-color);
+        font-size: 28px;
+        margin-bottom: 15px;
+      }
+
+      .call-header p {
+        color: var(--text-muted);
+        font-size: 16px;
+        line-height: 1.5;
+      }
+
+      .call-action-btn {
+        background: linear-gradient(45deg, var(--primary-color), var(--primary-dark));
+        color: white;
+        border: none;
+        padding: 20px 40px;
+        border-radius: 50px;
+        font-size: 18px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        box-shadow: var(--shadow);
+      }
+
+      .call-action-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0, 102, 204, 0.3);
+      }
+
+      /* Connecting Screen */
+      .connecting-content {
+        text-align: center;
+      }
+
+      .connecting-avatar {
+        width: 100px;
+        height: 100px;
+        background: var(--warning-color);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 40px;
+        margin: 0 auto 30px;
+        animation: pulse 2s infinite;
+      }
+
+      .connecting-content h2 {
+        color: var(--primary-color);
+        font-size: 24px;
+        margin-bottom: 15px;
+      }
+
+      .connecting-content p {
+        color: var(--text-muted);
+        font-size: 16px;
+        margin-bottom: 30px;
+      }
+
+      .connecting-animation {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+      }
+
+      .connecting-animation .dot {
+        width: 12px;
+        height: 12px;
+        background: var(--primary-color);
+        border-radius: 50%;
+        animation: bounce 1.4s infinite ease-in-out both;
+      }
+
+      .connecting-animation .dot:nth-child(1) { animation-delay: -0.32s; }
+      .connecting-animation .dot:nth-child(2) { animation-delay: -0.16s; }
+
+      @keyframes bounce {
+        0%, 80%, 100% { 
+          transform: scale(0);
+        } 40% { 
+          transform: scale(1.0);
+        }
+      }
+
+      /* Call Ended Screen */
+      .call-ended-content {
+        text-align: center;
+      }
+
+      .call-ended-icon {
+        width: 100px;
+        height: 100px;
+        background: var(--secondary-color);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 40px;
+        margin: 0 auto 30px;
+      }
+
+      .call-ended-content h2 {
+        color: var(--primary-color);
+        font-size: 24px;
+        margin-bottom: 15px;
+      }
+
+      .call-ended-content p {
+        color: var(--text-muted);
+        font-size: 16px;
+        margin-bottom: 30px;
+      }
+
+      /* Call Timer */
+      .call-timer {
+        background: var(--secondary-color);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 14px;
+      }
+
+      /* Hidden elements */
+      .hidden {
+        display: none !important;
+      }
+
+      /* Loading animation */
+      .loading-spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255,255,255,.3);
+        border-radius: 50%;
+        border-top-color: #fff;
+        animation: spin 1s ease-in-out infinite;
+        margin-left: 10px;
+      }
+
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Header -->
+      <div class="header">
+        <div class="logo-section">
+          <div class="logo">
+            <i class="fas fa-shield-alt"></i>
+          </div>
+          <div class="company-info">
+            <h1>Bảo Hiểm ABC</h1>
+            <p>Tư vấn bảo hiểm trực tuyến 24/7</p>
+          </div>
+        </div>
+        
+        <div class="welcome-text">
+          Chào mừng bạn đến với dịch vụ tư vấn bảo hiểm
+        </div>
+        <p class="subtitle">
+          Được tư vấn miễn phí về các sản phẩm bảo hiểm phù hợp nhất cho bạn và gia đình.
+        </p>
+      </div>
+
+      <div name="log" id="log" style="overflow-y: auto;"></div>
+
+
+      <!-- Page 1: Call Screen -->
+      <div class="call-screen" id="callScreen">
+        <div class="call-content">
+          <div class="call-header">
+            <div class="advisor-avatar">
+              <i class="fas fa-user-tie"></i>
+            </div>
+            <h2>Liên hệ tư vấn bảo hiểm qua video</h2>
+            <p>Nhấn nút bên dưới để bắt đầu cuộc gọi video với nhân viên tư vấn</p>
+          </div>
+          
+          <div class="call-form">
+            <div style="display: flex; flex-direction: column; gap: 15px; align-items: center; margin-bottom: 30px;">
+              <div style="display: flex; gap: 10px; align-items: center;">
+                <label for="phoneInput" style="color: var(--text-muted); font-size: 14px; min-width: 80px;">Số điện thoại:</label>
+                <input type="tel" id="phoneInput" placeholder="Nhập số điện thoại" style="width: 200px; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 16px;" />
+              </div>
+              
+              <div style="display: flex; gap: 10px; align-items: center;">
+                <label for="appIdInput" style="color: var(--text-muted); font-size: 14px; min-width: 80px;">AppId:</label>
+                <input type="text" id="appIdInput" placeholder="Enter appId (optional)" style="width: 200px; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 6px;" />
+              </div>
+            </div>
+            
+            <button class="call-action-btn" id="make">
+              <i class="fas fa-phone"></i>
+              Gọi ngay
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Page 2: Connecting Screen -->
+      <div class="connecting-screen hidden" id="connectingScreen">
+        <div class="connecting-content">
+          <div class="connecting-avatar">
+            <i class="fas fa-user-tie"></i>
+          </div>
+          <h2>Đang kết nối...</h2>
+          <p>Vui lòng chờ trong giây lát</p>
+          <div class="connecting-animation">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Page 3: Video Call Screen -->
+      <div class="video-screen hidden" id="videoScreen">
+        <div class="video-section">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2 style="margin: 0; display: flex; align-items: center; gap: 10px;">
+              <i class="fas fa-video"></i>
+              Video Call
+            </h2>
+            
+            <div class="call-timer" id="callTimer">00:00</div>
+          </div>
+          
+          <div class="video-container">
+            <!-- Remote Video (Tư vấn viên) -->
+            <video 
+              id="video1" 
+              class="remote-video" 
+              title="Remote Video" 
+              muted 
+              autoplay 
+              playsinline
+              onerror="console.log('Remote video error')" 
+              onplaying="console.log('Remote video playing successfully!')"
+            ></video>
+            
+            <!-- Local Video (Khách hàng) -->
+            <video 
+              id="local" 
+              class="local-video"
+              title="Local Video" 
+              muted 
+              autoplay 
+              playsinline
+              onplaying="console.log('Local video playing successfully!')"
+            ></video>
+            
+            <!-- Hidden canvas for blur effect -->
+            <!-- <canvas id="outputCanvas" width="640" height="480" style="display: none;"></canvas> -->
+          </div>
+        </div>
+
+        <!-- Controls Section -->
+        <div class="controls-section">
+          <h2>
+            <i class="fas fa-sliders-h"></i>
+            Điều khiển cuộc gọi
+          </h2>
+          
+          <div class="control-grid">
+            <button class="control-btn" id="mute">
+              <i class="fas fa-microphone-slash"></i>
+              <span id="muteText">Tắt mic</span>
+            </button>
+            
+            <button class="control-btn" id="unmute">
+              <i class="fas fa-microphone"></i>
+              Mở mic
+            </button>
+            
+            <button class="control-btn" id="cameraOn">
+              <i class="fas fa-video"></i>
+              Mở camera
+            </button>
+            
+            <button class="control-btn" id="cameraOff">
+              <i class="fas fa-video-slash"></i>
+              Tắt camera
+            </button>
+            
+            <button class="control-btn" id="switchCamera">
+              <i class="fas fa-sync-alt"></i>
+              Chuyển camera
+            </button>
+            
+            <button class="control-btn danger" id="hangup">
+              <i class="fas fa-phone-slash"></i>
+              Kết thúc
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Page 4: Call Ended Screen -->
+      <div class="call-ended-screen hidden" id="callEndedScreen">
+        <div class="call-ended-content">
+          <div class="call-ended-icon">
+            <i class="fas fa-thumbs-up"></i>
+          </div>
+          <h2>Cuộc gọi đã kết thúc.</h2>
+          <p>Cảm ơn bạn đã liên hệ</p>
+          <button class="call-action-btn" id="callAgain">
+            <i class="fas fa-redo"></i>
+            Gọi lại
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Hidden Audio/Video Elements -->
+    <audio id="audio1"></audio>
+    <audio id="audio2"></audio>
+    <audio id="audio3"></audio>
+    <audio id="audio4"></audio>
+    <audio id="audio5"></audio>
+    <audio id="audio6"></audio>
+    <audio id="audio7"></audio>
+    
+    <!-- Hidden video elements -->
+    <video id="screen" style="display: none;"></video>
+    <video id="video2" style="display: none;"></video>
+    <video id="video3" style="display: none;"></video>
+    <video id="video4" style="display: none;"></video>
+    <video id="video5" style="display: none;"></video>
+    <video id="video6" style="display: none;"></video>
+    <video id="video7" style="display: none;"></video>
+
+    <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+
+
+    <script type="module">
+      console.log("Insurance Video Call loaded!", new Date());
+      const notyf = new Notyf({
+        duration: 3000,
+        position: { x: 'center', y: 'top' }
+      });
+      let facingMode = "environment";
+
+
+        // Import SDK
+      import { OmiGuestSDK } from "../omisdk.es.js";
+      
+      // Global variables
+      let guest = null;
+      let isConnected = false;
+      let isMuted = false;
+      let isCameraOn = true;
+      let callStartTime = null;
+      let callTimer = null;
+
+      // DOM Elements
+      const callBtn = document.getElementById("make");
+      const phoneInput = document.getElementById("phoneInput");
+      const appIdInput = document.getElementById("appIdInput");
+      const callAgainBtn = document.getElementById("callAgain");
+      
+      // Screen Elements
+      const callScreen = document.getElementById("callScreen");
+      const connectingScreen = document.getElementById("connectingScreen");
+      const videoScreen = document.getElementById("videoScreen");
+      const callEndedScreen = document.getElementById("callEndedScreen");
+      const callTimerDisplay = document.getElementById("callTimer");
+
+      // Control buttons
+      const muteBtn = document.getElementById("mute");
+      const unmuteBtn = document.getElementById("unmute");
+      const cameraOnBtn = document.getElementById("cameraOn");
+      const cameraOffBtn = document.getElementById("cameraOff");
+      const switchCameraBtn = document.getElementById("switchCamera");
+      const hangupBtn = document.getElementById("hangup");
+
+      // Initialize when page loads
+      window.addEventListener("load", () => {
+        console.log("Page loaded, setting up event listeners");
+        setupEventListeners();
+        
+        // Check URL parameters for appId
+        const urlParams = new URLSearchParams(window.location.search);
+        const appId = urlParams.get("appId");
+        if (appId) {
+          appIdInput.value = appId;
+          console.log("AppId from URL:", appId);
+        }
+      });
+
+      // Utility functions
+      function addLog(logText) {
+        const container = document.getElementById("log");
+        const p = document.createElement("p");
+        p.textContent = JSON.stringify(logText);
+        container.appendChild(p);
+      }
+
+      function setupEventListeners() {
+        // Main call button
+        callBtn.addEventListener("click", handleMakeCall);
+        callAgainBtn.addEventListener("click", handleCallAgain);
+        
+        // Control buttons
+        muteBtn.addEventListener("click", () => toggleMute(true));
+        unmuteBtn.addEventListener("click", () => toggleMute(false));
+        cameraOnBtn.addEventListener("click", () => toggleCamera(true));
+        cameraOffBtn.addEventListener("click", () => toggleCamera(false));
+        switchCameraBtn.addEventListener("click", handleSwitchCamera);
+        hangupBtn.addEventListener("click", handleHangup);
+        
+      }
+
+      // Screen management functions
+      function showScreen(screenName) {
+        // Hide all screens
+        callScreen.classList.add('hidden');
+        connectingScreen.classList.add('hidden');
+        videoScreen.classList.add('hidden');
+        callEndedScreen.classList.add('hidden');
+        
+        // Show selected screen
+        switch(screenName) {
+          case 'call':
+            callScreen.classList.remove('hidden');
+            break;
+          case 'connecting':
+            connectingScreen.classList.remove('hidden');
+            break;
+          case 'video':
+            videoScreen.classList.remove('hidden');
+            break;
+          case 'ended':
+            callEndedScreen.classList.remove('hidden');
+            break;
+        }
+        
+        console.log(`Switched to ${screenName} screen`);
+      }
+
+      function handleCallAgain() {
+        showScreen('call');
+        // Reset states
+        guest = null;
+        isConnected = false;
+        isMuted = false;
+        isCameraOn = true;
+        stopCallTimer();
+        
+        // Clear form inputs
+        phoneInput.value = '';
+        appIdInput.value = '';
+      }
+
+      async function handleMakeCall() {
+        const phoneNumber = phoneInput.value.trim();
+        const appId = appIdInput.value.trim();
+
+        // Validate phone number
+        if (!phoneNumber) {
+          notyf.error("Vui lòng nhập số điện thoại!");
+          return;
+        }
+
+        // Basic phone validation (Vietnamese phone format)
+        const phoneRegex = /^(0|\+84)[0-9]{8,10}$/;
+        if (!phoneRegex.test(phoneNumber)) {
+          notyf.error("Số điện thoại không hợp lệ! Vui lòng nhập đúng định dạng.");
+          return;
+        }
+
+        console.log("phoneNumber", phoneNumber);
+        console.log("appId", appId);
+        
+
+        // Show connecting screen
+        showScreen('connecting');
+
+        try {
+          // Initialize SDK
+          guest = new OmiGuestSDK({
+            baseUrl: "https://crm-dev-v2.metechvn.com",
+            apiKey: "0c16d4aa-abe7-4098-b47a-7b914f9b7444",
+            appId: appId || "",
+            mediaIds: {
+              localVideoID: "local",
+              remoteVideoID: "video1",
+              remoteAudioID: "audio1",
+              remoteScreenID: "screen",
+            },
+          });
+          // Setup event listeners
+          setupSDKEventListeners();
+          facingMode = "environment"; 
+          // Make the call using the entered phone number
+          const result = await guest.makeCall(phoneNumber, { 
+            enableVideo: true,
+            requestDelegate: {
+              onAccept: (sessionId, record) => {
+                console.log("Call accepted", sessionId, record);
+                addLog("Call accepted: " + sessionId);
+                // Show video call screen
+                showScreen('video');
+                callStartTime = Date.now();
+                startCallTimer();
+              },
+              onHangup: (sessionId, record) => {
+                console.log("Call ended", sessionId, record);
+                alert("Cuộc gọi đã kết thúc." + sessionId);
+                handleCallEnded();
+                addLog("Call onHangup: " + sessionId);
+              },
+              onConnection: () => {
+                console.log("Connection established");
+                addLog("onConnection");
+              },
+              onConnectedSuccessfully: (sessionId) => {
+                console.log("Connected successfully", sessionId);
+                addLog("onConnectedSuccessfully: ");
+                // Keep showing connecting screen until call is accepted
+              },
+            }
+          });
+          facingMode = "environment"; // Reset to default camera
+          console.log("Call initiated successfully", result);
+          addLog("Call initiated: " + JSON.stringify(result));
+
+        } catch (error) {
+          console.error("Failed to make call:", error);
+          addLog("Call error: " + error?.message || error);
+          notyf.error(error?.message || "Không thể kết nối. Vui lòng thử lại sau!");
+          showScreen('call'); // Go back to call screen
+        }
+      }
+
+      function setupSDKEventListeners() {
+        guest.on("GuestEvent", (event) => {
+          console.log("Guest event received:", event, new Date().getTime());
+          handleGuestEvent(event);
+        });
+      }
+
+      function handleGuestEvent(event) {
+        switch (event.type) {
+          case 'call_ended':
+            handleCallEnded();
+            break;
+        }
+      }
+
+      function toggleMute(mute) {
+        if (!guest) return;
+        
+        if (mute) {
+          guest.mute();
+          muteBtn.classList.add("active");
+          unmuteBtn.classList.remove("active");
+          isMuted = true;
+          console.log("Microphone muted");
+        } else {
+          guest.unmute();
+          muteBtn.classList.remove("active");
+          unmuteBtn.classList.add("active");
+          isMuted = false;
+          console.log("Microphone unmuted");
+        }
+      }
+
+      function toggleCamera(enable) {
+        if (!guest) return;
+        
+        if (enable) {
+          guest.cameraOn();
+          cameraOnBtn.classList.add("active");
+          cameraOffBtn.classList.remove("active");
+          isCameraOn = true;
+          console.log("Camera enabled");
+        } else {
+          guest.cameraOff();
+          cameraOnBtn.classList.remove("active");
+          cameraOffBtn.classList.add("active");
+          isCameraOn = false;
+          console.log("Camera disabled");
+        }
+      }
+
+      function handleSwitchCamera() {
+        if (!guest) return;
+        
+           guest
+              .switchCamera(facingMode)
+              .then((res) => {
+                console.log("switchCamera success", res);
+                facingMode = facingMode === "user" ? "environment" : "user";
+                  switchCameraBtn.classList.add("active");
+                  setTimeout(() => {
+                    switchCameraBtn.classList.remove("active");
+                  }, 1000);
+                notyf.success("Đã chuyển camera!");
+              })
+              .catch((err) => {
+                console.log("switchCamera error", err);
+                notyf.error("Không thể chuyển camera!" + err?.message || "");
+              });
+            console.log("Switching camera");
+      }
+
+      function handleHangup() {
+        if (!guest) return;
+        
+        if (confirm("Bạn có chắc muốn kết thúc cuộc gọi?")) {
+          guest.hangup();
+          handleCallEnded();
+        }
+      }
+
+      function handleCallEnded() {
+        console.log("Call ended");
+        stopCallTimer();
+        
+        // Show call ended screen
+        showScreen('ended');
+      }
+
+      // Call timer functions
+      function startCallTimer() {
+        callTimer = setInterval(updateCallTimer, 1000);
+      }
+
+      function stopCallTimer() {
+        if (callTimer) {
+          clearInterval(callTimer);
+          callTimer = null;
+        }
+      }
+
+      function updateCallTimer() {
+        if (callStartTime && callTimerDisplay) {
+          const elapsed = Math.floor((Date.now() - callStartTime) / 1000);
+          const minutes = Math.floor(elapsed / 60);
+          const seconds = elapsed % 60;
+          callTimerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+      }
+
+      // Auto-update appId from URL changes
+      window.addEventListener("popstate", () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const appId = urlParams.get("appId");
+        if (appId && appIdInput.value !== appId) {
+          appIdInput.value = appId;
+        }
+      });
+    </script>
+  </body>
+</html>
