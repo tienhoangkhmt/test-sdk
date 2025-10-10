@@ -2630,18 +2630,14 @@ function requireReact_development() {
   })(react_development, react_development.exports);
   return react_development.exports;
 }
-var hasRequiredReact;
-function requireReact() {
-  if (hasRequiredReact) return react.exports;
-  hasRequiredReact = 1;
-  var define_process_env_default2 = {};
-  if (define_process_env_default2.NODE_ENV === "production") {
-    react.exports = requireReact_production_min();
-  } else {
-    react.exports = requireReact_development();
-  }
-  return react.exports;
+var define_process_env_default$g = {};
+if (define_process_env_default$g.NODE_ENV === "production") {
+  react.exports = requireReact_production_min();
+} else {
+  react.exports = requireReact_development();
 }
+var reactExports = react.exports;
+const React__default$1 = /* @__PURE__ */ getDefaultExportFromCjs(reactExports);
 /**
  * @license React
  * react-jsx-runtime.production.min.js
@@ -2655,7 +2651,7 @@ var hasRequiredReactJsxRuntime_production_min;
 function requireReactJsxRuntime_production_min() {
   if (hasRequiredReactJsxRuntime_production_min) return reactJsxRuntime_production_min;
   hasRequiredReactJsxRuntime_production_min = 1;
-  var f = requireReact(), k = Symbol.for("react.element"), l2 = Symbol.for("react.fragment"), m2 = Object.prototype.hasOwnProperty, n2 = f.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactCurrentOwner, p2 = { key: true, ref: true, __self: true, __source: true };
+  var f = reactExports, k = Symbol.for("react.element"), l2 = Symbol.for("react.fragment"), m2 = Object.prototype.hasOwnProperty, n2 = f.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactCurrentOwner, p2 = { key: true, ref: true, __self: true, __source: true };
   function q(c2, a2, g) {
     var b, d = {}, e2 = null, h = null;
     void 0 !== g && (e2 = "" + g);
@@ -2687,7 +2683,7 @@ function requireReactJsxRuntime_development() {
    */
   if (define_process_env_default2.NODE_ENV !== "production") {
     (function() {
-      var React2 = requireReact();
+      var React2 = reactExports;
       var REACT_ELEMENT_TYPE = Symbol.for("react.element");
       var REACT_PORTAL_TYPE = Symbol.for("react.portal");
       var REACT_FRAGMENT_TYPE = Symbol.for("react.fragment");
@@ -4289,7 +4285,7 @@ var hasRequiredReactDom_production_min;
 function requireReactDom_production_min() {
   if (hasRequiredReactDom_production_min) return reactDom_production_min;
   hasRequiredReactDom_production_min = 1;
-  var aa = requireReact(), ca = requireScheduler();
+  var aa = reactExports, ca = requireScheduler();
   function p2(a2) {
     for (var b = "https://reactjs.org/docs/error-decoder.html?invariant=" + a2, c2 = 1; c2 < arguments.length; c2++) b += "&args[]=" + encodeURIComponent(arguments[c2]);
     return "Minified React error #" + a2 + "; visit " + b + " for the full message or use the non-minified dev environment for full errors and additional helpful warnings.";
@@ -10708,7 +10704,7 @@ function requireReactDom_development() {
       if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ !== "undefined" && typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart === "function") {
         __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(new Error());
       }
-      var React2 = requireReact();
+      var React2 = reactExports;
       var Scheduler = requireScheduler();
       var ReactSharedInternals = React2.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
       var suppressWarning = false;
@@ -31843,8 +31839,6 @@ if (define_process_env_default$d.NODE_ENV === "production") {
     }
   };
 }
-var reactExports = requireReact();
-const React__default$1 = /* @__PURE__ */ getDefaultExportFromCjs(reactExports);
 var lib = {};
 var uaParser_min = { exports: {} };
 (function(module, exports) {
@@ -32041,7 +32035,7 @@ Object.defineProperty(lib, "__esModule", { value: true });
 function _interopDefault(ex) {
   return ex && typeof ex === "object" && "default" in ex ? ex["default"] : ex;
 }
-var React = requireReact();
+var React = reactExports;
 var React__default = _interopDefault(React);
 var UAParser = uaParser_minExports;
 var ClientUAInstance = new UAParser();
@@ -35358,7 +35352,7 @@ var hasRequiredUseSyncExternalStoreWithSelector_production;
 function requireUseSyncExternalStoreWithSelector_production() {
   if (hasRequiredUseSyncExternalStoreWithSelector_production) return useSyncExternalStoreWithSelector_production;
   hasRequiredUseSyncExternalStoreWithSelector_production = 1;
-  var React2 = requireReact();
+  var React2 = reactExports;
   function is2(x, y) {
     return x === y && (0 !== x || 1 / x === 1 / y) || x !== x && y !== y;
   }
@@ -35436,7 +35430,7 @@ function requireUseSyncExternalStoreWithSelector_development() {
       return x === y && (0 !== x || 1 / x === 1 / y) || x !== x && y !== y;
     }
     "undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-    var React2 = requireReact(), objectIs = "function" === typeof Object.is ? Object.is : is2, useSyncExternalStore = React2.useSyncExternalStore, useRef = React2.useRef, useEffect = React2.useEffect, useMemo = React2.useMemo, useDebugValue = React2.useDebugValue;
+    var React2 = reactExports, objectIs = "function" === typeof Object.is ? Object.is : is2, useSyncExternalStore = React2.useSyncExternalStore, useRef = React2.useRef, useEffect = React2.useEffect, useMemo = React2.useMemo, useDebugValue = React2.useDebugValue;
     useSyncExternalStoreWithSelector_development.useSyncExternalStoreWithSelector = function(subscribe, getSnapshot, getServerSnapshot, selector, isEqual) {
       var instRef = useRef(null);
       if (null === instRef.current) {
@@ -93558,9 +93552,6 @@ class GuestSwitchBoard {
     __publicField(this, "mediaElement");
     __publicField(this, "usingFront", false);
     __publicField(this, "count", 0);
-    // NEW fields
-    __publicField(this, "localStream");
-    __publicField(this, "pendingReinvite", /* @__PURE__ */ new Set());
     this.count = 0;
     this.connectSwitchboard({
       server,
@@ -93598,45 +93589,14 @@ class GuestSwitchBoard {
       }
     }
   }
-  // ensureLocalStream: MUST be called after a user gesture on mobile to get camera permission
-  async ensureLocalStream(force = false) {
-    var _a;
-    try {
-      if (this.localStream && !force) return this.localStream;
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-        video: { width: { ideal: 1280 }, height: { ideal: 720 } }
-      });
-      stream.getVideoTracks().forEach((t2) => t2.enabled = false);
-      const el = this.getElement(
-        ((_a = this.mediaElement) == null ? void 0 : _a.localVideoID) ?? ""
-      );
-      if (el) {
-        el.srcObject = stream;
-        el.muted = true;
-        el.playsInline = true;
-        try {
-          await el.play();
-        } catch (e2) {
-        }
-      }
-      this.localStream = stream;
-      return stream;
-    } catch (err) {
-      console.error("ensureLocalStream error:", err);
-      return void 0;
-    }
-  }
   async startLocalVideo() {
-    var _a;
     try {
-      const stream = await this.ensureLocalStream(true);
-      if (!stream) throw new Error("Không lấy được stream local");
-      const video = document.getElementById(
-        ((_a = this.mediaElement) == null ? void 0 : _a.localVideoID) ?? ""
-      );
+      const stream = await navigator.mediaDevices.getDisplayMedia({
+        video: true,
+        audio: true
+      });
+      const video = document.getElementById("localVideo");
       video.srcObject = stream;
-      stream.getVideoTracks().forEach((t2) => t2.enabled = true);
     } catch (err) {
       console.error("Không lấy được camera/mic:", err);
     }
@@ -93673,7 +93633,7 @@ class GuestSwitchBoard {
     );
     const sdk = new PortSipSdk(
       {
-        onRegisterSuccess: async () => {
+        onRegisterSuccess: () => {
           client_socket.emit(Event_SDK.AppEvent, {
             type: AppEventType$1.CONNECTED,
             message: AppEventType$1.CONNECTED
@@ -93844,7 +93804,7 @@ class GuestSwitchBoard {
         onRecvDtmfTone: (id, tone) => {
         },
         onRecvMessage: async (id, message2, contentType) => {
-          var _a, _b, _c, _d;
+          var _a, _b, _c, _d, _e;
           const values = JSON.parse(message2);
           console.log("onRecvMessage", values);
           this.addLog("onRecvMessage " + message2);
@@ -93855,8 +93815,6 @@ class GuestSwitchBoard {
               session2.constraints.video = true;
             }
             try {
-              await this.ensureLocalStream();
-              await this.startLocalVideo();
               if ((_c = values == null ? void 0 : values.payload) == null ? void 0 : _c.isInternal)
                 await this.waitUntilStable(session2 == null ? void 0 : session2.session);
               this.addLog(
@@ -93865,11 +93823,10 @@ class GuestSwitchBoard {
               console.log(
                 "✅ PeerConnection is stable, upgrading to video call"
               );
-              setTimeout(async () => {
-                await this.upgradeToVideo(id);
-              }, 2e3);
+              await this.port_sip_sdk.updateCall(id, true, true);
+              await ((_d = this.port_sip_sdk) == null ? void 0 : _d.sendVideo(id, true));
               this.ext_agent = values == null ? void 0 : values.extension;
-              (_d = requestDelegate == null ? void 0 : requestDelegate.onAccept) == null ? void 0 : _d.call(requestDelegate, sessionId, {});
+              (_e = requestDelegate == null ? void 0 : requestDelegate.onAccept) == null ? void 0 : _e.call(requestDelegate, sessionId, {});
             } catch (error) {
               console.log("error enableVideo", error);
               this.addLog("error enableVideo " + JSON.stringify(error));
@@ -94054,112 +94011,52 @@ class GuestSwitchBoard {
     const element = document.querySelector("#" + id);
     return element;
   }
-  // upgradeToVideo: safe flow to add/replace video track and trigger SDK updateCall
-  async upgradeToVideo(callId) {
-    var _a, _b, _c, _d;
-    if (this.pendingReinvite.has(callId)) {
-      console.log("Upgrade already in progress for", callId);
-      return;
-    }
-    this.pendingReinvite.add(callId);
-    try {
-      const sessionWrapper = (_a = this.port_sip_sdk) == null ? void 0 : _a.sessions.get(callId);
-      if (!sessionWrapper) throw new Error("session không tồn tại");
-      const session2 = sessionWrapper.session;
-      const pc = (_b = session2.sessionDescriptionHandler) == null ? void 0 : _b.peerConnection;
-      if (!pc) throw new Error("No PeerConnection");
-      const local2 = await this.ensureLocalStream();
-      if (!local2) throw new Error("No local stream available");
-      await this.waitUntilStableWithTimeout(session2, 5e3);
-      const videoTrack = local2.getVideoTracks()[0];
-      let sender = pc.getSenders().find((s2) => {
-        var _a2;
-        return ((_a2 = s2.track) == null ? void 0 : _a2.kind) === "video";
-      });
-      if (sender && videoTrack) {
-        try {
-          await sender.replaceTrack(videoTrack);
-          sender.track && (sender.track.enabled = true);
-        } catch (err) {
-          console.warn("replaceTrack failed, will try addTrack:", err);
-          try {
-            pc.removeTrack(sender);
-          } catch (_) {
-          }
-          pc.addTrack(videoTrack, local2);
-        }
-        await ((_c = this.port_sip_sdk) == null ? void 0 : _c.updateCall(callId, true, true));
-      } else {
-        pc.addTrack(videoTrack, local2);
-        await ((_d = this.port_sip_sdk) == null ? void 0 : _d.updateCall(callId, true, true));
-      }
-      if (sessionWrapper)
-        sessionWrapper.constraints = sessionWrapper.constraints || {};
-      sessionWrapper.constraints.video = true;
-    } catch (err) {
-      console.error("upgradeToVideo error:", err);
-    } finally {
-      this.pendingReinvite.delete(callId);
-    }
-  }
   async sendCamera(enableVideo) {
-    var _a, _b, _c, _d, _e, _f;
+    var _a, _b, _c, _d;
     const el = this.getElement(
       ((_a = this.mediaElement) == null ? void 0 : _a.localVideoID) ?? ""
     );
-    let stream = el == null ? void 0 : el.srcObject;
-    if (!this.localStream) {
-      stream = await this.ensureLocalStream();
-    } else {
-      stream = this.localStream;
-    }
-    if (!stream) throw new Error("No local stream");
-    stream.getVideoTracks().forEach((track) => track.enabled = enableVideo);
+    const stream = el.srcObject;
+    stream.getTracks().forEach((track) => {
+      if (track.kind === "video") {
+        track.enabled = enableVideo;
+      }
+    });
     try {
       const callId = this.getSessionMain();
-      const sessionWrapper = (_b = this.port_sip_sdk) == null ? void 0 : _b.sessions.get(callId);
-      if (!sessionWrapper) throw new Error("session does not exist");
-      const pc = (_d = (_c = sessionWrapper.session) == null ? void 0 : _c.sessionDescriptionHandler) == null ? void 0 : _d.peerConnection;
-      if (!pc) throw new Error("PC not found");
+      const session2 = (_b = this.port_sip_sdk) == null ? void 0 : _b.sessions.get(callId);
+      if (!session2) throw new Error("session does not exti");
+      const pc = (_d = (_c = session2.session) == null ? void 0 : _c.sessionDescriptionHandler) == null ? void 0 : _d.peerConnection;
       if (enableVideo) {
-        const sender = pc.getSenders().find((s2) => {
+        session2.constraints.video = true;
+        pc.getSenders().forEach((sender) => {
           var _a2;
-          return ((_a2 = s2.track) == null ? void 0 : _a2.kind) === "video";
+          if (((_a2 = sender.track) == null ? void 0 : _a2.kind) === "video") {
+            sender.track.enabled = enableVideo;
+          }
         });
-        if (sender) {
-          sender.track && (sender.track.enabled = true);
-          sessionWrapper.constraints = sessionWrapper.constraints || {};
-          sessionWrapper.constraints.video = true;
-          await ((_e = this.port_sip_sdk) == null ? void 0 : _e.updateCall(callId, true, true));
-        } else {
-          await this.upgradeToVideo(callId);
-        }
       } else {
         pc.getSenders().forEach((sender) => {
           var _a2;
           if (((_a2 = sender.track) == null ? void 0 : _a2.kind) === "video") {
-            sender.track.enabled = false;
+            sender.track.enabled = enableVideo;
           }
         });
-        sessionWrapper.constraints = sessionWrapper.constraints || {};
-        sessionWrapper.constraints.video = false;
-        if (this.port_sip_sdk) {
-          try {
-            await ((_f = this.port_sip_sdk) == null ? void 0 : _f.updateCall(callId, true, false));
-          } catch (error) {
-            this.addLog("error sendCaemera" + JSON.stringify(error));
-          }
-        }
+        session2.constraints.video = false;
       }
     } catch (error) {
       console.log("erro sendCaemera", error);
     }
   }
   async switchVideoCall() {
+    var _a, _b;
     const callId = this.getSessionMain();
     try {
-      await this.ensureLocalStream();
-      await this.upgradeToVideo(callId);
+      const s2 = (_a = this.port_sip_sdk) == null ? void 0 : _a.sessions.get(callId);
+      if (s2) {
+        s2.constraints.video = true;
+      }
+      await ((_b = this.port_sip_sdk) == null ? void 0 : _b.updateCall(callId, true, true));
       return Promise.resolve({
         success: true,
         message: "Video switched successfully"
@@ -94221,7 +94118,7 @@ class GuestSwitchBoard {
     }
   }
   async switchCamera(facingMode2 = "user") {
-    var _a, _b, _c, _d, _e;
+    var _a, _b, _c, _d;
     try {
       const devices = await navigator.mediaDevices.enumerateDevices();
       const videoDevices = devices.filter((d) => d.kind === "videoinput");
@@ -94244,12 +94141,6 @@ class GuestSwitchBoard {
           },
           audio: true
         });
-        try {
-          if (this.localStream)
-            this.localStream.getTracks().forEach((t2) => t2.stop());
-        } catch (_) {
-        }
-        this.localStream = newStream;
         video.srcObject = newStream;
         this.usingFront = !this.usingFront;
         const newTrack = newStream.getVideoTracks()[0];
@@ -94263,14 +94154,6 @@ class GuestSwitchBoard {
             success: true,
             message: "switchCamera success"
           });
-        }
-        if (newTrack) {
-          pc.addTrack(newTrack, newStream);
-          try {
-            await ((_e = this.port_sip_sdk) == null ? void 0 : _e.updateCall(callId, true, true));
-          } catch (error) {
-            this.addLog("error fallback" + JSON.stringify(error));
-          }
         }
         return Promise.resolve({
           success: true,
@@ -94316,27 +94199,6 @@ class GuestSwitchBoard {
         }
       };
       pc.addEventListener("signalingstatechange", check);
-    });
-  }
-  // new: waitUntilStable with timeout to avoid hanging forever
-  async waitUntilStableWithTimeout(session2, timeout2 = 5e3) {
-    const pc = session2.sessionDescriptionHandler.peerConnection;
-    if (!pc) return Promise.resolve();
-    if (pc.signalingState === "stable") return Promise.resolve();
-    return new Promise((resolve) => {
-      const onChange = () => {
-        if (pc.signalingState === "stable") {
-          pc.removeEventListener("signalingstatechange", onChange);
-          clearTimeout(t2);
-          resolve();
-        }
-      };
-      pc.addEventListener("signalingstatechange", onChange);
-      const t2 = setTimeout(() => {
-        pc.removeEventListener("signalingstatechange", onChange);
-        console.warn("waitUntilStable timeout, proceeding anyway");
-        resolve();
-      }, timeout2);
     });
   }
 }
@@ -94447,9 +94309,7 @@ class GuestService extends GuestSocket {
         message: "AppId is not available"
       });
     }
-    alert("Make call");
     try {
-      await navigator.mediaDevices.enumerateDevices();
       await navigator.mediaDevices.getUserMedia({
         video: (option == null ? void 0 : option.enableVideo) ?? false,
         audio: true
