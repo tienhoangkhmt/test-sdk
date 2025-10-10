@@ -4,8 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tư Vấn Bảo Hiểm Trực Tuyến</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css"
+    />
 
     <style>
       :root {
@@ -24,24 +30,24 @@
         --gradient-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       }
 
-      * { 
+      * {
         box-sizing: border-box;
         margin: 0;
         padding: 0;
       }
 
       body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         background: var(--gradient-bg);
         color: var(--text-dark);
         min-height: 100vh;
         line-height: 1.6;
       }
 
-      .container { 
-        max-width: 1080px; 
-        padding: 20px; 
-        margin: 0 auto; 
+      .container {
+        max-width: 1080px;
+        padding: 20px;
+        margin: 0 auto;
       }
 
       /* Header */
@@ -86,7 +92,11 @@
       }
 
       .welcome-text {
-        background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+        background: linear-gradient(
+          45deg,
+          var(--primary-color),
+          var(--secondary-color)
+        );
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         font-size: 20px;
@@ -156,7 +166,11 @@
       }
 
       .call-btn {
-        background: linear-gradient(45deg, var(--primary-color), var(--primary-dark));
+        background: linear-gradient(
+          45deg,
+          var(--primary-color),
+          var(--primary-dark)
+        );
         color: white;
         border: none;
         padding: 18px 40px;
@@ -320,9 +334,15 @@
       }
 
       @keyframes pulse {
-        0% { opacity: 1; }
-        50% { opacity: 0.5; }
-        100% { opacity: 1; }
+        0% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+        100% {
+          opacity: 1;
+        }
       }
 
       .status-text {
@@ -372,7 +392,8 @@
           margin-bottom: 0;
         }
 
-        .video-section, .controls-section {
+        .video-section,
+        .controls-section {
           padding: 15px;
           margin-bottom: 15px;
           width: 100%;
@@ -529,7 +550,10 @@
       }
 
       /* Page Screens */
-      .call-screen, .connecting-screen, .video-screen, .call-ended-screen {
+      .call-screen,
+      .connecting-screen,
+      .video-screen,
+      .call-ended-screen {
         background: var(--white);
         border-radius: 15px;
         padding: 40px;
@@ -576,7 +600,11 @@
       }
 
       .call-action-btn {
-        background: linear-gradient(45deg, var(--primary-color), var(--primary-dark));
+        background: linear-gradient(
+          45deg,
+          var(--primary-color),
+          var(--primary-dark)
+        );
         color: white;
         border: none;
         padding: 20px 40px;
@@ -641,14 +669,21 @@
         animation: bounce 1.4s infinite ease-in-out both;
       }
 
-      .connecting-animation .dot:nth-child(1) { animation-delay: -0.32s; }
-      .connecting-animation .dot:nth-child(2) { animation-delay: -0.16s; }
+      .connecting-animation .dot:nth-child(1) {
+        animation-delay: -0.32s;
+      }
+      .connecting-animation .dot:nth-child(2) {
+        animation-delay: -0.16s;
+      }
 
       @keyframes bounce {
-        0%, 80%, 100% { 
+        0%,
+        80%,
+        100% {
           transform: scale(0);
-        } 40% { 
-          transform: scale(1.0);
+        }
+        40% {
+          transform: scale(1);
         }
       }
 
@@ -702,7 +737,7 @@
         display: inline-block;
         width: 20px;
         height: 20px;
-        border: 3px solid rgba(255,255,255,.3);
+        border: 3px solid rgba(255, 255, 255, 0.3);
         border-radius: 50%;
         border-top-color: #fff;
         animation: spin 1s ease-in-out infinite;
@@ -710,7 +745,9 @@
       }
 
       @keyframes spin {
-        to { transform: rotate(360deg); }
+        to {
+          transform: rotate(360deg);
+        }
       }
     </style>
   </head>
@@ -727,17 +764,17 @@
             <p>Tư vấn bảo hiểm trực tuyến 24/7</p>
           </div>
         </div>
-        
+
         <div class="welcome-text">
           Chào mừng bạn đến với dịch vụ tư vấn bảo hiểm
         </div>
         <p class="subtitle">
-          Được tư vấn miễn phí về các sản phẩm bảo hiểm phù hợp nhất cho bạn và gia đình.
+          Được tư vấn miễn phí về các sản phẩm bảo hiểm phù hợp nhất cho bạn và
+          gia đình.
         </p>
       </div>
 
-      <div name="log" id="log" style="overflow-y: auto;"></div>
-
+      <div name="log" id="log" style="overflow-y: auto"></div>
 
       <!-- Page 1: Call Screen -->
       <div class="call-screen" id="callScreen">
@@ -747,22 +784,69 @@
               <i class="fas fa-user-tie"></i>
             </div>
             <h2>Liên hệ tư vấn bảo hiểm qua video</h2>
-            <p>Nhấn nút bên dưới để bắt đầu cuộc gọi video với nhân viên tư vấn</p>
+            <p>
+              Nhấn nút bên dưới để bắt đầu cuộc gọi video với nhân viên tư vấn
+            </p>
           </div>
-          
+
           <div class="call-form">
-            <div style="display: flex; flex-direction: column; gap: 15px; align-items: center; margin-bottom: 30px;">
-              <div style="display: flex; gap: 10px; align-items: center;">
-                <label for="phoneInput" style="color: var(--text-muted); font-size: 14px; min-width: 80px;">Số điện thoại:</label>
-                <input type="tel" id="phoneInput" placeholder="Nhập số điện thoại" style="width: 200px; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 16px;" />
+            <div
+              style="
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+                align-items: center;
+                margin-bottom: 30px;
+              "
+            >
+              <div style="display: flex; gap: 10px; align-items: center">
+                <label
+                  for="phoneInput"
+                  style="
+                    color: var(--text-muted);
+                    font-size: 14px;
+                    min-width: 80px;
+                  "
+                  >Số điện thoại:</label
+                >
+                <input
+                  type="tel"
+                  id="phoneInput"
+                  placeholder="Nhập số điện thoại"
+                  style="
+                    width: 200px;
+                    padding: 10px 12px;
+                    border: 1px solid var(--border-color);
+                    border-radius: 6px;
+                    font-size: 16px;
+                  "
+                />
               </div>
-              
-              <div style="display: flex; gap: 10px; align-items: center;">
-                <label for="appIdInput" style="color: var(--text-muted); font-size: 14px; min-width: 80px;">AppId:</label>
-                <input type="text" id="appIdInput" placeholder="Enter appId (optional)" style="width: 200px; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 6px;" />
+
+              <div style="display: flex; gap: 10px; align-items: center">
+                <label
+                  for="appIdInput"
+                  style="
+                    color: var(--text-muted);
+                    font-size: 14px;
+                    min-width: 80px;
+                  "
+                  >AppId:</label
+                >
+                <input
+                  type="text"
+                  id="appIdInput"
+                  placeholder="Enter appId (optional)"
+                  style="
+                    width: 200px;
+                    padding: 10px 12px;
+                    border: 1px solid var(--border-color);
+                    border-radius: 6px;
+                  "
+                />
               </div>
             </div>
-            
+
             <button class="call-action-btn" id="make">
               <i class="fas fa-phone"></i>
               Gọi ngay
@@ -790,39 +874,48 @@
       <!-- Page 3: Video Call Screen -->
       <div class="video-screen hidden" id="videoScreen">
         <div class="video-section">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h2 style="margin: 0; display: flex; align-items: center; gap: 10px;">
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 20px;
+            "
+          >
+            <h2
+              style="margin: 0; display: flex; align-items: center; gap: 10px"
+            >
               <i class="fas fa-video"></i>
               Video Call
             </h2>
-            
+
             <div class="call-timer" id="callTimer">00:00</div>
           </div>
-          
+
           <div class="video-container">
             <!-- Remote Video (Tư vấn viên) -->
-            <video 
-              id="video1" 
-              class="remote-video" 
-              title="Remote Video" 
-              muted 
-              autoplay 
+            <video
+              id="video1"
+              class="remote-video"
+              title="Remote Video"
+              muted
+              autoplay
               playsinline
-              onerror="console.log('Remote video error')" 
+              onerror="console.log('Remote video error')"
               onplaying="console.log('Remote video playing successfully!')"
             ></video>
-            
+
             <!-- Local Video (Khách hàng) -->
-            <video 
-              id="local" 
+            <video
+              id="local"
               class="local-video"
-              title="Local Video" 
-              muted 
-              autoplay 
+              title="Local Video"
+              muted
+              autoplay
               playsinline
               onplaying="console.log('Local video playing successfully!')"
             ></video>
-            
+
             <!-- Hidden canvas for blur effect -->
             <!-- <canvas id="outputCanvas" width="640" height="480" style="display: none;"></canvas> -->
           </div>
@@ -834,33 +927,33 @@
             <i class="fas fa-sliders-h"></i>
             Điều khiển cuộc gọi
           </h2>
-          
+
           <div class="control-grid">
             <button class="control-btn" id="mute">
               <i class="fas fa-microphone-slash"></i>
               <span id="muteText">Tắt mic</span>
             </button>
-            
+
             <button class="control-btn" id="unmute">
               <i class="fas fa-microphone"></i>
               Mở mic
             </button>
-            
+
             <button class="control-btn" id="cameraOn">
               <i class="fas fa-video"></i>
               Mở camera
             </button>
-            
+
             <button class="control-btn" id="cameraOff">
               <i class="fas fa-video-slash"></i>
               Tắt camera
             </button>
-            
+
             <button class="control-btn" id="switchCamera">
               <i class="fas fa-sync-alt"></i>
               Chuyển camera
             </button>
-            
+
             <button class="control-btn danger" id="hangup">
               <i class="fas fa-phone-slash"></i>
               Kết thúc
@@ -883,7 +976,6 @@
           </button>
         </div>
       </div>
-
     </div>
 
     <!-- Hidden Audio/Video Elements -->
@@ -894,31 +986,29 @@
     <audio id="audio5"></audio>
     <audio id="audio6"></audio>
     <audio id="audio7"></audio>
-    
+
     <!-- Hidden video elements -->
-    <video id="screen" style="display: none;"></video>
-    <video id="video2" style="display: none;"></video>
-    <video id="video3" style="display: none;"></video>
-    <video id="video4" style="display: none;"></video>
-    <video id="video5" style="display: none;"></video>
-    <video id="video6" style="display: none;"></video>
-    <video id="video7" style="display: none;"></video>
+    <video id="screen" style="display: none"></video>
+    <video id="video2" style="display: none"></video>
+    <video id="video3" style="display: none"></video>
+    <video id="video4" style="display: none"></video>
+    <video id="video5" style="display: none"></video>
+    <video id="video6" style="display: none"></video>
+    <video id="video7" style="display: none"></video>
 
     <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
-
 
     <script type="module">
       console.log("Insurance Video Call loaded!", new Date());
       const notyf = new Notyf({
         duration: 3000,
-        position: { x: 'center', y: 'top' }
+        position: { x: "center", y: "top" },
       });
       let facingMode = "environment";
 
+      // Import SDK
+      import { OmiGuestSDK } from "./omisdk.es.js";
 
-        // Import SDK
-      import { OmiGuestSDK } from "../omisdk.es.js";
-      
       // Global variables
       let guest = null;
       let isConnected = false;
@@ -932,7 +1022,7 @@
       const phoneInput = document.getElementById("phoneInput");
       const appIdInput = document.getElementById("appIdInput");
       const callAgainBtn = document.getElementById("callAgain");
-      
+
       // Screen Elements
       const callScreen = document.getElementById("callScreen");
       const connectingScreen = document.getElementById("connectingScreen");
@@ -952,7 +1042,7 @@
       window.addEventListener("load", () => {
         console.log("Page loaded, setting up event listeners");
         setupEventListeners();
-        
+
         // Check URL parameters for appId
         const urlParams = new URLSearchParams(window.location.search);
         const appId = urlParams.get("appId");
@@ -974,7 +1064,7 @@
         // Main call button
         callBtn.addEventListener("click", handleMakeCall);
         callAgainBtn.addEventListener("click", handleCallAgain);
-        
+
         // Control buttons
         muteBtn.addEventListener("click", () => toggleMute(true));
         unmuteBtn.addEventListener("click", () => toggleMute(false));
@@ -982,48 +1072,47 @@
         cameraOffBtn.addEventListener("click", () => toggleCamera(false));
         switchCameraBtn.addEventListener("click", handleSwitchCamera);
         hangupBtn.addEventListener("click", handleHangup);
-        
       }
 
       // Screen management functions
       function showScreen(screenName) {
         // Hide all screens
-        callScreen.classList.add('hidden');
-        connectingScreen.classList.add('hidden');
-        videoScreen.classList.add('hidden');
-        callEndedScreen.classList.add('hidden');
-        
+        callScreen.classList.add("hidden");
+        connectingScreen.classList.add("hidden");
+        videoScreen.classList.add("hidden");
+        callEndedScreen.classList.add("hidden");
+
         // Show selected screen
-        switch(screenName) {
-          case 'call':
-            callScreen.classList.remove('hidden');
+        switch (screenName) {
+          case "call":
+            callScreen.classList.remove("hidden");
             break;
-          case 'connecting':
-            connectingScreen.classList.remove('hidden');
+          case "connecting":
+            connectingScreen.classList.remove("hidden");
             break;
-          case 'video':
-            videoScreen.classList.remove('hidden');
+          case "video":
+            videoScreen.classList.remove("hidden");
             break;
-          case 'ended':
-            callEndedScreen.classList.remove('hidden');
+          case "ended":
+            callEndedScreen.classList.remove("hidden");
             break;
         }
-        
+
         console.log(`Switched to ${screenName} screen`);
       }
 
       function handleCallAgain() {
-        showScreen('call');
+        showScreen("call");
         // Reset states
         guest = null;
         isConnected = false;
         isMuted = false;
         isCameraOn = true;
         stopCallTimer();
-        
+
         // Clear form inputs
-        phoneInput.value = '';
-        appIdInput.value = '';
+        phoneInput.value = "";
+        appIdInput.value = "";
       }
 
       async function handleMakeCall() {
@@ -1039,16 +1128,17 @@
         // Basic phone validation (Vietnamese phone format)
         const phoneRegex = /^(0|\+84)[0-9]{8,10}$/;
         if (!phoneRegex.test(phoneNumber)) {
-          notyf.error("Số điện thoại không hợp lệ! Vui lòng nhập đúng định dạng.");
+          notyf.error(
+            "Số điện thoại không hợp lệ! Vui lòng nhập đúng định dạng."
+          );
           return;
         }
 
         console.log("phoneNumber", phoneNumber);
         console.log("appId", appId);
-        
 
         // Show connecting screen
-        showScreen('connecting');
+        showScreen("connecting");
 
         try {
           // Initialize SDK
@@ -1065,16 +1155,16 @@
           });
           // Setup event listeners
           setupSDKEventListeners();
-          facingMode = "environment"; 
+          facingMode = "environment";
           // Make the call using the entered phone number
-          const result = await guest.makeCall(phoneNumber, { 
+          const result = await guest.makeCall(phoneNumber, {
             enableVideo: true,
             requestDelegate: {
               onAccept: (sessionId, record) => {
                 console.log("Call accepted", sessionId, record);
                 addLog("Call accepted: " + sessionId);
                 // Show video call screen
-                showScreen('video');
+                showScreen("video");
                 callStartTime = Date.now();
                 startCallTimer();
               },
@@ -1093,17 +1183,18 @@
                 addLog("onConnectedSuccessfully: ");
                 // Keep showing connecting screen until call is accepted
               },
-            }
+            },
           });
           facingMode = "environment"; // Reset to default camera
           console.log("Call initiated successfully", result);
           addLog("Call initiated: " + JSON.stringify(result));
-
         } catch (error) {
           console.error("Failed to make call:", error);
           addLog("Call error: " + error?.message || error);
-          notyf.error(error?.message || "Không thể kết nối. Vui lòng thử lại sau!");
-          showScreen('call'); // Go back to call screen
+          notyf.error(
+            error?.message || "Không thể kết nối. Vui lòng thử lại sau!"
+          );
+          showScreen("call"); // Go back to call screen
         }
       }
 
@@ -1116,7 +1207,7 @@
 
       function handleGuestEvent(event) {
         switch (event.type) {
-          case 'call_ended':
+          case "call_ended":
             handleCallEnded();
             break;
         }
@@ -1124,7 +1215,7 @@
 
       function toggleMute(mute) {
         if (!guest) return;
-        
+
         if (mute) {
           guest.mute();
           muteBtn.classList.add("active");
@@ -1142,7 +1233,7 @@
 
       function toggleCamera(enable) {
         if (!guest) return;
-        
+
         if (enable) {
           guest.cameraOn();
           cameraOnBtn.classList.add("active");
@@ -1160,28 +1251,28 @@
 
       function handleSwitchCamera() {
         if (!guest) return;
-        
-           guest
-              .switchCamera(facingMode)
-              .then((res) => {
-                console.log("switchCamera success", res);
-                facingMode = facingMode === "user" ? "environment" : "user";
-                  switchCameraBtn.classList.add("active");
-                  setTimeout(() => {
-                    switchCameraBtn.classList.remove("active");
-                  }, 1000);
-                notyf.success("Đã chuyển camera!");
-              })
-              .catch((err) => {
-                console.log("switchCamera error", err);
-                notyf.error("Không thể chuyển camera!" + err?.message || "");
-              });
-            console.log("Switching camera");
+
+        guest
+          .switchCamera(facingMode)
+          .then((res) => {
+            console.log("switchCamera success", res);
+            facingMode = facingMode === "user" ? "environment" : "user";
+            switchCameraBtn.classList.add("active");
+            setTimeout(() => {
+              switchCameraBtn.classList.remove("active");
+            }, 1000);
+            notyf.success("Đã chuyển camera!");
+          })
+          .catch((err) => {
+            console.log("switchCamera error", err);
+            notyf.error("Không thể chuyển camera!" + err?.message || "");
+          });
+        console.log("Switching camera");
       }
 
       function handleHangup() {
         if (!guest) return;
-        
+
         if (confirm("Bạn có chắc muốn kết thúc cuộc gọi?")) {
           guest.hangup();
           handleCallEnded();
@@ -1191,9 +1282,9 @@
       function handleCallEnded() {
         console.log("Call ended");
         stopCallTimer();
-        
+
         // Show call ended screen
-        showScreen('ended');
+        showScreen("ended");
       }
 
       // Call timer functions
@@ -1213,7 +1304,9 @@
           const elapsed = Math.floor((Date.now() - callStartTime) / 1000);
           const minutes = Math.floor(elapsed / 60);
           const seconds = elapsed % 60;
-          callTimerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+          callTimerDisplay.textContent = `${minutes
+            .toString()
+            .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
         }
       }
 
