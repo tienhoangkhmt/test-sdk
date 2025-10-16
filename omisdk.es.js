@@ -93558,6 +93558,38 @@ class GuestSwitchBoard {
     __publicField(this, "mediaElement");
     __publicField(this, "usingFront", false);
     __publicField(this, "count", 0);
+    __publicField(this, "reconnectionAttempts", 5);
+    __publicField(this, "reconnectionDelay", 5);
+    __publicField(this, "attemptingReconnection", false);
+    __publicField(this, "shouldBeConnected", true);
+    __publicField(this, "attemptReconnection", (reconnectionAttempt = 1) => {
+      if (!this.shouldBeConnected) {
+        return;
+      }
+      if (this.attemptingReconnection) {
+        return;
+      }
+      if (reconnectionAttempt > this.reconnectionAttempts) {
+        return;
+      }
+      this.attemptingReconnection = true;
+      setTimeout(
+        () => {
+          var _a, _b;
+          if (!this.shouldBeConnected) {
+            this.attemptingReconnection = false;
+            return;
+          }
+          (_b = (_a = this.port_sip_sdk) == null ? void 0 : _a.userAgent) == null ? void 0 : _b.reconnect().then(() => {
+            this.attemptingReconnection = false;
+          }).catch((error) => {
+            this.attemptingReconnection = false;
+            this.attemptReconnection(++reconnectionAttempt);
+          });
+        },
+        reconnectionAttempt === 1 ? 0 : this.reconnectionDelay * 1e3
+      );
+    });
     this.count = 0;
     this.connectSwitchboard({
       server,
@@ -93674,17 +93706,11 @@ class GuestSwitchBoard {
         onConnect: () => {
         },
         onDisconnect: (reason) => {
-          if (!window.navigator.onLine) {
-            client_socket.emit(Event_SDK.GuestEvent, {
-              type: AppEventType$1.NETWORK_ERROR,
-              message: AppEventType$1.NETWORK_ERROR
-            });
-          } else {
-            client_socket.emit(Event_SDK.GuestEvent, {
-              type: AppEventType$1.DISCONNECTED,
-              message: reason
-            });
-          }
+          client_socket.emit(Event_SDK.GuestEvent, {
+            type: AppEventType$1.DISCONNECTED,
+            message: reason
+          });
+          this.attemptReconnection(1);
         },
         onReconnectFailure: () => {
         },
