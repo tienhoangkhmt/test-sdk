@@ -93884,23 +93884,51 @@ class GuestSwitchBoard {
           this.releaseExtension(ext ?? "");
         }
       });
-      navigator.connection.addEventListener("change", () => {
-        var _a, _b, _c;
-        let type = navigator.connection.effectiveType;
-        if (this.data.size > 0) {
-          const callId = this.getSessionMain();
-          const session2 = (_a = this.port_sip_sdk) == null ? void 0 : _a.sessions.get(callId);
-          if (session2) {
-            const pc = (_c = (_b = session2.session) == null ? void 0 : _b.sessionDescriptionHandler) == null ? void 0 : _c.peerConnection;
-            pc.oniceconnectionstatechange = () => {
-              if (pc.iceConnectionState === "failed" || pc.iceConnectionState === "disconnected") {
-                console.warn("ICE disconnected, try ICE restart");
-                this.restartIce(pc, session2.session);
+      const connection = navigator.connection;
+      if (connection && typeof connection.addEventListener === "function") {
+        connection.addEventListener("change", () => {
+          var _a, _b, _c;
+          console.log("Network changed:", connection.effectiveType);
+          if (this.data.size > 0) {
+            const callId = this.getSessionMain();
+            const session2 = (_a = this.port_sip_sdk) == null ? void 0 : _a.sessions.get(callId);
+            if (session2) {
+              const pc = (_c = (_b = session2.session) == null ? void 0 : _b.sessionDescriptionHandler) == null ? void 0 : _c.peerConnection;
+              if (pc.oniceconnectionstatechange) {
+                pc.oniceconnectionstatechange = () => {
+                  if (pc.iceConnectionState === "failed" || pc.iceConnectionState === "disconnected") {
+                    console.warn("ICE disconnected, try ICE restart");
+                    this.restartIce(pc, session2.session);
+                  }
+                };
               }
-            };
+            }
           }
-        }
-      });
+        });
+      } else {
+        window.addEventListener("online", () => {
+          var _a, _b, _c;
+          console.log("Network reconnected");
+          if (this.data.size > 0) {
+            const callId = this.getSessionMain();
+            const session2 = (_a = this.port_sip_sdk) == null ? void 0 : _a.sessions.get(callId);
+            if (session2) {
+              const pc = (_c = (_b = session2.session) == null ? void 0 : _b.sessionDescriptionHandler) == null ? void 0 : _c.peerConnection;
+              if (pc.oniceconnectionstatechange) {
+                pc.oniceconnectionstatechange = () => {
+                  if (pc.iceConnectionState === "failed" || pc.iceConnectionState === "disconnected") {
+                    console.warn("ICE disconnected, try ICE restart");
+                    this.restartIce(pc, session2.session);
+                  }
+                };
+              }
+            }
+          }
+        });
+        window.addEventListener("offline", () => {
+          console.log("Network lost");
+        });
+      }
     } catch (error) {
       console.log("erorr", error);
       this.addLog("Connect switchboard error" + JSON.stringify(error));
