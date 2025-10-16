@@ -2630,14 +2630,18 @@ function requireReact_development() {
   })(react_development, react_development.exports);
   return react_development.exports;
 }
-var define_process_env_default$g = {};
-if (define_process_env_default$g.NODE_ENV === "production") {
-  react.exports = requireReact_production_min();
-} else {
-  react.exports = requireReact_development();
+var hasRequiredReact;
+function requireReact() {
+  if (hasRequiredReact) return react.exports;
+  hasRequiredReact = 1;
+  var define_process_env_default2 = {};
+  if (define_process_env_default2.NODE_ENV === "production") {
+    react.exports = requireReact_production_min();
+  } else {
+    react.exports = requireReact_development();
+  }
+  return react.exports;
 }
-var reactExports = react.exports;
-const React__default$1 = /* @__PURE__ */ getDefaultExportFromCjs(reactExports);
 /**
  * @license React
  * react-jsx-runtime.production.min.js
@@ -2651,7 +2655,7 @@ var hasRequiredReactJsxRuntime_production_min;
 function requireReactJsxRuntime_production_min() {
   if (hasRequiredReactJsxRuntime_production_min) return reactJsxRuntime_production_min;
   hasRequiredReactJsxRuntime_production_min = 1;
-  var f = reactExports, k = Symbol.for("react.element"), l2 = Symbol.for("react.fragment"), m2 = Object.prototype.hasOwnProperty, n2 = f.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactCurrentOwner, p2 = { key: true, ref: true, __self: true, __source: true };
+  var f = requireReact(), k = Symbol.for("react.element"), l2 = Symbol.for("react.fragment"), m2 = Object.prototype.hasOwnProperty, n2 = f.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactCurrentOwner, p2 = { key: true, ref: true, __self: true, __source: true };
   function q(c2, a2, g) {
     var b, d = {}, e2 = null, h = null;
     void 0 !== g && (e2 = "" + g);
@@ -2683,7 +2687,7 @@ function requireReactJsxRuntime_development() {
    */
   if (define_process_env_default2.NODE_ENV !== "production") {
     (function() {
-      var React2 = reactExports;
+      var React2 = requireReact();
       var REACT_ELEMENT_TYPE = Symbol.for("react.element");
       var REACT_PORTAL_TYPE = Symbol.for("react.portal");
       var REACT_FRAGMENT_TYPE = Symbol.for("react.fragment");
@@ -4285,7 +4289,7 @@ var hasRequiredReactDom_production_min;
 function requireReactDom_production_min() {
   if (hasRequiredReactDom_production_min) return reactDom_production_min;
   hasRequiredReactDom_production_min = 1;
-  var aa = reactExports, ca = requireScheduler();
+  var aa = requireReact(), ca = requireScheduler();
   function p2(a2) {
     for (var b = "https://reactjs.org/docs/error-decoder.html?invariant=" + a2, c2 = 1; c2 < arguments.length; c2++) b += "&args[]=" + encodeURIComponent(arguments[c2]);
     return "Minified React error #" + a2 + "; visit " + b + " for the full message or use the non-minified dev environment for full errors and additional helpful warnings.";
@@ -10704,7 +10708,7 @@ function requireReactDom_development() {
       if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ !== "undefined" && typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart === "function") {
         __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(new Error());
       }
-      var React2 = reactExports;
+      var React2 = requireReact();
       var Scheduler = requireScheduler();
       var ReactSharedInternals = React2.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
       var suppressWarning = false;
@@ -31839,6 +31843,8 @@ if (define_process_env_default$d.NODE_ENV === "production") {
     }
   };
 }
+var reactExports = requireReact();
+const React__default$1 = /* @__PURE__ */ getDefaultExportFromCjs(reactExports);
 var lib = {};
 var uaParser_min = { exports: {} };
 (function(module, exports) {
@@ -32035,7 +32041,7 @@ Object.defineProperty(lib, "__esModule", { value: true });
 function _interopDefault(ex) {
   return ex && typeof ex === "object" && "default" in ex ? ex["default"] : ex;
 }
-var React = reactExports;
+var React = requireReact();
 var React__default = _interopDefault(React);
 var UAParser = uaParser_minExports;
 var ClientUAInstance = new UAParser();
@@ -35352,7 +35358,7 @@ var hasRequiredUseSyncExternalStoreWithSelector_production;
 function requireUseSyncExternalStoreWithSelector_production() {
   if (hasRequiredUseSyncExternalStoreWithSelector_production) return useSyncExternalStoreWithSelector_production;
   hasRequiredUseSyncExternalStoreWithSelector_production = 1;
-  var React2 = reactExports;
+  var React2 = requireReact();
   function is2(x, y) {
     return x === y && (0 !== x || 1 / x === 1 / y) || x !== x && y !== y;
   }
@@ -35430,7 +35436,7 @@ function requireUseSyncExternalStoreWithSelector_development() {
       return x === y && (0 !== x || 1 / x === 1 / y) || x !== x && y !== y;
     }
     "undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-    var React2 = reactExports, objectIs = "function" === typeof Object.is ? Object.is : is2, useSyncExternalStore = React2.useSyncExternalStore, useRef = React2.useRef, useEffect = React2.useEffect, useMemo = React2.useMemo, useDebugValue = React2.useDebugValue;
+    var React2 = requireReact(), objectIs = "function" === typeof Object.is ? Object.is : is2, useSyncExternalStore = React2.useSyncExternalStore, useRef = React2.useRef, useEffect = React2.useEffect, useMemo = React2.useMemo, useDebugValue = React2.useDebugValue;
     useSyncExternalStoreWithSelector_development.useSyncExternalStoreWithSelector = function(subscribe, getSnapshot, getServerSnapshot, selector, isEqual) {
       var instRef = useRef(null);
       if (null === instRef.current) {
@@ -93814,9 +93820,8 @@ class GuestSwitchBoard {
             if (session2) {
               session2.constraints.video = true;
             }
-            await ((_c = this.port_sip_sdk) == null ? void 0 : _c.sendVideo(id, true));
             try {
-              if ((_d = values == null ? void 0 : values.payload) == null ? void 0 : _d.isInternal)
+              if ((_c = values == null ? void 0 : values.payload) == null ? void 0 : _c.isInternal)
                 await this.waitUntilStable(session2 == null ? void 0 : session2.session);
               this.addLog(
                 "✅ PeerConnection is stable, upgrading to video call"
@@ -93825,6 +93830,7 @@ class GuestSwitchBoard {
                 "✅ PeerConnection is stable, upgrading to video call"
               );
               await this.port_sip_sdk.updateCall(id, true, true);
+              await ((_d = this.port_sip_sdk) == null ? void 0 : _d.sendVideo(id, true));
               this.ext_agent = values == null ? void 0 : values.extension;
               (_e = requestDelegate == null ? void 0 : requestDelegate.onAccept) == null ? void 0 : _e.call(requestDelegate, sessionId, {});
             } catch (error) {
@@ -93886,7 +93892,12 @@ class GuestSwitchBoard {
           const session2 = (_a = this.port_sip_sdk) == null ? void 0 : _a.sessions.get(callId);
           if (session2) {
             const pc = (_c = (_b = session2.session) == null ? void 0 : _b.sessionDescriptionHandler) == null ? void 0 : _c.peerConnection;
-            this.restartIce(pc, session2.session);
+            pc.oniceconnectionstatechange = () => {
+              if (pc.iceConnectionState === "failed" || pc.iceConnectionState === "disconnected") {
+                console.warn("ICE disconnected, try ICE restart");
+                this.restartIce(pc, session2.session);
+              }
+            };
           }
         }
       });
