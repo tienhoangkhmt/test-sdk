@@ -93552,38 +93552,7 @@ class GuestSwitchBoard {
     __publicField(this, "mediaElement");
     __publicField(this, "usingFront", false);
     __publicField(this, "count", 0);
-    __publicField(this, "reconnectionAttempts", 5);
-    __publicField(this, "reconnectionDelay", 5);
-    __publicField(this, "attemptingReconnection", false);
-    __publicField(this, "shouldBeConnected", true);
-    __publicField(this, "attemptReconnection", (reconnectionAttempt = 1) => {
-      if (!this.shouldBeConnected) {
-        return;
-      }
-      if (this.attemptingReconnection) {
-        return;
-      }
-      if (reconnectionAttempt > this.reconnectionAttempts) {
-        return;
-      }
-      this.attemptingReconnection = true;
-      setTimeout(
-        () => {
-          var _a, _b;
-          if (!this.shouldBeConnected) {
-            this.attemptingReconnection = false;
-            return;
-          }
-          (_b = (_a = this.port_sip_sdk) == null ? void 0 : _a.userAgent) == null ? void 0 : _b.reconnect().then(() => {
-            this.attemptingReconnection = false;
-          }).catch((error) => {
-            this.attemptingReconnection = false;
-            this.attemptReconnection(++reconnectionAttempt);
-          });
-        },
-        reconnectionAttempt === 1 ? 0 : this.reconnectionDelay * 1e3
-      );
-    });
+    __publicField(this, "iceReset", 0);
     this.count = 0;
     this.connectSwitchboard({
       server,
@@ -93700,11 +93669,17 @@ class GuestSwitchBoard {
         onConnect: () => {
         },
         onDisconnect: (reason) => {
-          client_socket.emit(Event_SDK.GuestEvent, {
-            type: AppEventType$1.DISCONNECTED,
-            message: reason
-          });
-          this.attemptReconnection(1);
+          if (!window.navigator.onLine) {
+            client_socket.emit(Event_SDK.GuestEvent, {
+              type: AppEventType$1.NETWORK_ERROR,
+              message: AppEventType$1.NETWORK_ERROR
+            });
+          } else {
+            client_socket.emit(Event_SDK.GuestEvent, {
+              type: AppEventType$1.DISCONNECTED,
+              message: reason
+            });
+          }
         },
         onReconnectFailure: () => {
         },
@@ -93904,49 +93879,15 @@ class GuestSwitchBoard {
           this.releaseExtension(ext ?? "");
         }
       });
-      const connection = navigator.connection;
+      const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
       if (connection && typeof connection.addEventListener === "function") {
-        connection.addEventListener("change", () => {
-          var _a, _b, _c;
-          console.log("Network changed:", connection.effectiveType);
-          if (this.data.size > 0) {
-            const callId = this.getSessionMain();
-            const session2 = (_a = this.port_sip_sdk) == null ? void 0 : _a.sessions.get(callId);
-            if (session2) {
-              const pc = (_c = (_b = session2.session) == null ? void 0 : _b.sessionDescriptionHandler) == null ? void 0 : _c.peerConnection;
-              if (pc.oniceconnectionstatechange) {
-                pc.oniceconnectionstatechange = () => {
-                  if (pc.iceConnectionState === "failed" || pc.iceConnectionState === "disconnected") {
-                    console.warn("ICE disconnected, try ICE restart");
-                    this.restartIce(pc, session2.session);
-                  }
-                };
-              }
-            }
-          }
+        navigator.connection.addEventListener("change", () => {
+          let type = navigator.connection.effectiveType;
+          this.reconnectNetWorkError();
         });
       } else {
         window.addEventListener("online", () => {
-          var _a, _b, _c;
-          console.log("Network reconnected");
-          if (this.data.size > 0) {
-            const callId = this.getSessionMain();
-            const session2 = (_a = this.port_sip_sdk) == null ? void 0 : _a.sessions.get(callId);
-            if (session2) {
-              const pc = (_c = (_b = session2.session) == null ? void 0 : _b.sessionDescriptionHandler) == null ? void 0 : _c.peerConnection;
-              if (pc.oniceconnectionstatechange) {
-                pc.oniceconnectionstatechange = () => {
-                  if (pc.iceConnectionState === "failed" || pc.iceConnectionState === "disconnected") {
-                    console.warn("ICE disconnected, try ICE restart");
-                    this.restartIce(pc, session2.session);
-                  }
-                };
-              }
-            }
-          }
-        });
-        window.addEventListener("offline", () => {
-          console.log("Network lost");
+          this.reconnectNetWorkError();
         });
       }
     } catch (error) {
@@ -93963,6 +93904,26 @@ class GuestSwitchBoard {
           type: AppEventType$1.DISCONNECTED,
           message: error
         });
+      }
+    }
+  }
+  reconnectNetWorkError() {
+    var _a, _b, _c;
+    if (this.data.size > 0) {
+      const callId = this.getSessionMain();
+      const session2 = (_a = this.port_sip_sdk) == null ? void 0 : _a.sessions.get(callId);
+      if (session2) {
+        this.iceReset += 1;
+        const pc = (_c = (_b = session2.session) == null ? void 0 : _b.sessionDescriptionHandler) == null ? void 0 : _c.peerConnection;
+        pc.onconnectionstatechange = () => {
+          console.log("onconnectionstatechange");
+          if (pc.iceConnectionState === "disconnected") {
+            setTimeout(() => {
+              if (!this.iceReset)
+                this.restartIce(pc, session2.session);
+            }, 3e3);
+          }
+        };
       }
     }
   }
@@ -94237,30 +94198,25 @@ class GuestSwitchBoard {
       session2.invite({
         sessionDescriptionHandlerOptions: {
           constraints: {
-            video: true,
-            audio: true
+            video: true
           }
         },
         requestDelegate: {
-          onAccept: async (response) => {
-            const answer = response.message.body;
-            await pc.setRemoteDescription({
-              type: "answer",
-              sdp: answer
-            });
-            const newStream = await navigator.mediaDevices.getUserMedia({
-              video: true,
-              audio: true
-            });
-            const sender = pc.getSenders().find((s2) => {
-              var _a;
-              return ((_a = s2.track) == null ? void 0 : _a.kind) === "video";
-            });
-            if (sender)
-              await sender.replaceTrack(newStream.getVideoTracks()[0]);
+          onAccept: (response) => {
+            console.log("response", response);
+            this.iceReset = 0;
           },
-          onReject: (response) => {
-            console.warn("ICE restart rejected by remote:", response);
+          onProgress(response) {
+            console.log("onProgress", response);
+          },
+          onReject(response) {
+            console.log("onReject", response);
+          },
+          onRedirect(response) {
+            console.log("onRedirect", response);
+          },
+          onTrying(response) {
+            console.log("onTrying", response);
           }
         }
       });
