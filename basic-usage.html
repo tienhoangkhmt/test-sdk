@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OmiSDK - Basic Usage Example</title>
+    <style>
+      :root {
+        --bg-page: #f6f8fa;
+        --text-color: #0f172a;
+        --card-bg: #ffffff;
+        --card-border: #e5e7eb;
+        --muted: #667085;
+        --primary: #2563eb;
+        --primary-hover: #1d4ed8;
+        --ring: #93c5fd;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
+          Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, Apple Color Emoji,
+          Segoe UI Emoji;
+        background: var(--bg-page);
+        color: var(--text-color);
+      }
+
+      h1 {
+        margin: 0 0 16px 0;
+        font-size: 24px;
+      }
+
+      h2 {
+        margin: 0 0 12px 0;
+        font-size: 18px;
+      }
+
+      .container {
+        max-width: 1200px;
+        padding: 24px;
+        margin: 0 auto;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      @media (min-width: 900px) {
+        .grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      .card {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+      }
+
+      .input-fields .form-row {
+        display: grid;
+        grid-template-columns: 180px 1fr;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+
+      label {
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      input[type="text"] {
+        width: 100%;
+        border: 1px solid #d0d5dd;
+        border-radius: 8px;
+        padding: 10px 12px;
+        outline: none;
+        transition: box-shadow 0.15s ease, border-color 0.15s ease;
+        background: #fff;
+        color: var(--text-color);
+      }
+
+      input[type="text"]:focus {
+        border-color: var(--ring);
+        box-shadow: 0 0 0 4px rgba(147, 197, 253, 0.35);
+      }
+
+      .button-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 10px;
+      }
+
+      .btn-call {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 44px;
+        padding: 0 12px;
+        border-radius: 10px;
+        border: 1px solid transparent;
+        background: var(--primary);
+        color: #fff;
+        font-weight: 600;
+        letter-spacing: 0.2px;
+        cursor: pointer;
+        transition: background 0.15s ease, transform 0.05s ease;
+        text-align: center;
+        word-break: break-word;
+      }
+
+      .btn-call:hover {
+        background: var(--primary-hover);
+      }
+
+      .btn-call:active {
+        transform: translateY(1px);
+      }
+
+      .console {
+        background: #0b1221;
+        color: #e5e7eb;
+        border-radius: 8px;
+        height: 220px;
+        overflow: auto;
+        padding: 12px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          "Liberation Mono", "Courier New", monospace;
+        font-size: 12px;
+        border: 1px solid #1f2937;
+      }
+
+      .video-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 10px;
+      }
+
+      video {
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        background: #111827;
+        border-radius: 8px;
+        display: block;
+      }
+
+      /* Fixed height for SDK container */
+      #sdk-container {
+        height: 250px;
+        width: 400px;
+        overflow-y: auto;
+        overflow-x: auto;
+      }
+    </style>
+    <link rel="stylesheet" href="./css/style.css" />
+  </head>
+
+  <body>
+    <div class="container">
+      <h1>OmiSDK - Basic Usage Example</h1>
+
+      <div class="grid">
+        <section class="card">
+          <h2>SDK Container</h2>
+          <div id="sdk-container"></div>
+        </section>
+
+        <section class="card">
+          <h2>Thông tin cuộc gọi</h2>
+          <div class="input-fields">
+            <div class="form-row">
+              <label for="phone-number">Số điện thoại</label>
+              <input
+                type="text"
+                id="phone-number"
+                placeholder="Nhập số điện thoại"
+                value="0988712192"
+              />
+            </div>
+            <div class="form-row">
+              <label for="call-center-number">Số tổng đài</label>
+              <input
+                type="text"
+                id="call-center-number"
+                placeholder="Nhập số tổng đài"
+                value="19006675"
+              />
+            </div>
+            <div class="form-row">
+              <label for="internal-extension">Số máy nhánh nội bộ</label>
+              <input
+                type="text"
+                id="internal-extension"
+                placeholder="Nhập số máy nhánh"
+                value="10004"
+              />
+            </div>
+            <div class="form-row">
+              <label for="transfer-destination">QUEUE</label>
+              <input
+                type="text"
+                id="transfer-destination"
+                placeholder="Nhập điểm đến"
+                value="30001"
+              />
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>Transfer Custom</h2>
+          <div class="input-fields">
+            <div class="form-row">
+              <label for="transfer-destination-custom"
+                >TRANSFER destination</label
+              >
+              <input
+                type="text"
+                id="transfer-destination-custom"
+                placeholder="Nhập điểm đến"
+                value=""
+              />
+            </div>
+            <div class="form-row">
+              <label for="transfer-destinationType-custom"
+                >TRANSFER destinationType</label
+              >
+              <input
+                type="text"
+                id="transfer-destinationType-custom"
+                placeholder="Nhập điểm đến"
+                value="QUEUE"
+              />
+            </div>
+            <div class="form-row">
+              <label for="transfer-transferType-custom"
+                >TRANSFER transferType</label
+              >
+              <input
+                type="text"
+                id="transfer-transferType-custom"
+                placeholder="Nhập điểm đến"
+                value="ATTENDED_TRANSFER"
+              />
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>Login</h2>
+          <div class="input-fields">
+            <div class="form-row">
+              <label for="tenantId">Không gian làm việc</label>
+              <input
+                type="text"
+                id="tenantId"
+                placeholder="Nhập không gian"
+                value="4"
+              />
+            </div>
+            <div class="form-row">
+              <label for="account">Tên tài khoản</label>
+              <input
+                type="text"
+                id="account"
+                placeholder="Nhập tài khoản"
+                value="hoangnt"
+              />
+            </div>
+            <div class="form-row">
+              <label for="password">Mật khẩu</label>
+              <input
+                type="text"
+                id="password"
+                placeholder="Nhập mật khẩu"
+                value=""
+              />
+            </div>
+          </div>
+        </section>
+
+        <section class="card" style="grid-column: 1 / -1">
+          <h2>Điều khiển cuộc gọi</h2>
+          <div class="button-grid">
+            <button class="btn-call" id="accept">Nhận cuộc gọi</button>
+            <button class="btn-call" id="accept-video">
+              Nhận cuộc gọi video
+            </button>
+            <button class="btn-call" id="reject">Hủy</button>
+            <button class="btn-call" id="mute">mute</button>
+            <button class="btn-call" id="un mute">un mute</button>
+            <button class="btn-call" id="hold">hold</button>
+            <button class="btn-call" id="un_hold">un hold</button>
+            <button class="btn-call" id="make">gọi ra</button>
+            <button class="btn-call" id="hangup">kết thúc cuộc gọi</button>
+            <button class="btn-call" id="change_agent">
+              change agent status
+            </button>
+            <button class="btn-call" id="logout">logout</button>
+            <button class="btn-call" id="login-call">login-call</button>
+            <button class="btn-call" id="makeInternal">
+              gọi cho agent với agent
+            </button>
+            <button class="btn-call" id="TRANSFER-CUSTOM">
+              TRANSFER CUSTOM
+            </button>
+            <button class="btn-call" id="login">accept Transfer</button>
+            <button class="btn-call" id="acceptRefuseTransfer">
+              accept Refuse Transfer
+            </button>
+            <button class="btn-call" id="transfer">transfer</button>
+            <button class="btn-call" id="blur">blur</button>
+            <button class="btn-call" id="unblur">unblur</button>
+          </div>
+        </section>
+
+        <section class="card" style="grid-column: 1 / -1">
+          <h2>Video</h2>
+          <div class="">
+            <div id="local-container" style="position: relative">
+              <!-- <canvas id="outputCanvas" width="640" height="480"></canvas> -->
+              <video
+                id="video1"
+                title="1"
+                muted
+                style="transform: scaleX(-1, 1)"
+              ></video>
+              <video
+                id="local"
+                title="local video"
+                muted
+                style="
+                  position: absolute;
+                  top: 0;
+                  right: 0;
+                  width: 160px;
+                  height: 160px;
+                  border: 1px solid white;
+                  transform: scale(-1, 1);
+                "
+              ></video>
+            </div>
+            <div>
+              <video
+                id="screen"
+                title="screen"
+                muted
+                style="display: none"
+              ></video>
+              <video id="video2" title="2" muted style="display: none"></video>
+              <video id="video3" title="3" muted style="display: none"></video>
+              <video id="video4" title="4" muted style="display: none"></video>
+              <video id="video5" title="5" muted style="display: none"></video>
+              <video id="video6" title="6" muted style="display: none"></video>
+              <video id="video7" title="7" muted style="display: none"></video>
+            </div>
+          </div>
+        </section>
+
+        <section class="card" style="grid-column: 1 / -1">
+          <h2>Console Output</h2>
+          <div id="console" class="console"></div>
+        </section>
+      </div>
+
+      <audio id="audio1"></audio>
+      <audio id="audio2"></audio>
+      <audio id="audio3"></audio>
+      <audio id="audio4"></audio>
+      <audio id="audio5"></audio>
+      <audio id="audio6"></audio>
+      <audio id="audio7"></audio>
+    </div>
+
+    <script type="module">
+      console.log("module load!", new Date());
+      const autoConnected = localStorage.getItem("autoConnected");
+
+      // For this example, we're importing from the local build
+      import { OmiSDK } from "./omisdk.es.js";
+      window.addEventListener("load", (ev) => {
+        console.log("document on load!", new Date());
+        // In a real application, you would import from the package
+        // import { OmiSDK } from '@mptransformation/omisdk';
+
+        // Console logging
+        const consoleElement = document.getElementById("console");
+
+        function logToConsole(message) {
+          const entry = document.createElement("div");
+          entry.className = "console-entry";
+
+          const timestamp = document.createElement("span");
+          timestamp.className = "timestamp";
+          timestamp.textContent = new Date().toLocaleTimeString() + " - ";
+
+          const content = document.createElement("span");
+          content.textContent = message;
+
+          entry.appendChild(timestamp);
+          entry.appendChild(content);
+          consoleElement.appendChild(entry);
+
+          // Auto-scroll to bottom
+          consoleElement.scrollTop = consoleElement.scrollHeight;
+        }
+
+        // Initialize the SDK
+        const sdk = new OmiSDK();
+
+        // Initialize the SDK
+        sdk.init({
+          targetElementId: "sdk-container",
+          mode: "bubble",
+          theme: {
+            primaryColor: "#4CAF50",
+            secondaryColor: "#2196F3",
+            borderRadius: "8px",
+            bubblePosition: "bottom-right",
+          },
+          debug: true,
+          forceNew: autoConnected,
+          // baseUrl: window.location.origin,
+          baseUrl: "https://call.frt.vn",
+          localVideoId: "local",
+          remoteVideoId: [
+            "video1",
+            "video2",
+            "video3",
+            "video4",
+            "video5",
+            "video6",
+          ],
+          remoteAudioId: [
+            "audio1",
+            "audio2",
+            "audio3",
+            "audio4",
+            "audio5",
+            "audio6",
+          ],
+        });
+
+        function AccpetCall() {
+          sdk.answerCall({
+            enableVideo: true,
+          });
+          console.log("Đã nhận cuộc gọi");
+        }
+        function Login() {
+          sdk.login({
+            username: "hoangnt",
+            password: "123456aA@",
+            tenantId: 8,
+          });
+          console.log("Đã nhận login");
+        }
+        function makeCall() {
+          const phoneNumber =
+            document.getElementById("phone-number").value || "0988712192";
+          const callCenterNumber =
+            document.getElementById("call-center-number").value || "18006601";
+
+          sdk.makeCall(phoneNumber, {
+            did: callCenterNumber,
+          });
+          console.log("Đã nhận makeCall");
+        }
+        function hangUp() {
+          sdk.hangup().then((res) => {
+            console.log("res", res);
+          });
+          console.log("Đã nhận hangUp");
+        }
+        function hold() {
+          sdk.hold();
+          console.log("Đã nhận hold");
+        }
+        function un_hold() {
+          sdk.unhold();
+          console.log("Đã nhận un_hold");
+        }
+        document.getElementById("mute").addEventListener("click", () => {
+          sdk.mute();
+          console.log("Đã nhận mute");
+        });
+        document.getElementById("un mute").addEventListener("click", () => {
+          sdk.unmute();
+          console.log("Đã nhận unmute");
+        });
+        document.getElementById("hangup").addEventListener("click", () => {
+          hangUp();
+        });
+        document.getElementById("accept").addEventListener("click", () => {
+          AccpetCall();
+        });
+        document
+          .getElementById("accept-video")
+          .addEventListener("click", () => {
+            sdk.answerCall({
+              enableVideo: true,
+            });
+          });
+        document.getElementById("reject").addEventListener("click", () => {
+          sdk.rejectCall();
+          console.log("Đã nhận rejectCall");
+        });
+        document.getElementById("hold").addEventListener("click", () => {
+          hold();
+        });
+        document.getElementById("un_hold").addEventListener("click", () => {
+          un_hold();
+        });
+        document.getElementById("make").addEventListener("click", () => {
+          makeCall();
+        });
+        document.getElementById("logout").addEventListener("click", () => {
+          sdk.logout();
+          console.log("Đã nhận logout");
+        });
+        document.getElementById("blur").addEventListener("click", () => {
+          console.log("blur clicked");
+          sdk.sendBackgroundBlur(
+            {
+              name: "Tổng đài viên",
+              mode: "blur",
+            },
+            true
+          );
+        });
+        document.getElementById("unblur").addEventListener("click", () => {
+          console.log("unblur clicked");
+          sdk.sendBackgroundBlur(
+            {
+              name: "Tổng đài viên",
+              mode: "none",
+            },
+            true
+          );
+        });
+        document
+          .getElementById("makeInternal")
+          .addEventListener("click", () => {
+            const internalExtension =
+              document.getElementById("internal-extension").value || "10004";
+            sdk.makeCallInternal(internalExtension);
+            console.log("Đã nhận makeCallInternal");
+          });
+        document.getElementById("transfer").addEventListener("click", () => {
+          const destination =
+            document.getElementById("transfer-destination").value || "30001";
+          sdk.transfer(destination, "QUEUE", "ATTENDED_TRANSFER");
+          console.log("Đã nhận transfer");
+        });
+
+        document
+          .getElementById("TRANSFER-CUSTOM")
+          .addEventListener("click", () => {
+            const destination = document.getElementById(
+              "transfer-destination-custom"
+            ).value;
+            const destinationType = document.getElementById(
+              "transfer-destinationType-custom"
+            ).value;
+            const transferType = document.getElementById(
+              "transfer-transferType-custom"
+            ).value;
+            sdk.transfer(destination, destinationType, transferType);
+            console.log("Đã nhận TRANSFER-CUSTOM");
+          });
+        document.getElementById("login").addEventListener("click", () => {
+          sdk.acceptTransfer();
+          console.log("Đã nhận acceptTransfer");
+        });
+        document.getElementById("login-call").addEventListener("click", () => {
+          const id = document.getElementById("tenantId").value;
+          const acc = document.getElementById("account").value;
+          const password = document.getElementById("password").value;
+          sdk.login({
+            username: acc,
+            password: password,
+            tenantId: Number(id),
+          });
+          console.log("Đã nhận login-call");
+        });
+        document
+          .getElementById("acceptRefuseTransfer")
+          .addEventListener("click", () => {
+            sdk.refuseTransfer();
+            console.log("refuseTransfer");
+          });
+
+        // function makeCall() {
+        //   sdk.makeCall();
+        // }
+
+        // Log the SDK version
+        logToConsole(`SDK Version: ${sdk.getVersion()}`);
+
+        // Set up event listeners
+        sdk.on("CallEvent", (event) => {
+          console.log("CallEvent received:", event);
+          const container = document.getElementById("sdk-container");
+          const p = document.createElement("p");
+          p.textContent = JSON.stringify(event);
+          container.appendChild(p);
+        });
+
+        sdk.on("AppEvent", (event) => {
+          console.log("AppEvent received:", event);
+          const container = document.getElementById("sdk-container");
+          const p = document.createElement("p");
+          p.textContent = JSON.stringify(event);
+          container.appendChild(p);
+        });
+        // sdk.on("AgentStatusEvent", (event) => {
+        //   console.log("AgentStatusEvent received:", event);
+        // });
+        // sdk.on("InteractionEvent", (event) => {
+        //   console.log("InteractionEvent received:", event);
+        // });
+
+        // Set up UI controls
+        document
+          .getElementById("change_agent")
+          .addEventListener("click", () => {
+            sdk.changeAgentStatus(3).then(() => {
+              logToConsole("Bubble hidden via API call");
+            });
+          });
+      });
+
+      // Example of making a call after 3 seconds
+      setTimeout(() => {}, 3000);
+    </script>
+  </body>
+</html>
