@@ -430,7 +430,7 @@
           debug: true,
           forceNew: autoConnected,
           // baseUrl: window.location.origin,
-          baseUrl: "https://call.frt.vn",
+          baseUrl: "https://crm-dev-v2.metechvn.com",
           localVideoId: "local",
           remoteVideoId: [
             "video1",
@@ -552,7 +552,7 @@
           .addEventListener("click", () => {
             const internalExtension =
               document.getElementById("internal-extension").value || "10004";
-            sdk.makeCallInternal(internalExtension);
+            sdk.makeCallSip(internalExtension);
             console.log("Đã nhận makeCallInternal");
           });
         document.getElementById("transfer").addEventListener("click", () => {
