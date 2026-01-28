@@ -94652,10 +94652,148 @@ class GuestSwitchBoard {
       );
     }
   }
+  async captureStreamV2(id, sessionId, remoteVideoId, userId, tenantId) {
+    var _a, _b, _c, _d, _e;
+    try {
+      const targetSessionId = sessionId || this.getDataSessionId(id);
+      if (!targetSessionId) {
+        return {
+          success: false,
+          error: "No active session found",
+          timestamp: Date.now()
+        };
+      }
+      const callId = this.getDataCallId(targetSessionId);
+      if (!callId) {
+        return {
+          success: false,
+          error: "Call ID not found for session",
+          timestamp: Date.now()
+        };
+      }
+      let videoElement = null;
+      if (remoteVideoId) {
+        videoElement = document.getElementById(
+          remoteVideoId
+        );
+      } else {
+        const remoteVideos = document.querySelectorAll("video");
+        for (const video of Array.from(remoteVideos)) {
+          if (video.srcObject && !video.muted && video.readyState >= 2 && !video.id.includes("local")) {
+            videoElement = video;
+            break;
+          }
+        }
+      }
+      if (!videoElement) {
+        return {
+          success: false,
+          error: "Remote video element not found",
+          timestamp: Date.now()
+        };
+      }
+      if (videoElement.readyState < 2) {
+        return {
+          success: false,
+          error: "Video is not ready for capture",
+          timestamp: Date.now()
+        };
+      }
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        return {
+          success: false,
+          error: "Failed to get canvas context",
+          timestamp: Date.now()
+        };
+      }
+      canvas.width = videoElement.videoWidth || videoElement.clientWidth;
+      canvas.height = videoElement.videoHeight || videoElement.clientHeight;
+      ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+      const format = "png";
+      const mimeType = `image/${format}`;
+      const dataURL = canvas.toDataURL(mimeType, 1);
+      const response = await getConversion({ session_id: targetSessionId });
+      if ((_a = response == null ? void 0 : response.data) == null ? void 0 : _a._id) {
+        const base64Data = dataURL.split(",")[1];
+        const responseApi = await postSendSession({
+          cloudAgentId: userId ?? 0,
+          sessionId: targetSessionId,
+          cloudTenantId: tenantId ?? 0,
+          intentName: "capture_snapshot",
+          text: "",
+          channel: (_b = response.data) == null ? void 0 : _b.channel,
+          attachments: [
+            {
+              fileName: `snapshot_${Date.now()}.${format}`,
+              buffer: base64Data,
+              type: mimeType,
+              name: `snapshot_${Date.now()}.${format}`
+              // size: blob?.size || 0,
+            }
+          ],
+          suggestionId: "",
+          conversationId: (_c = response == null ? void 0 : response.data) == null ? void 0 : _c._id,
+          messageType: "FILE"
+        });
+        traceLog(
+          "captureRemoteSnapshot success",
+          {
+            sessionId: targetSessionId,
+            format,
+            quality: 1,
+            width: canvas.width,
+            height: canvas.height
+          },
+          {
+            isLogClient: false,
+            isLogServer: true,
+            tenantId,
+            agentId: userId,
+            sessionId: targetSessionId
+          }
+        );
+        return {
+          success: true,
+          data: (_e = (_d = responseApi.data) == null ? void 0 : _d.data) == null ? void 0 : _e.attachment,
+          timestamp: Date.now()
+        };
+      } else {
+        throw Error("Cannot get conversation for snapshot");
+      }
+    } catch (error) {
+      traceLog(
+        "captureRemoteSnapshot error",
+        {
+          error: JSON.stringify(error),
+          sessionId
+        },
+        {
+          isLogClient: false,
+          isLogServer: true,
+          tenantId,
+          agentId: userId,
+          sessionId
+        }
+      );
+      return {
+        success: false,
+        error: error instanceof Error ? error == null ? void 0 : error.message : "Unknown error",
+        timestamp: Date.now()
+      };
+    }
+  }
   switchMsgTypeSip(payload, id, sessionId) {
     switch (payload == null ? void 0 : payload.type) {
       case CAPTURE_SNAPSHOT:
-        this.captureStream(id, sessionId, payload == null ? void 0 : payload.userId, payload == null ? void 0 : payload.tenantId);
+        this.captureStreamV2(
+          id,
+          sessionId,
+          "video1",
+          payload == null ? void 0 : payload.userId,
+          payload == null ? void 0 : payload.tenantId
+        );
         break;
     }
   }
