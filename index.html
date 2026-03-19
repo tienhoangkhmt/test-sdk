@@ -954,6 +954,11 @@
               Chuyển camera
             </button>
 
+            <button class="control-btn" id="zoomBtn">
+              <i class="fas fa-search-plus"></i>
+              Zoom
+            </button>
+
             <button class="control-btn danger" id="hangup">
               <i class="fas fa-phone-slash"></i>
               Kết thúc
@@ -1036,6 +1041,7 @@
       const cameraOnBtn = document.getElementById("cameraOn");
       const cameraOffBtn = document.getElementById("cameraOff");
       const switchCameraBtn = document.getElementById("switchCamera");
+      const zoomBtn = document.getElementById("zoomBtn");
       const hangupBtn = document.getElementById("hangup");
 
       // Initialize when page loads
@@ -1071,6 +1077,7 @@
         cameraOnBtn.addEventListener("click", () => toggleCamera(true));
         cameraOffBtn.addEventListener("click", () => toggleCamera(false));
         switchCameraBtn.addEventListener("click", handleSwitchCamera);
+        zoomBtn.addEventListener("click", handleZoom);
         hangupBtn.addEventListener("click", handleHangup);
       }
 
@@ -1270,6 +1277,21 @@
         console.log("Switching camera");
       }
 
+      function handleZoom() {
+        if (!guest) return;
+
+        guest.ZoomVideoCall()
+          .then((res) => {
+            console.log("ZoomVideoCall success", res);
+            zoomBtn.classList.add("active");
+            notyf.success("Zoom 2x thành công!");
+          })
+          .catch((err) => {
+            console.error("ZoomVideoCall error", err);
+            notyf.error("Không thể zoom: " + (err?.message || err?.description || ""));
+          });
+      }
+
       function handleHangup() {
         if (!guest) return;
 
@@ -1283,7 +1305,6 @@
         console.log("Call ended");
         stopCallTimer();
 
-        // Show call ended screen
         showScreen("ended");
       }
 

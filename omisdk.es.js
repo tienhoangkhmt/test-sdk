@@ -23,6 +23,8 @@ var CallEventType = /* @__PURE__ */ ((CallEventType2) => {
   CallEventType2["CALL_TERMINATED_OR_IVR_MISSED"] = "call_terminated_or_ivr_missed";
   CallEventType2["CALL_CROSS_PLATFORM"] = "call_cross_platform";
   CallEventType2["CALL_RECORDING"] = "call_recording";
+  CallEventType2["SNAPSHOT_SUCCESS"] = "snapshot_success";
+  CallEventType2["SNAPSHOT_ERROR"] = "snapshot_error";
   return CallEventType2;
 })(CallEventType || {});
 var AppEventType$1 = /* @__PURE__ */ ((AppEventType2) => {
@@ -45,6 +47,17 @@ var AppEventType$1 = /* @__PURE__ */ ((AppEventType2) => {
   AppEventType2["FORCE_LOGOUT"] = "force_logout";
   return AppEventType2;
 })(AppEventType$1 || {});
+var InteractionEventType$1 = /* @__PURE__ */ ((InteractionEventType2) => {
+  InteractionEventType2["NEW_CONVERSATION"] = "new_conversation";
+  InteractionEventType2["NEW_MESSAGE"] = "new_message";
+  InteractionEventType2["CLOSE_CONVERSATION"] = "close_conversation";
+  InteractionEventType2["MESSAGE_RECEIVED"] = "message_received";
+  InteractionEventType2["MESSAGE_SENT"] = "message_sent";
+  InteractionEventType2["MESSAGE_DELIVERED"] = "message_delivered";
+  InteractionEventType2["MESSAGE_READ"] = "message_read";
+  InteractionEventType2["CONVERSATION_ENDED"] = "conversation_ended";
+  return InteractionEventType2;
+})(InteractionEventType$1 || {});
 var TransferType = /* @__PURE__ */ ((TransferType2) => {
   TransferType2["BLIND_TRANSFER"] = "BLIND_TRANSFER";
   TransferType2["ATTENDED_TRANSFER"] = "ATTENDED_TRANSFER";
@@ -33069,6 +33082,7 @@ const zl_message = "ZL_MESSAGE";
 const phoneContact = "VOICE";
 const channelCall = "CALL";
 const internetCall = "LIVE_CONNECT";
+const liveConnect = "LIVE_CONNECT";
 const EVENT_ABLY_NAME = {
   INBOUND_CALL: "INIT",
   OFFER_CALL: "OFFER",
@@ -33076,6 +33090,7 @@ const EVENT_ABLY_NAME = {
   REJECT_CALL: "REJECT",
   END_CALL: "HANGUP",
   CLOSE: "CLOSE_CONVERSATION",
+  READ_CONVERSATION: "READ_CONVERSATION",
   MESSAGE_TRANSFERED: "MESSAGE_TRANSFERED",
   ASSIGN_CONVERSATION: "ASSIGN_CONVERSATION",
   NEW_CONVERSATION: "NEW_CONVERSATION",
@@ -33137,7 +33152,7 @@ const Event_SDK = {
   InteractionEvent: "InteractionEvent",
   GuestEvent: "GuestEvent"
 };
-const Map_event_name = {
+({
   CLOSE_CONVERSATION: InteractionEventType.CLOSE_CONVERSATION,
   READ_CONVERSATION: InteractionEventType.MESSAGE_READ,
   NEW_CONVERSATION: InteractionEventType.NEW_CONVERSATION,
@@ -33147,7 +33162,7 @@ const Map_event_name = {
   MESSAGE_DELIVERED: InteractionEventType.MESSAGE_DELIVERED,
   MESSAGE_READ: InteractionEventType.MESSAGE_READ,
   CONVERSATION_ENDED: InteractionEventType.CONVERSATION_ENDED
-};
+});
 const conversationStateClient = {
   open: "OPEN",
   close: "CLOSE",
@@ -33210,6 +33225,10 @@ const CALL_TYPE = {
   VOICE: "VOICE"
 };
 const CAPTURE_SNAPSHOT = "CAPTURE_SNAPSHOT";
+const CAPTURE_SNAPSHOT_RESPONSE = {
+  SUCCESS: "SUCCESS_CAPTURE_SNAPSHOT",
+  ERROR: "ERROR_CAPTURE_SNAPSHOT"
+};
 var define_process_env_default$c = {};
 function formatProdErrorMessage$1(code) {
   return `Minified Redux error #${code}; visit https://redux.js.org/Errors?code=${code} for the full message or use the non-minified dev environment for full errors. `;
@@ -48935,7 +48954,7 @@ const traceLog = (msg, data = "", push = {
         date: customDayjs().format(DATE_FORMAT.HH_MM_DD_MM_YY_HH_MM_SS),
         device: browserInfo.platform,
         browser: browserInfo.browser,
-        version: browserInfo.version,
+        version: SDK_VERSION,
         userAgent: browserInfo.userAgent
       })
     };
@@ -48997,6 +49016,36 @@ const getBrowserInfo = () => {
     platform: navigator.platform,
     language: navigator.language
   };
+};
+const randomNumber = (length = 10) => {
+  const digits = "0123456789";
+  let result = "";
+  for (let i2 = 0; i2 < length; i2++) {
+    result += digits.charAt(Math.floor(Math.random() * digits.length));
+  }
+  return result;
+};
+const randomName = (length = 8) => {
+  const letters = "abcdefghijklmnopqrstuvwxyz";
+  const alphanumeric = "abcdefghijklmnopqrstuvwxyz0123456789";
+  let result = letters.charAt(Math.floor(Math.random() * letters.length));
+  for (let i2 = 1; i2 < length; i2++) {
+    result += alphanumeric.charAt(
+      Math.floor(Math.random() * alphanumeric.length)
+    );
+  }
+  return result;
+};
+const randomEmail = (nameLength = 8, domain = "example.com") => {
+  return `${randomName(nameLength)}@${domain}`;
+};
+const convertBufferToBase64 = (buffer, type) => {
+  let binary = "";
+  const bytes = new Uint8Array(buffer);
+  bytes.forEach((byte) => {
+    binary += String.fromCharCode(byte);
+  });
+  return `data:${type};base64,${window.btoa(binary)}`;
 };
 const defaultInfo = {
   tenant: {
@@ -85250,6 +85299,24 @@ class Port_Sip {
           );
         }
         break;
+      case CAPTURE_SNAPSHOT_RESPONSE.SUCCESS:
+        console.log("success capture snapshot", values);
+        client_socket.emit(Event_SDK.CallEvent, {
+          type: CallEventType.SNAPSHOT_SUCCESS,
+          name: CallEventType.SNAPSHOT_SUCCESS,
+          data: values == null ? void 0 : values.data,
+          sessionId: values == null ? void 0 : values.sessionId
+        });
+        break;
+      case CAPTURE_SNAPSHOT_RESPONSE.ERROR:
+        console.log("error capture snapshot", values);
+        client_socket.emit(Event_SDK.CallEvent, {
+          type: CallEventType.SNAPSHOT_ERROR,
+          name: CallEventType.SNAPSHOT_ERROR,
+          reason: values == null ? void 0 : values.reason,
+          data: null
+        });
+        break;
       default:
         return;
     }
@@ -85360,7 +85427,7 @@ class Port_Sip {
     this.pushMsgSnapshot();
     return Promise.resolve({
       success: false,
-      error: "Chức năng chụp ảnh tạm thời không khả dụng",
+      message: "Đang chụp ảnh...",
       timestamp: Date.now()
     });
   }
@@ -88694,7 +88761,7 @@ class Socket_SDK extends Port_Sip {
     cbFouceLogout,
     delegate
   }) {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _A, _B;
     super();
     __publicField(this, "info");
     __publicField(this, "getMsg");
@@ -88719,6 +88786,7 @@ class Socket_SDK extends Port_Sip {
     rooms.push(`agent_status_${(_f = this.info.tenant) == null ? void 0 : _f.id}_${(_g = this.info.user) == null ? void 0 : _g.id}`);
     rooms.push(`private_${(_h = this.info.tenant) == null ? void 0 : _h.id}_${(_i = this.info.user) == null ? void 0 : _i.id}`);
     rooms.push(`system_info_${(_j = info == null ? void 0 : info.tenant) == null ? void 0 : _j.id}_${(_k = info == null ? void 0 : info.user) == null ? void 0 : _k.id}`);
+    rooms.push(`conversation_${(_l = info == null ? void 0 : info.tenant) == null ? void 0 : _l.id}`);
     const socket = lookup(config.url, {
       ...config.options,
       auth: {
@@ -88726,11 +88794,11 @@ class Socket_SDK extends Port_Sip {
       },
       query: {
         participantType,
-        participantId: (_l = this.info.user) == null ? void 0 : _l.id,
-        tenantId: (_m = this.info.tenant) == null ? void 0 : _m.id,
+        participantId: (_m = this.info.user) == null ? void 0 : _m.id,
+        tenantId: (_n = this.info.tenant) == null ? void 0 : _n.id,
         channels: chanels.join(","),
-        fullName: `${(_n = this.info.user) == null ? void 0 : _n.fullName} (${(_o = this.info.user) == null ? void 0 : _o.userName})`,
-        applicationId: (_p = this.info.user) == null ? void 0 : _p.supportApplicationIds,
+        fullName: `${(_o = this.info.user) == null ? void 0 : _o.fullName} (${(_p = this.info.user) == null ? void 0 : _p.userName})`,
+        applicationId: (_q = this.info.user) == null ? void 0 : _q.supportApplicationIds,
         forceNew: false
       }
       // transports: ["websocket", "polling"],
@@ -88828,7 +88896,7 @@ class Socket_SDK extends Port_Sip {
       }
     });
     socket.on(
-      `private_transfer_accepted_${(_q = info == null ? void 0 : info.tenant) == null ? void 0 : _q.id}_${(_r = info == null ? void 0 : info.user) == null ? void 0 : _r.id}`,
+      `private_transfer_accepted_${(_r = info == null ? void 0 : info.tenant) == null ? void 0 : _r.id}_${(_s = info == null ? void 0 : info.user) == null ? void 0 : _s.id}`,
       (msg) => {
         this.pushCallEventEmitter(CallEventType.CALL_TRANSFER_ACCEPTED, msg);
         this.main_id = "";
@@ -88838,7 +88906,7 @@ class Socket_SDK extends Port_Sip {
       }
     );
     socket.on(
-      `private_answer_terminated_${(_s = info == null ? void 0 : info.tenant) == null ? void 0 : _s.id}_${(_t = info == null ? void 0 : info.user) == null ? void 0 : _t.id}`,
+      `private_answer_terminated_${(_t = info == null ? void 0 : info.tenant) == null ? void 0 : _t.id}_${(_u = info == null ? void 0 : info.user) == null ? void 0 : _u.id}`,
       () => {
         this.pushCallEventEmitter(
           CallEventType.CALL_TERMINATED_OR_IVR_MISSED,
@@ -88847,13 +88915,23 @@ class Socket_SDK extends Port_Sip {
       }
     );
     socket.on(
-      `private_agent_${(_u = info == null ? void 0 : info.tenant) == null ? void 0 : _u.id}_${(_v = info == null ? void 0 : info.user) == null ? void 0 : _v.id}`,
+      `conversation_${(_v = info == null ? void 0 : info.tenant) == null ? void 0 : _v.id}`,
+      (msg) => {
+        var _a2, _b2, _c2;
+        const pass = msg.name === EVENT_ABLY_NAME.ASSIGN_CONVERSATION || msg.name === EVENT_ABLY_NAME.NEW_CONVERSATION || msg.name === EVENT_ABLY_NAME.TRANSFER_CONVERSATION || msg.name === EVENT_ABLY_NAME.READ_CONVERSATION || msg.name === EVENT_ABLY_NAME.MESSAGE_TRANSFERED;
+        if (((_b2 = (_a2 = this.info) == null ? void 0 : _a2.user) == null ? void 0 : _b2.id) === ((_c2 = msg.data) == null ? void 0 : _c2.agentPicked) && pass) {
+          this.getChannelConversation(msg);
+        }
+      }
+    );
+    socket.on(
+      `private_agent_${(_w = info == null ? void 0 : info.tenant) == null ? void 0 : _w.id}_${(_x = info == null ? void 0 : info.user) == null ? void 0 : _x.id}`,
       (msg) => {
         cbUserAction && cbUserAction(msg);
       }
     );
     socket.on(
-      `private_agent_call_event_${(_w = info == null ? void 0 : info.tenant) == null ? void 0 : _w.id}_${(_x = info == null ? void 0 : info.user) == null ? void 0 : _x.id}`,
+      `private_agent_call_event_${(_y = info == null ? void 0 : info.tenant) == null ? void 0 : _y.id}_${(_z = info == null ? void 0 : info.user) == null ? void 0 : _z.id}`,
       (msg) => {
         if (!this.searchSessionEstablished()) {
           client_socket.emit(Event_SDK.CallEvent, msg);
@@ -88861,7 +88939,7 @@ class Socket_SDK extends Port_Sip {
       }
     );
     socket.on(
-      `private_platform_${(_y = info == null ? void 0 : info.tenant) == null ? void 0 : _y.id}_${(_z = info == null ? void 0 : info.user) == null ? void 0 : _z.id}`,
+      `private_platform_${(_A = info == null ? void 0 : info.tenant) == null ? void 0 : _A.id}_${(_B = info == null ? void 0 : info.user) == null ? void 0 : _B.id}`,
       (msg) => {
         this.pushCallEventEmitter(CallEventType.CALL_CROSS_PLATFORM, {
           platform: msg.platform,
@@ -89277,18 +89355,6 @@ class Socket_SDK extends Port_Sip {
         }
       }
       if (((_d = SIP_SDK.sessionIds) == null ? void 0 : _d.length) && SIP_SDK.sessionIds.includes(message2.sessionId)) {
-        if (message2.state in Map_event_name) {
-          emitInteractionEvent(
-            Map_event_name[message2.state],
-            {
-              type: Map_event_name[message2.state] ?? "",
-              senderId: message2.ani ?? "",
-              applicationId: message2.dnis ?? "",
-              conversationId: "",
-              message: message2.text ?? ""
-            }
-          );
-        }
         this.getMsg(message2);
         this.msg_channel = message2;
       }
@@ -89557,2480 +89623,81 @@ class Socket_SDK extends Port_Sip {
       }
     }
   }
+  getChannelConversation(msg) {
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l;
+    const values = {
+      text: ((_b = (_a = msg == null ? void 0 : msg.data) == null ? void 0 : _a.lastMessage) == null ? void 0 : _b.text) ?? "",
+      sessionId: ((_c = msg == null ? void 0 : msg.data) == null ? void 0 : _c.sessionId) ?? "",
+      messageFrom: ((_e = (_d = msg == null ? void 0 : msg.data) == null ? void 0 : _d.lastMessage) == null ? void 0 : _e.messageFrom) ?? "",
+      messageType: ((_g = (_f = msg == null ? void 0 : msg.data) == null ? void 0 : _f.lastMessage) == null ? void 0 : _g.messageType) ?? "",
+      receivedTime: ((_i = (_h = msg == null ? void 0 : msg.data) == null ? void 0 : _h.lastMessage) == null ? void 0 : _i.receivedTime) ?? "",
+      event: msg.name,
+      attachments: ((_k = (_j = msg == null ? void 0 : msg.data) == null ? void 0 : _j.lastMessage) == null ? void 0 : _k.attachment) ?? [],
+      channel: ((_l = msg == null ? void 0 : msg.data) == null ? void 0 : _l.channel) ?? ""
+    };
+    this.pushMessage(values);
+  }
+  pushMessage(values) {
+    var _a, _b, _c, _d;
+    emitInteractionEvent(InteractionEventType$1.NEW_MESSAGE, values);
+    traceLog(
+      "conversation",
+      {
+        event: Event_SDK.InteractionEvent,
+        msg: values
+      },
+      {
+        isLogClient: false,
+        isLogServer: true,
+        tenantId: (_b = (_a = this.info) == null ? void 0 : _a.tenant) == null ? void 0 : _b.id,
+        agentId: (_d = (_c = this == null ? void 0 : this.info) == null ? void 0 : _c.user) == null ? void 0 : _d.id
+      }
+    );
+  }
+  async sendMessageSdk(message2, messageType, attachments = []) {
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j;
+    try {
+      const response = await getConversion({ session_id: this.main_id });
+      if ((_a = response == null ? void 0 : response.data) == null ? void 0 : _a._id) {
+        const sendMessageResponse = await postSendSession({
+          cloudAgentId: ((_c = (_b = this.info) == null ? void 0 : _b.user) == null ? void 0 : _c.id) ?? 0,
+          sessionId: this.main_id,
+          cloudTenantId: ((_e = (_d = this.info) == null ? void 0 : _d.tenant) == null ? void 0 : _e.id) ?? 0,
+          intentName: "send_message",
+          text: message2,
+          suggestionId: "",
+          conversationId: ((_f = response == null ? void 0 : response.data) == null ? void 0 : _f._id) ?? "",
+          messageType,
+          attachments,
+          channel: ((_g = response == null ? void 0 : response.data) == null ? void 0 : _g.channel) ?? liveConnect
+        });
+        if ((_h = sendMessageResponse == null ? void 0 : sendMessageResponse.data) == null ? void 0 : _h.success) {
+          return Promise.resolve({
+            success: true,
+            message: "send message to conversation successfully",
+            data: (_i = sendMessageResponse == null ? void 0 : sendMessageResponse.data) == null ? void 0 : _i.data
+          });
+        } else {
+          throw new Error(
+            ((_j = sendMessageResponse == null ? void 0 : sendMessageResponse.data) == null ? void 0 : _j.description) ?? "unknown error"
+          );
+        }
+      } else {
+        throw new Error("Cannot get conversation");
+      }
+    } catch (error) {
+      return Promise.reject({
+        success: false,
+        message: (error == null ? void 0 : error.message) ?? "unknown error"
+      });
+    }
+  }
 }
 const deleteRegisterCall = (body) => {
   return axiosNotAuth.delete(`/contact-center/agent/registration`, {
     data: body
   });
 };
-var selfie_segmentation = {};
-(function() {
-  var x;
-  function aa(a2) {
-    var b = 0;
-    return function() {
-      return b < a2.length ? { done: false, value: a2[b++] } : { done: true };
-    };
-  }
-  var ba = "function" == typeof Object.defineProperties ? Object.defineProperty : function(a2, b, c2) {
-    if (a2 == Array.prototype || a2 == Object.prototype) return a2;
-    a2[b] = c2.value;
-    return a2;
-  };
-  function ca(a2) {
-    a2 = ["object" == typeof globalThis && globalThis, a2, "object" == typeof window && window, "object" == typeof self && self, "object" == typeof commonjsGlobal && commonjsGlobal];
-    for (var b = 0; b < a2.length; ++b) {
-      var c2 = a2[b];
-      if (c2 && c2.Math == Math) return c2;
-    }
-    throw Error("Cannot find global object");
-  }
-  var y = ca(this);
-  function z(a2, b) {
-    if (b) a: {
-      var c2 = y;
-      a2 = a2.split(".");
-      for (var d = 0; d < a2.length - 1; d++) {
-        var e2 = a2[d];
-        if (!(e2 in c2)) break a;
-        c2 = c2[e2];
-      }
-      a2 = a2[a2.length - 1];
-      d = c2[a2];
-      b = b(d);
-      b != d && null != b && ba(c2, a2, { configurable: true, writable: true, value: b });
-    }
-  }
-  z("Symbol", function(a2) {
-    function b(g) {
-      if (this instanceof b) throw new TypeError("Symbol is not a constructor");
-      return new c2(d + (g || "") + "_" + e2++, g);
-    }
-    function c2(g, f) {
-      this.h = g;
-      ba(this, "description", { configurable: true, writable: true, value: f });
-    }
-    if (a2) return a2;
-    c2.prototype.toString = function() {
-      return this.h;
-    };
-    var d = "jscomp_symbol_" + (1e9 * Math.random() >>> 0) + "_", e2 = 0;
-    return b;
-  });
-  z("Symbol.iterator", function(a2) {
-    if (a2) return a2;
-    a2 = Symbol("Symbol.iterator");
-    for (var b = "Array Int8Array Uint8Array Uint8ClampedArray Int16Array Uint16Array Int32Array Uint32Array Float32Array Float64Array".split(" "), c2 = 0; c2 < b.length; c2++) {
-      var d = y[b[c2]];
-      "function" === typeof d && "function" != typeof d.prototype[a2] && ba(d.prototype, a2, { configurable: true, writable: true, value: function() {
-        return da(aa(this));
-      } });
-    }
-    return a2;
-  });
-  function da(a2) {
-    a2 = { next: a2 };
-    a2[Symbol.iterator] = function() {
-      return this;
-    };
-    return a2;
-  }
-  function A(a2) {
-    var b = "undefined" != typeof Symbol && Symbol.iterator && a2[Symbol.iterator];
-    return b ? b.call(a2) : { next: aa(a2) };
-  }
-  function ea(a2) {
-    if (!(a2 instanceof Array)) {
-      a2 = A(a2);
-      for (var b, c2 = []; !(b = a2.next()).done; ) c2.push(b.value);
-      a2 = c2;
-    }
-    return a2;
-  }
-  var fa = "function" == typeof Object.assign ? Object.assign : function(a2, b) {
-    for (var c2 = 1; c2 < arguments.length; c2++) {
-      var d = arguments[c2];
-      if (d) for (var e2 in d) Object.prototype.hasOwnProperty.call(d, e2) && (a2[e2] = d[e2]);
-    }
-    return a2;
-  };
-  z("Object.assign", function(a2) {
-    return a2 || fa;
-  });
-  var ha = "function" == typeof Object.create ? Object.create : function(a2) {
-    function b() {
-    }
-    b.prototype = a2;
-    return new b();
-  }, ia;
-  if ("function" == typeof Object.setPrototypeOf) ia = Object.setPrototypeOf;
-  else {
-    var ja;
-    a: {
-      var ka = { a: true }, la = {};
-      try {
-        la.__proto__ = ka;
-        ja = la.a;
-        break a;
-      } catch (a2) {
-      }
-      ja = false;
-    }
-    ia = ja ? function(a2, b) {
-      a2.__proto__ = b;
-      if (a2.__proto__ !== b) throw new TypeError(a2 + " is not extensible");
-      return a2;
-    } : null;
-  }
-  var ma = ia;
-  function na(a2, b) {
-    a2.prototype = ha(b.prototype);
-    a2.prototype.constructor = a2;
-    if (ma) ma(a2, b);
-    else for (var c2 in b) if ("prototype" != c2) if (Object.defineProperties) {
-      var d = Object.getOwnPropertyDescriptor(b, c2);
-      d && Object.defineProperty(a2, c2, d);
-    } else a2[c2] = b[c2];
-    a2.za = b.prototype;
-  }
-  function oa() {
-    this.m = false;
-    this.j = null;
-    this.i = void 0;
-    this.h = 1;
-    this.v = this.s = 0;
-    this.l = null;
-  }
-  function pa(a2) {
-    if (a2.m) throw new TypeError("Generator is already running");
-    a2.m = true;
-  }
-  oa.prototype.u = function(a2) {
-    this.i = a2;
-  };
-  function qa(a2, b) {
-    a2.l = { ma: b, na: true };
-    a2.h = a2.s || a2.v;
-  }
-  oa.prototype.return = function(a2) {
-    this.l = { return: a2 };
-    this.h = this.v;
-  };
-  function D(a2, b, c2) {
-    a2.h = c2;
-    return { value: b };
-  }
-  function ra(a2) {
-    this.h = new oa();
-    this.i = a2;
-  }
-  function sa(a2, b) {
-    pa(a2.h);
-    var c2 = a2.h.j;
-    if (c2) return ta(a2, "return" in c2 ? c2["return"] : function(d) {
-      return { value: d, done: true };
-    }, b, a2.h.return);
-    a2.h.return(b);
-    return ua2(a2);
-  }
-  function ta(a2, b, c2, d) {
-    try {
-      var e2 = b.call(a2.h.j, c2);
-      if (!(e2 instanceof Object)) throw new TypeError("Iterator result " + e2 + " is not an object");
-      if (!e2.done) return a2.h.m = false, e2;
-      var g = e2.value;
-    } catch (f) {
-      return a2.h.j = null, qa(a2.h, f), ua2(a2);
-    }
-    a2.h.j = null;
-    d.call(a2.h, g);
-    return ua2(a2);
-  }
-  function ua2(a2) {
-    for (; a2.h.h; ) try {
-      var b = a2.i(a2.h);
-      if (b) return a2.h.m = false, { value: b.value, done: false };
-    } catch (c2) {
-      a2.h.i = void 0, qa(a2.h, c2);
-    }
-    a2.h.m = false;
-    if (a2.h.l) {
-      b = a2.h.l;
-      a2.h.l = null;
-      if (b.na) throw b.ma;
-      return { value: b.return, done: true };
-    }
-    return { value: void 0, done: true };
-  }
-  function va(a2) {
-    this.next = function(b) {
-      pa(a2.h);
-      a2.h.j ? b = ta(a2, a2.h.j.next, b, a2.h.u) : (a2.h.u(b), b = ua2(a2));
-      return b;
-    };
-    this.throw = function(b) {
-      pa(a2.h);
-      a2.h.j ? b = ta(a2, a2.h.j["throw"], b, a2.h.u) : (qa(a2.h, b), b = ua2(a2));
-      return b;
-    };
-    this.return = function(b) {
-      return sa(a2, b);
-    };
-    this[Symbol.iterator] = function() {
-      return this;
-    };
-  }
-  function wa(a2) {
-    function b(d) {
-      return a2.next(d);
-    }
-    function c2(d) {
-      return a2.throw(d);
-    }
-    return new Promise(function(d, e2) {
-      function g(f) {
-        f.done ? d(f.value) : Promise.resolve(f.value).then(b, c2).then(g, e2);
-      }
-      g(a2.next());
-    });
-  }
-  function E(a2) {
-    return wa(new va(new ra(a2)));
-  }
-  z("Promise", function(a2) {
-    function b(f) {
-      this.i = 0;
-      this.j = void 0;
-      this.h = [];
-      this.u = false;
-      var h = this.l();
-      try {
-        f(h.resolve, h.reject);
-      } catch (k) {
-        h.reject(k);
-      }
-    }
-    function c2() {
-      this.h = null;
-    }
-    function d(f) {
-      return f instanceof b ? f : new b(function(h) {
-        h(f);
-      });
-    }
-    if (a2) return a2;
-    c2.prototype.i = function(f) {
-      if (null == this.h) {
-        this.h = [];
-        var h = this;
-        this.j(function() {
-          h.m();
-        });
-      }
-      this.h.push(f);
-    };
-    var e2 = y.setTimeout;
-    c2.prototype.j = function(f) {
-      e2(f, 0);
-    };
-    c2.prototype.m = function() {
-      for (; this.h && this.h.length; ) {
-        var f = this.h;
-        this.h = [];
-        for (var h = 0; h < f.length; ++h) {
-          var k = f[h];
-          f[h] = null;
-          try {
-            k();
-          } catch (l2) {
-            this.l(l2);
-          }
-        }
-      }
-      this.h = null;
-    };
-    c2.prototype.l = function(f) {
-      this.j(function() {
-        throw f;
-      });
-    };
-    b.prototype.l = function() {
-      function f(l2) {
-        return function(m2) {
-          k || (k = true, l2.call(h, m2));
-        };
-      }
-      var h = this, k = false;
-      return { resolve: f(this.I), reject: f(this.m) };
-    };
-    b.prototype.I = function(f) {
-      if (f === this) this.m(new TypeError("A Promise cannot resolve to itself"));
-      else if (f instanceof b) this.L(f);
-      else {
-        a: switch (typeof f) {
-          case "object":
-            var h = null != f;
-            break a;
-          case "function":
-            h = true;
-            break a;
-          default:
-            h = false;
-        }
-        h ? this.F(f) : this.s(f);
-      }
-    };
-    b.prototype.F = function(f) {
-      var h = void 0;
-      try {
-        h = f.then;
-      } catch (k) {
-        this.m(k);
-        return;
-      }
-      "function" == typeof h ? this.M(h, f) : this.s(f);
-    };
-    b.prototype.m = function(f) {
-      this.v(2, f);
-    };
-    b.prototype.s = function(f) {
-      this.v(1, f);
-    };
-    b.prototype.v = function(f, h) {
-      if (0 != this.i) throw Error("Cannot settle(" + f + ", " + h + "): Promise already settled in state" + this.i);
-      this.i = f;
-      this.j = h;
-      2 === this.i && this.K();
-      this.H();
-    };
-    b.prototype.K = function() {
-      var f = this;
-      e2(function() {
-        if (f.D()) {
-          var h = y.console;
-          "undefined" !== typeof h && h.error(f.j);
-        }
-      }, 1);
-    };
-    b.prototype.D = function() {
-      if (this.u) return false;
-      var f = y.CustomEvent, h = y.Event, k = y.dispatchEvent;
-      if ("undefined" === typeof k) return true;
-      "function" === typeof f ? f = new f("unhandledrejection", { cancelable: true }) : "function" === typeof h ? f = new h("unhandledrejection", { cancelable: true }) : (f = y.document.createEvent("CustomEvent"), f.initCustomEvent("unhandledrejection", false, true, f));
-      f.promise = this;
-      f.reason = this.j;
-      return k(f);
-    };
-    b.prototype.H = function() {
-      if (null != this.h) {
-        for (var f = 0; f < this.h.length; ++f) g.i(this.h[f]);
-        this.h = null;
-      }
-    };
-    var g = new c2();
-    b.prototype.L = function(f) {
-      var h = this.l();
-      f.T(h.resolve, h.reject);
-    };
-    b.prototype.M = function(f, h) {
-      var k = this.l();
-      try {
-        f.call(h, k.resolve, k.reject);
-      } catch (l2) {
-        k.reject(l2);
-      }
-    };
-    b.prototype.then = function(f, h) {
-      function k(p2, n2) {
-        return "function" == typeof p2 ? function(q) {
-          try {
-            l2(p2(q));
-          } catch (t2) {
-            m2(t2);
-          }
-        } : n2;
-      }
-      var l2, m2, r2 = new b(function(p2, n2) {
-        l2 = p2;
-        m2 = n2;
-      });
-      this.T(k(f, l2), k(h, m2));
-      return r2;
-    };
-    b.prototype.catch = function(f) {
-      return this.then(void 0, f);
-    };
-    b.prototype.T = function(f, h) {
-      function k() {
-        switch (l2.i) {
-          case 1:
-            f(l2.j);
-            break;
-          case 2:
-            h(l2.j);
-            break;
-          default:
-            throw Error("Unexpected state: " + l2.i);
-        }
-      }
-      var l2 = this;
-      null == this.h ? g.i(k) : this.h.push(k);
-      this.u = true;
-    };
-    b.resolve = d;
-    b.reject = function(f) {
-      return new b(function(h, k) {
-        k(f);
-      });
-    };
-    b.race = function(f) {
-      return new b(function(h, k) {
-        for (var l2 = A(f), m2 = l2.next(); !m2.done; m2 = l2.next()) d(m2.value).T(h, k);
-      });
-    };
-    b.all = function(f) {
-      var h = A(f), k = h.next();
-      return k.done ? d([]) : new b(function(l2, m2) {
-        function r2(q) {
-          return function(t2) {
-            p2[q] = t2;
-            n2--;
-            0 == n2 && l2(p2);
-          };
-        }
-        var p2 = [], n2 = 0;
-        do
-          p2.push(void 0), n2++, d(k.value).T(r2(p2.length - 1), m2), k = h.next();
-        while (!k.done);
-      });
-    };
-    return b;
-  });
-  function xa(a2, b) {
-    a2 instanceof String && (a2 += "");
-    var c2 = 0, d = false, e2 = { next: function() {
-      if (!d && c2 < a2.length) {
-        var g = c2++;
-        return { value: b(g, a2[g]), done: false };
-      }
-      d = true;
-      return { done: true, value: void 0 };
-    } };
-    e2[Symbol.iterator] = function() {
-      return e2;
-    };
-    return e2;
-  }
-  z("Array.prototype.keys", function(a2) {
-    return a2 ? a2 : function() {
-      return xa(this, function(b) {
-        return b;
-      });
-    };
-  });
-  z("Array.prototype.fill", function(a2) {
-    return a2 ? a2 : function(b, c2, d) {
-      var e2 = this.length || 0;
-      0 > c2 && (c2 = Math.max(0, e2 + c2));
-      if (null == d || d > e2) d = e2;
-      d = Number(d);
-      0 > d && (d = Math.max(0, e2 + d));
-      for (c2 = Number(c2 || 0); c2 < d; c2++) this[c2] = b;
-      return this;
-    };
-  });
-  function F(a2) {
-    return a2 ? a2 : Array.prototype.fill;
-  }
-  z("Int8Array.prototype.fill", F);
-  z("Uint8Array.prototype.fill", F);
-  z("Uint8ClampedArray.prototype.fill", F);
-  z("Int16Array.prototype.fill", F);
-  z("Uint16Array.prototype.fill", F);
-  z("Int32Array.prototype.fill", F);
-  z("Uint32Array.prototype.fill", F);
-  z("Float32Array.prototype.fill", F);
-  z("Float64Array.prototype.fill", F);
-  z("Object.is", function(a2) {
-    return a2 ? a2 : function(b, c2) {
-      return b === c2 ? 0 !== b || 1 / b === 1 / c2 : b !== b && c2 !== c2;
-    };
-  });
-  z("Array.prototype.includes", function(a2) {
-    return a2 ? a2 : function(b, c2) {
-      var d = this;
-      d instanceof String && (d = String(d));
-      var e2 = d.length;
-      c2 = c2 || 0;
-      for (0 > c2 && (c2 = Math.max(c2 + e2, 0)); c2 < e2; c2++) {
-        var g = d[c2];
-        if (g === b || Object.is(g, b)) return true;
-      }
-      return false;
-    };
-  });
-  z("String.prototype.includes", function(a2) {
-    return a2 ? a2 : function(b, c2) {
-      if (null == this) throw new TypeError("The 'this' value for String.prototype.includes must not be null or undefined");
-      if (b instanceof RegExp) throw new TypeError("First argument to String.prototype.includes must not be a regular expression");
-      return -1 !== this.indexOf(b, c2 || 0);
-    };
-  });
-  var ya = this || self;
-  function Aa(a2, b) {
-    a2 = a2.split(".");
-    var c2 = ya;
-    a2[0] in c2 || "undefined" == typeof c2.execScript || c2.execScript("var " + a2[0]);
-    for (var d; a2.length && (d = a2.shift()); ) a2.length || void 0 === b ? c2[d] && c2[d] !== Object.prototype[d] ? c2 = c2[d] : c2 = c2[d] = {} : c2[d] = b;
-  }
-  function Ba(a2) {
-    var b;
-    a: {
-      if (b = ya.navigator) {
-        if (b = b.userAgent) break a;
-      }
-      b = "";
-    }
-    return -1 != b.indexOf(a2);
-  }
-  var Ca = Array.prototype.map ? function(a2, b) {
-    return Array.prototype.map.call(a2, b, void 0);
-  } : function(a2, b) {
-    for (var c2 = a2.length, d = Array(c2), e2 = "string" === typeof a2 ? a2.split("") : a2, g = 0; g < c2; g++) g in e2 && (d[g] = b.call(void 0, e2[g], g, a2));
-    return d;
-  };
-  var Da = {}, Ea = null;
-  function Fa(a2) {
-    var b = a2.length, c2 = 3 * b / 4;
-    c2 % 3 ? c2 = Math.floor(c2) : -1 != "=.".indexOf(a2[b - 1]) && (c2 = -1 != "=.".indexOf(a2[b - 2]) ? c2 - 2 : c2 - 1);
-    var d = new Uint8Array(c2), e2 = 0;
-    Ga(a2, function(g) {
-      d[e2++] = g;
-    });
-    return e2 !== c2 ? d.subarray(0, e2) : d;
-  }
-  function Ga(a2, b) {
-    function c2(k) {
-      for (; d < a2.length; ) {
-        var l2 = a2.charAt(d++), m2 = Ea[l2];
-        if (null != m2) return m2;
-        if (!/^[\s\xa0]*$/.test(l2)) throw Error("Unknown base64 encoding at char: " + l2);
-      }
-      return k;
-    }
-    Ha();
-    for (var d = 0; ; ) {
-      var e2 = c2(-1), g = c2(0), f = c2(64), h = c2(64);
-      if (64 === h && -1 === e2) break;
-      b(e2 << 2 | g >> 4);
-      64 != f && (b(g << 4 & 240 | f >> 2), 64 != h && b(f << 6 & 192 | h));
-    }
-  }
-  function Ha() {
-    if (!Ea) {
-      Ea = {};
-      for (var a2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".split(""), b = ["+/=", "+/", "-_=", "-_.", "-_"], c2 = 0; 5 > c2; c2++) {
-        var d = a2.concat(b[c2].split(""));
-        Da[c2] = d;
-        for (var e2 = 0; e2 < d.length; e2++) {
-          var g = d[e2];
-          void 0 === Ea[g] && (Ea[g] = e2);
-        }
-      }
-    }
-  }
-  var Ia = "undefined" !== typeof Uint8Array, Ja = !(Ba("Trident") || Ba("MSIE")) && "function" === typeof ya.btoa;
-  function Ka(a2) {
-    if (!Ja) {
-      var b;
-      void 0 === b && (b = 0);
-      Ha();
-      b = Da[b];
-      for (var c2 = Array(Math.floor(a2.length / 3)), d = b[64] || "", e2 = 0, g = 0; e2 < a2.length - 2; e2 += 3) {
-        var f = a2[e2], h = a2[e2 + 1], k = a2[e2 + 2], l2 = b[f >> 2];
-        f = b[(f & 3) << 4 | h >> 4];
-        h = b[(h & 15) << 2 | k >> 6];
-        k = b[k & 63];
-        c2[g++] = l2 + f + h + k;
-      }
-      l2 = 0;
-      k = d;
-      switch (a2.length - e2) {
-        case 2:
-          l2 = a2[e2 + 1], k = b[(l2 & 15) << 2] || d;
-        case 1:
-          a2 = a2[e2], c2[g] = b[a2 >> 2] + b[(a2 & 3) << 4 | l2 >> 4] + k + d;
-      }
-      return c2.join("");
-    }
-    for (b = ""; 10240 < a2.length; ) b += String.fromCharCode.apply(null, a2.subarray(0, 10240)), a2 = a2.subarray(10240);
-    b += String.fromCharCode.apply(
-      null,
-      a2
-    );
-    return btoa(b);
-  }
-  var La = RegExp("[-_.]", "g");
-  function Ma(a2) {
-    switch (a2) {
-      case "-":
-        return "+";
-      case "_":
-        return "/";
-      case ".":
-        return "=";
-      default:
-        return "";
-    }
-  }
-  function Na(a2) {
-    if (!Ja) return Fa(a2);
-    La.test(a2) && (a2 = a2.replace(La, Ma));
-    a2 = atob(a2);
-    for (var b = new Uint8Array(a2.length), c2 = 0; c2 < a2.length; c2++) b[c2] = a2.charCodeAt(c2);
-    return b;
-  }
-  var Oa;
-  function Pa() {
-    return Oa || (Oa = new Uint8Array(0));
-  }
-  var Qa = {};
-  var Ra = "function" === typeof Uint8Array.prototype.slice, G = 0, H = 0;
-  function Sa(a2) {
-    var b = 0 > a2;
-    a2 = Math.abs(a2);
-    var c2 = a2 >>> 0;
-    a2 = Math.floor((a2 - c2) / 4294967296);
-    b && (c2 = A(Ta(c2, a2)), b = c2.next().value, a2 = c2.next().value, c2 = b);
-    G = c2 >>> 0;
-    H = a2 >>> 0;
-  }
-  var Ua = "function" === typeof BigInt;
-  function Ta(a2, b) {
-    b = ~b;
-    a2 ? a2 = ~a2 + 1 : b += 1;
-    return [a2, b];
-  }
-  function Va(a2, b) {
-    this.i = a2 >>> 0;
-    this.h = b >>> 0;
-  }
-  function Wa(a2) {
-    if (!a2) return Xa || (Xa = new Va(0, 0));
-    if (!/^-?\d+$/.test(a2)) return null;
-    if (16 > a2.length) Sa(Number(a2));
-    else if (Ua) a2 = BigInt(a2), G = Number(a2 & BigInt(4294967295)) >>> 0, H = Number(a2 >> BigInt(32) & BigInt(4294967295));
-    else {
-      var b = +("-" === a2[0]);
-      H = G = 0;
-      for (var c2 = a2.length, d = b, e2 = (c2 - b) % 6 + b; e2 <= c2; d = e2, e2 += 6) d = Number(a2.slice(d, e2)), H *= 1e6, G = 1e6 * G + d, 4294967296 <= G && (H += G / 4294967296 | 0, G %= 4294967296);
-      b && (b = A(Ta(G, H)), a2 = b.next().value, b = b.next().value, G = a2, H = b);
-    }
-    return new Va(G, H);
-  }
-  var Xa;
-  function Ya(a2, b) {
-    return Error("Invalid wire type: " + a2 + " (at position " + b + ")");
-  }
-  function Za() {
-    return Error("Failed to read varint, encoding is invalid.");
-  }
-  function $a(a2, b) {
-    return Error("Tried to read past the end of the data " + b + " > " + a2);
-  }
-  function K() {
-    throw Error("Invalid UTF8");
-  }
-  function ab(a2, b) {
-    b = String.fromCharCode.apply(null, b);
-    return null == a2 ? b : a2 + b;
-  }
-  var bb = void 0, cb, db = "undefined" !== typeof TextDecoder, eb, fb = "undefined" !== typeof TextEncoder;
-  var gb;
-  function hb(a2) {
-    if (a2 !== Qa) throw Error("illegal external caller");
-  }
-  function ib(a2, b) {
-    hb(b);
-    this.V = a2;
-    if (null != a2 && 0 === a2.length) throw Error("ByteString should be constructed with non-empty values");
-  }
-  function jb() {
-    return gb || (gb = new ib(null, Qa));
-  }
-  function kb(a2) {
-    hb(Qa);
-    var b = a2.V;
-    b = null == b || Ia && null != b && b instanceof Uint8Array ? b : "string" === typeof b ? Na(b) : null;
-    return null == b ? b : a2.V = b;
-  }
-  function lb(a2) {
-    if ("string" === typeof a2) return { buffer: Na(a2), C: false };
-    if (Array.isArray(a2)) return { buffer: new Uint8Array(a2), C: false };
-    if (a2.constructor === Uint8Array) return { buffer: a2, C: false };
-    if (a2.constructor === ArrayBuffer) return { buffer: new Uint8Array(a2), C: false };
-    if (a2.constructor === ib) return { buffer: kb(a2) || Pa(), C: true };
-    if (a2 instanceof Uint8Array) return { buffer: new Uint8Array(a2.buffer, a2.byteOffset, a2.byteLength), C: false };
-    throw Error("Type not convertible to a Uint8Array, expected a Uint8Array, an ArrayBuffer, a base64 encoded string, a ByteString or an Array of numbers");
-  }
-  function mb(a2, b) {
-    this.i = null;
-    this.m = false;
-    this.h = this.j = this.l = 0;
-    nb(this, a2, b);
-  }
-  function nb(a2, b, c2) {
-    c2 = void 0 === c2 ? {} : c2;
-    a2.S = void 0 === c2.S ? false : c2.S;
-    b && (b = lb(b), a2.i = b.buffer, a2.m = b.C, a2.l = 0, a2.j = a2.i.length, a2.h = a2.l);
-  }
-  mb.prototype.reset = function() {
-    this.h = this.l;
-  };
-  function L(a2, b) {
-    a2.h = b;
-    if (b > a2.j) throw $a(a2.j, b);
-  }
-  function ob(a2) {
-    var b = a2.i, c2 = a2.h, d = b[c2++], e2 = d & 127;
-    if (d & 128 && (d = b[c2++], e2 |= (d & 127) << 7, d & 128 && (d = b[c2++], e2 |= (d & 127) << 14, d & 128 && (d = b[c2++], e2 |= (d & 127) << 21, d & 128 && (d = b[c2++], e2 |= d << 28, d & 128 && b[c2++] & 128 && b[c2++] & 128 && b[c2++] & 128 && b[c2++] & 128 && b[c2++] & 128))))) throw Za();
-    L(a2, c2);
-    return e2;
-  }
-  function pb(a2, b) {
-    if (0 > b) throw Error("Tried to read a negative byte length: " + b);
-    var c2 = a2.h, d = c2 + b;
-    if (d > a2.j) throw $a(b, a2.j - c2);
-    a2.h = d;
-    return c2;
-  }
-  var qb = [];
-  function rb() {
-    this.h = [];
-  }
-  rb.prototype.length = function() {
-    return this.h.length;
-  };
-  rb.prototype.end = function() {
-    var a2 = this.h;
-    this.h = [];
-    return a2;
-  };
-  function sb(a2, b, c2) {
-    for (; 0 < c2 || 127 < b; ) a2.h.push(b & 127 | 128), b = (b >>> 7 | c2 << 25) >>> 0, c2 >>>= 7;
-    a2.h.push(b);
-  }
-  function M(a2, b) {
-    for (; 127 < b; ) a2.h.push(b & 127 | 128), b >>>= 7;
-    a2.h.push(b);
-  }
-  function tb(a2, b) {
-    if (qb.length) {
-      var c2 = qb.pop();
-      nb(c2, a2, b);
-      a2 = c2;
-    } else a2 = new mb(a2, b);
-    this.h = a2;
-    this.j = this.h.h;
-    this.i = this.l = -1;
-    this.setOptions(b);
-  }
-  tb.prototype.setOptions = function(a2) {
-    a2 = void 0 === a2 ? {} : a2;
-    this.ca = void 0 === a2.ca ? false : a2.ca;
-  };
-  tb.prototype.reset = function() {
-    this.h.reset();
-    this.j = this.h.h;
-    this.i = this.l = -1;
-  };
-  function ub(a2) {
-    var b = a2.h;
-    if (b.h == b.j) return false;
-    a2.j = a2.h.h;
-    var c2 = ob(a2.h) >>> 0;
-    b = c2 >>> 3;
-    c2 &= 7;
-    if (!(0 <= c2 && 5 >= c2)) throw Ya(c2, a2.j);
-    if (1 > b) throw Error("Invalid field number: " + b + " (at position " + a2.j + ")");
-    a2.l = b;
-    a2.i = c2;
-    return true;
-  }
-  function vb(a2) {
-    switch (a2.i) {
-      case 0:
-        if (0 != a2.i) vb(a2);
-        else a: {
-          a2 = a2.h;
-          for (var b = a2.h, c2 = b + 10, d = a2.i; b < c2; ) if (0 === (d[b++] & 128)) {
-            L(a2, b);
-            break a;
-          }
-          throw Za();
-        }
-        break;
-      case 1:
-        a2 = a2.h;
-        L(a2, a2.h + 8);
-        break;
-      case 2:
-        2 != a2.i ? vb(a2) : (b = ob(a2.h) >>> 0, a2 = a2.h, L(a2, a2.h + b));
-        break;
-      case 5:
-        a2 = a2.h;
-        L(a2, a2.h + 4);
-        break;
-      case 3:
-        b = a2.l;
-        do {
-          if (!ub(a2)) throw Error("Unmatched start-group tag: stream EOF");
-          if (4 == a2.i) {
-            if (a2.l != b) throw Error("Unmatched end-group tag");
-            break;
-          }
-          vb(a2);
-        } while (1);
-        break;
-      default:
-        throw Ya(a2.i, a2.j);
-    }
-  }
-  var wb = [];
-  function xb() {
-    this.j = [];
-    this.i = 0;
-    this.h = new rb();
-  }
-  function N(a2, b) {
-    0 !== b.length && (a2.j.push(b), a2.i += b.length);
-  }
-  function yb(a2, b) {
-    if (b = b.R) {
-      N(a2, a2.h.end());
-      for (var c2 = 0; c2 < b.length; c2++) N(a2, kb(b[c2]) || Pa());
-    }
-  }
-  var O = "function" === typeof Symbol && "symbol" === typeof Symbol() ? Symbol() : void 0;
-  function P(a2, b) {
-    if (O) return a2[O] |= b;
-    if (void 0 !== a2.A) return a2.A |= b;
-    Object.defineProperties(a2, { A: { value: b, configurable: true, writable: true, enumerable: false } });
-    return b;
-  }
-  function zb(a2, b) {
-    O ? a2[O] && (a2[O] &= ~b) : void 0 !== a2.A && (a2.A &= ~b);
-  }
-  function Q(a2) {
-    var b;
-    O ? b = a2[O] : b = a2.A;
-    return null == b ? 0 : b;
-  }
-  function R(a2, b) {
-    O ? a2[O] = b : void 0 !== a2.A ? a2.A = b : Object.defineProperties(a2, { A: { value: b, configurable: true, writable: true, enumerable: false } });
-  }
-  function Ab(a2) {
-    P(a2, 1);
-    return a2;
-  }
-  function Bb(a2, b) {
-    R(b, (a2 | 0) & -51);
-  }
-  function Cb(a2, b) {
-    R(b, (a2 | 18) & -41);
-  }
-  var Db = {};
-  function Eb(a2) {
-    return null !== a2 && "object" === typeof a2 && !Array.isArray(a2) && a2.constructor === Object;
-  }
-  var Fb, Gb = [];
-  R(Gb, 23);
-  Fb = Object.freeze(Gb);
-  function Hb(a2) {
-    if (Q(a2.o) & 2) throw Error("Cannot mutate an immutable Message");
-  }
-  function Ib(a2) {
-    var b = a2.length;
-    (b = b ? a2[b - 1] : void 0) && Eb(b) ? b.g = 1 : (b = {}, a2.push((b.g = 1, b)));
-  }
-  function Jb(a2) {
-    var b = a2.i + a2.G;
-    return a2.B || (a2.B = a2.o[b] = {});
-  }
-  function S(a2, b) {
-    return -1 === b ? null : b >= a2.i ? a2.B ? a2.B[b] : void 0 : a2.o[b + a2.G];
-  }
-  function U(a2, b, c2, d) {
-    Hb(a2);
-    Kb(a2, b, c2, d);
-  }
-  function Kb(a2, b, c2, d) {
-    a2.j && (a2.j = void 0);
-    b >= a2.i || d ? Jb(a2)[b] = c2 : (a2.o[b + a2.G] = c2, (a2 = a2.B) && b in a2 && delete a2[b]);
-  }
-  function Lb(a2, b, c2, d) {
-    var e2 = S(a2, b);
-    Array.isArray(e2) || (e2 = Fb);
-    var g = Q(e2);
-    g & 1 || Ab(e2);
-    if (d) g & 2 || P(e2, 2), c2 & 1 || Object.freeze(e2);
-    else {
-      d = !(c2 & 2);
-      var f = g & 2;
-      c2 & 1 || !f ? d && g & 16 && !f && zb(e2, 16) : (e2 = Ab(Array.prototype.slice.call(e2)), Kb(a2, b, e2));
-    }
-    return e2;
-  }
-  function Mb(a2, b) {
-    var c2 = S(a2, b);
-    var d = null == c2 ? c2 : "number" === typeof c2 || "NaN" === c2 || "Infinity" === c2 || "-Infinity" === c2 ? Number(c2) : void 0;
-    null != d && d !== c2 && Kb(a2, b, d);
-    return d;
-  }
-  function Nb(a2, b, c2, d, e2) {
-    a2.h || (a2.h = {});
-    var g = a2.h[c2], f = Lb(a2, c2, 3, e2);
-    if (!g) {
-      var h = f;
-      g = [];
-      var k = !!(Q(a2.o) & 16);
-      f = !!(Q(h) & 2);
-      var l2 = h;
-      !e2 && f && (h = Array.prototype.slice.call(h));
-      for (var m2 = f, r2 = 0; r2 < h.length; r2++) {
-        var p2 = h[r2];
-        var n2 = b, q = false;
-        q = void 0 === q ? false : q;
-        p2 = Array.isArray(p2) ? new n2(p2) : q ? new n2() : void 0;
-        if (void 0 !== p2) {
-          n2 = p2.o;
-          var t2 = q = Q(n2);
-          f && (t2 |= 2);
-          k && (t2 |= 16);
-          t2 != q && R(n2, t2);
-          n2 = t2;
-          m2 = m2 || !!(2 & n2);
-          g.push(p2);
-        }
-      }
-      a2.h[c2] = g;
-      k = Q(h);
-      b = k | 33;
-      b = m2 ? b & -9 : b | 8;
-      k != b && (m2 = h, Object.isFrozen(m2) && (m2 = Array.prototype.slice.call(m2)), R(m2, b), h = m2);
-      l2 !== h && Kb(
-        a2,
-        c2,
-        h
-      );
-      (e2 || d && f) && P(g, 2);
-      d && Object.freeze(g);
-      return g;
-    }
-    e2 || (e2 = Object.isFrozen(g), d && !e2 ? Object.freeze(g) : !d && e2 && (g = Array.prototype.slice.call(g), a2.h[c2] = g));
-    return g;
-  }
-  function Ob(a2, b, c2) {
-    var d = !!(Q(a2.o) & 2);
-    b = Nb(a2, b, c2, d, d);
-    a2 = Lb(a2, c2, 3, d);
-    if (!(d || Q(a2) & 8)) {
-      for (d = 0; d < b.length; d++) {
-        c2 = b[d];
-        if (Q(c2.o) & 2) {
-          var e2 = Pb(c2, false);
-          e2.j = c2;
-        } else e2 = c2;
-        c2 !== e2 && (b[d] = e2, a2[d] = e2.o);
-      }
-      P(a2, 8);
-    }
-    return b;
-  }
-  function V(a2, b, c2) {
-    if (null != c2 && "number" !== typeof c2) throw Error("Value of float/double field must be a number|null|undefined, found " + typeof c2 + ": " + c2);
-    U(a2, b, c2);
-  }
-  function Qb(a2, b, c2, d, e2) {
-    Hb(a2);
-    var g = Nb(a2, c2, b, false, false);
-    c2 = null != d ? d : new c2();
-    a2 = Lb(a2, b, 2, false);
-    void 0 != e2 ? (g.splice(e2, 0, c2), a2.splice(e2, 0, c2.o)) : (g.push(c2), a2.push(c2.o));
-    c2.C() && zb(a2, 8);
-    return c2;
-  }
-  function Rb(a2, b) {
-    return null == a2 ? b : a2;
-  }
-  function W(a2, b, c2) {
-    c2 = void 0 === c2 ? 0 : c2;
-    return Rb(Mb(a2, b), c2);
-  }
-  var Sb;
-  function Tb(a2) {
-    switch (typeof a2) {
-      case "number":
-        return isFinite(a2) ? a2 : String(a2);
-      case "object":
-        if (a2) if (Array.isArray(a2)) {
-          if (0 !== (Q(a2) & 128)) return a2 = Array.prototype.slice.call(a2), Ib(a2), a2;
-        } else {
-          if (Ia && null != a2 && a2 instanceof Uint8Array) return Ka(a2);
-          if (a2 instanceof ib) {
-            var b = a2.V;
-            return null == b ? "" : "string" === typeof b ? b : a2.V = Ka(b);
-          }
-        }
-    }
-    return a2;
-  }
-  function Ub(a2, b, c2, d) {
-    if (null != a2) {
-      if (Array.isArray(a2)) a2 = Vb(a2, b, c2, void 0 !== d);
-      else if (Eb(a2)) {
-        var e2 = {}, g;
-        for (g in a2) e2[g] = Ub(a2[g], b, c2, d);
-        a2 = e2;
-      } else a2 = b(a2, d);
-      return a2;
-    }
-  }
-  function Vb(a2, b, c2, d) {
-    var e2 = Q(a2);
-    d = d ? !!(e2 & 16) : void 0;
-    a2 = Array.prototype.slice.call(a2);
-    for (var g = 0; g < a2.length; g++) a2[g] = Ub(a2[g], b, c2, d);
-    c2(e2, a2);
-    return a2;
-  }
-  function Wb(a2) {
-    return a2.ja === Db ? a2.toJSON() : Tb(a2);
-  }
-  function Xb(a2, b) {
-    a2 & 128 && Ib(b);
-  }
-  function Yb(a2, b, c2) {
-    c2 = void 0 === c2 ? Cb : c2;
-    if (null != a2) {
-      if (Ia && a2 instanceof Uint8Array) return a2.length ? new ib(new Uint8Array(a2), Qa) : jb();
-      if (Array.isArray(a2)) {
-        var d = Q(a2);
-        if (d & 2) return a2;
-        if (b && !(d & 32) && (d & 16 || 0 === d)) return R(a2, d | 2), a2;
-        a2 = Vb(a2, Yb, d & 4 ? Cb : c2, true);
-        b = Q(a2);
-        b & 4 && b & 2 && Object.freeze(a2);
-        return a2;
-      }
-      return a2.ja === Db ? Zb(a2) : a2;
-    }
-  }
-  function $b(a2, b, c2, d, e2, g, f) {
-    if (a2 = a2.h && a2.h[c2]) {
-      d = Q(a2);
-      d & 2 ? d = a2 : (g = Ca(a2, Zb), Cb(d, g), Object.freeze(g), d = g);
-      Hb(b);
-      f = null == d ? Fb : Ab([]);
-      if (null != d) {
-        g = !!d.length;
-        for (a2 = 0; a2 < d.length; a2++) {
-          var h = d[a2];
-          g = g && !(Q(h.o) & 2);
-          f[a2] = h.o;
-        }
-        g = (g ? 8 : 0) | 1;
-        a2 = Q(f);
-        (a2 & g) !== g && (Object.isFrozen(f) && (f = Array.prototype.slice.call(f)), R(f, a2 | g));
-        b.h || (b.h = {});
-        b.h[c2] = d;
-      } else b.h && (b.h[c2] = void 0);
-      Kb(b, c2, f, e2);
-    } else U(b, c2, Yb(d, g, f), e2);
-  }
-  function Zb(a2) {
-    if (Q(a2.o) & 2) return a2;
-    a2 = Pb(a2, true);
-    P(a2.o, 2);
-    return a2;
-  }
-  function Pb(a2, b) {
-    var c2 = a2.o, d = [];
-    P(d, 16);
-    var e2 = a2.constructor.h;
-    e2 && d.push(e2);
-    e2 = a2.B;
-    if (e2) {
-      d.length = c2.length;
-      d.fill(void 0, d.length, c2.length);
-      var g = {};
-      d[d.length - 1] = g;
-    }
-    0 !== (Q(c2) & 128) && Ib(d);
-    b = b || a2.C() ? Cb : Bb;
-    g = a2.constructor;
-    Sb = d;
-    d = new g(d);
-    Sb = void 0;
-    a2.R && (d.R = a2.R.slice());
-    g = !!(Q(c2) & 16);
-    for (var f = e2 ? c2.length - 1 : c2.length, h = 0; h < f; h++) $b(a2, d, h - a2.G, c2[h], false, g, b);
-    if (e2) for (var k in e2) $b(a2, d, +k, e2[k], true, g, b);
-    return d;
-  }
-  function X(a2, b, c2) {
-    null == a2 && (a2 = Sb);
-    Sb = void 0;
-    var d = this.constructor.i || 0, e2 = 0 < d, g = this.constructor.h, f = false;
-    if (null == a2) {
-      a2 = g ? [g] : [];
-      var h = 48;
-      var k = true;
-      e2 && (d = 0, h |= 128);
-      R(a2, h);
-    } else {
-      if (!Array.isArray(a2)) throw Error();
-      if (g && g !== a2[0]) throw Error();
-      var l2 = h = P(a2, 0);
-      if (k = 0 !== (16 & l2)) (f = 0 !== (32 & l2)) || (l2 |= 32);
-      if (e2) if (128 & l2) d = 0;
-      else {
-        if (0 < a2.length) {
-          var m2 = a2[a2.length - 1];
-          if (Eb(m2) && "g" in m2) {
-            d = 0;
-            l2 |= 128;
-            delete m2.g;
-            var r2 = true, p2;
-            for (p2 in m2) {
-              r2 = false;
-              break;
-            }
-            r2 && a2.pop();
-          }
-        }
-      }
-      else if (128 & l2) throw Error();
-      h !== l2 && R(a2, l2);
-    }
-    this.G = (g ? 0 : -1) - d;
-    this.h = void 0;
-    this.o = a2;
-    a: {
-      g = this.o.length;
-      d = g - 1;
-      if (g && (g = this.o[d], Eb(g))) {
-        this.B = g;
-        this.i = d - this.G;
-        break a;
-      }
-      void 0 !== b && -1 < b ? (this.i = Math.max(b, d + 1 - this.G), this.B = void 0) : this.i = Number.MAX_VALUE;
-    }
-    if (!e2 && this.B && "g" in this.B) throw Error('Unexpected "g" flag in sparse object of message that is not a group type.');
-    if (c2) {
-      b = k && !f && true;
-      e2 = this.i;
-      var n2;
-      for (k = 0; k < c2.length; k++) f = c2[k], f < e2 ? (f += this.G, (d = a2[f]) ? ac(d, b) : a2[f] = Fb) : (n2 || (n2 = Jb(this)), (d = n2[f]) ? ac(d, b) : n2[f] = Fb);
-    }
-  }
-  X.prototype.toJSON = function() {
-    return Vb(this.o, Wb, Xb);
-  };
-  X.prototype.C = function() {
-    return !!(Q(this.o) & 2);
-  };
-  function ac(a2, b) {
-    if (Array.isArray(a2)) {
-      var c2 = Q(a2), d = 1;
-      !b || c2 & 2 || (d |= 16);
-      (c2 & d) !== d && R(a2, c2 | d);
-    }
-  }
-  X.prototype.ja = Db;
-  X.prototype.toString = function() {
-    return this.o.toString();
-  };
-  function bc(a2, b, c2) {
-    if (c2) {
-      var d = {}, e2;
-      for (e2 in c2) {
-        var g = c2[e2], f = g.ra;
-        f || (d.J = g.xa || g.oa.W, g.ia ? (d.aa = cc(g.ia), f = /* @__PURE__ */ function(h) {
-          return function(k, l2, m2) {
-            return h.J(k, l2, m2, h.aa);
-          };
-        }(d)) : g.ka ? (d.Z = dc(g.da.P, g.ka), f = /* @__PURE__ */ function(h) {
-          return function(k, l2, m2) {
-            return h.J(k, l2, m2, h.Z);
-          };
-        }(d)) : f = d.J, g.ra = f);
-        f(b, a2, g.da);
-        d = { J: d.J, aa: d.aa, Z: d.Z };
-      }
-    }
-    yb(b, a2);
-  }
-  var ec = Symbol();
-  function fc(a2, b, c2) {
-    return a2[ec] || (a2[ec] = function(d, e2) {
-      return b(d, e2, c2);
-    });
-  }
-  function gc(a2) {
-    var b = a2[ec];
-    if (!b) {
-      var c2 = hc(a2);
-      b = function(d, e2) {
-        return ic(d, e2, c2);
-      };
-      a2[ec] = b;
-    }
-    return b;
-  }
-  function jc(a2) {
-    var b = a2.ia;
-    if (b) return gc(b);
-    if (b = a2.wa) return fc(a2.da.P, b, a2.ka);
-  }
-  function kc(a2) {
-    var b = jc(a2), c2 = a2.da, d = a2.oa.U;
-    return b ? function(e2, g) {
-      return d(e2, g, c2, b);
-    } : function(e2, g) {
-      return d(e2, g, c2);
-    };
-  }
-  function lc(a2, b) {
-    var c2 = a2[b];
-    "function" == typeof c2 && 0 === c2.length && (c2 = c2(), a2[b] = c2);
-    return Array.isArray(c2) && (mc in c2 || nc in c2 || 0 < c2.length && "function" == typeof c2[0]) ? c2 : void 0;
-  }
-  function oc(a2, b, c2, d, e2, g) {
-    b.P = a2[0];
-    var f = 1;
-    if (a2.length > f && "number" !== typeof a2[f]) {
-      var h = a2[f++];
-      c2(b, h);
-    }
-    for (; f < a2.length; ) {
-      c2 = a2[f++];
-      for (var k = f + 1; k < a2.length && "number" !== typeof a2[k]; ) k++;
-      h = a2[f++];
-      k -= f;
-      switch (k) {
-        case 0:
-          d(b, c2, h);
-          break;
-        case 1:
-          (k = lc(a2, f)) ? (f++, e2(b, c2, h, k)) : d(b, c2, h, a2[f++]);
-          break;
-        case 2:
-          k = f++;
-          k = lc(a2, k);
-          e2(b, c2, h, k, a2[f++]);
-          break;
-        case 3:
-          g(b, c2, h, a2[f++], a2[f++], a2[f++]);
-          break;
-        case 4:
-          g(b, c2, h, a2[f++], a2[f++], a2[f++], a2[f++]);
-          break;
-        default:
-          throw Error("unexpected number of binary field arguments: " + k);
-      }
-    }
-    return b;
-  }
-  var pc = Symbol();
-  function cc(a2) {
-    var b = a2[pc];
-    if (!b) {
-      var c2 = qc(a2);
-      b = function(d, e2) {
-        return rc(d, e2, c2);
-      };
-      a2[pc] = b;
-    }
-    return b;
-  }
-  function dc(a2, b) {
-    var c2 = a2[pc];
-    c2 || (c2 = function(d, e2) {
-      return bc(d, e2, b);
-    }, a2[pc] = c2);
-    return c2;
-  }
-  var nc = Symbol();
-  function sc(a2, b) {
-    a2.push(b);
-  }
-  function tc(a2, b, c2) {
-    a2.push(b, c2.W);
-  }
-  function uc(a2, b, c2, d) {
-    var e2 = cc(d), g = qc(d).P, f = c2.W;
-    a2.push(b, function(h, k, l2) {
-      return f(h, k, l2, g, e2);
-    });
-  }
-  function vc(a2, b, c2, d, e2, g) {
-    var f = dc(d, g), h = c2.W;
-    a2.push(b, function(k, l2, m2) {
-      return h(k, l2, m2, d, f);
-    });
-  }
-  function qc(a2) {
-    var b = a2[nc];
-    if (b) return b;
-    b = oc(a2, a2[nc] = [], sc, tc, uc, vc);
-    mc in a2 && nc in a2 && (a2.length = 0);
-    return b;
-  }
-  var mc = Symbol();
-  function wc(a2, b) {
-    a2[0] = b;
-  }
-  function xc(a2, b, c2, d) {
-    var e2 = c2.U;
-    a2[b] = d ? function(g, f, h) {
-      return e2(g, f, h, d);
-    } : e2;
-  }
-  function yc(a2, b, c2, d, e2) {
-    var g = c2.U, f = gc(d), h = hc(d).P;
-    a2[b] = function(k, l2, m2) {
-      return g(k, l2, m2, h, f, e2);
-    };
-  }
-  function zc(a2, b, c2, d, e2, g, f) {
-    var h = c2.U, k = fc(d, e2, g);
-    a2[b] = function(l2, m2, r2) {
-      return h(l2, m2, r2, d, k, f);
-    };
-  }
-  function hc(a2) {
-    var b = a2[mc];
-    if (b) return b;
-    b = oc(a2, a2[mc] = {}, wc, xc, yc, zc);
-    mc in a2 && nc in a2 && (a2.length = 0);
-    return b;
-  }
-  function ic(a2, b, c2) {
-    for (; ub(b) && 4 != b.i; ) {
-      var d = b.l, e2 = c2[d];
-      if (!e2) {
-        var g = c2[0];
-        g && (g = g[d]) && (e2 = c2[d] = kc(g));
-      }
-      if (!e2 || !e2(b, a2, d)) {
-        e2 = b;
-        d = a2;
-        g = e2.j;
-        vb(e2);
-        var f = e2;
-        if (!f.ca) {
-          e2 = f.h.h - g;
-          f.h.h = g;
-          f = f.h;
-          if (0 == e2) e2 = jb();
-          else {
-            g = pb(f, e2);
-            if (f.S && f.m) e2 = f.i.subarray(g, g + e2);
-            else {
-              f = f.i;
-              var h = g;
-              e2 = g + e2;
-              e2 = h === e2 ? Pa() : Ra ? f.slice(h, e2) : new Uint8Array(f.subarray(h, e2));
-            }
-            e2 = 0 == e2.length ? jb() : new ib(e2, Qa);
-          }
-          (g = d.R) ? g.push(e2) : d.R = [e2];
-        }
-      }
-    }
-    return a2;
-  }
-  function rc(a2, b, c2) {
-    for (var d = c2.length, e2 = 1 == d % 2, g = e2 ? 1 : 0; g < d; g += 2) (0, c2[g + 1])(b, a2, c2[g]);
-    bc(a2, b, e2 ? c2[0] : void 0);
-  }
-  function Ac(a2, b) {
-    return { U: a2, W: b };
-  }
-  var Y = Ac(function(a2, b, c2) {
-    if (5 !== a2.i) return false;
-    a2 = a2.h;
-    var d = a2.i, e2 = a2.h, g = d[e2];
-    var f = d[e2 + 1];
-    var h = d[e2 + 2];
-    d = d[e2 + 3];
-    L(a2, a2.h + 4);
-    f = (g << 0 | f << 8 | h << 16 | d << 24) >>> 0;
-    a2 = 2 * (f >> 31) + 1;
-    g = f >>> 23 & 255;
-    f &= 8388607;
-    U(b, c2, 255 == g ? f ? NaN : Infinity * a2 : 0 == g ? a2 * Math.pow(2, -149) * f : a2 * Math.pow(2, g - 150) * (f + Math.pow(2, 23)));
-    return true;
-  }, function(a2, b, c2) {
-    b = Mb(b, c2);
-    if (null != b) {
-      M(a2.h, 8 * c2 + 5);
-      a2 = a2.h;
-      var d = +b;
-      0 === d ? 0 < 1 / d ? G = H = 0 : (H = 0, G = 2147483648) : isNaN(d) ? (H = 0, G = 2147483647) : (d = (c2 = 0 > d ? -2147483648 : 0) ? -d : d, 34028234663852886e22 < d ? (H = 0, G = (c2 | 2139095040) >>> 0) : 11754943508222875e-54 > d ? (d = Math.round(d / Math.pow(2, -149)), H = 0, G = (c2 | d) >>> 0) : (b = Math.floor(Math.log(d) / Math.LN2), d *= Math.pow(2, -b), d = Math.round(8388608 * d), 16777216 <= d && ++b, H = 0, G = (c2 | b + 127 << 23 | d & 8388607) >>> 0));
-      c2 = G;
-      a2.h.push(c2 >>> 0 & 255);
-      a2.h.push(c2 >>> 8 & 255);
-      a2.h.push(c2 >>> 16 & 255);
-      a2.h.push(c2 >>> 24 & 255);
-    }
-  }), Bc = Ac(function(a2, b, c2) {
-    if (0 !== a2.i) return false;
-    var d = a2.h, e2 = 0, g = a2 = 0, f = d.i, h = d.h;
-    do {
-      var k = f[h++];
-      e2 |= (k & 127) << g;
-      g += 7;
-    } while (32 > g && k & 128);
-    32 < g && (a2 |= (k & 127) >> 4);
-    for (g = 3; 32 > g && k & 128; g += 7) k = f[h++], a2 |= (k & 127) << g;
-    L(
-      d,
-      h
-    );
-    if (128 > k) {
-      d = e2 >>> 0;
-      k = a2 >>> 0;
-      if (a2 = k & 2147483648) d = ~d + 1 >>> 0, k = ~k >>> 0, 0 == d && (k = k + 1 >>> 0);
-      d = 4294967296 * k + (d >>> 0);
-    } else throw Za();
-    U(b, c2, a2 ? -d : d);
-    return true;
-  }, function(a2, b, c2) {
-    b = S(b, c2);
-    null != b && ("string" === typeof b && Wa(b), null != b && (M(a2.h, 8 * c2), "number" === typeof b ? (a2 = a2.h, Sa(b), sb(a2, G, H)) : (c2 = Wa(b), sb(a2.h, c2.i, c2.h))));
-  }), Cc = Ac(function(a2, b, c2) {
-    if (0 !== a2.i) return false;
-    U(b, c2, ob(a2.h));
-    return true;
-  }, function(a2, b, c2) {
-    b = S(b, c2);
-    if (null != b && null != b) if (M(a2.h, 8 * c2), a2 = a2.h, c2 = b, 0 <= c2) M(a2, c2);
-    else {
-      for (b = 0; 9 > b; b++) a2.h.push(c2 & 127 | 128), c2 >>= 7;
-      a2.h.push(1);
-    }
-  }), Dc = Ac(function(a2, b, c2) {
-    if (2 !== a2.i) return false;
-    var d = ob(a2.h) >>> 0;
-    a2 = a2.h;
-    var e2 = pb(a2, d);
-    a2 = a2.i;
-    if (db) {
-      var g = a2, f;
-      (f = cb) || (f = cb = new TextDecoder("utf-8", { fatal: true }));
-      a2 = e2 + d;
-      g = 0 === e2 && a2 === g.length ? g : g.subarray(e2, a2);
-      try {
-        var h = f.decode(g);
-      } catch (r2) {
-        if (void 0 === bb) {
-          try {
-            f.decode(new Uint8Array([128]));
-          } catch (p2) {
-          }
-          try {
-            f.decode(new Uint8Array([97])), bb = true;
-          } catch (p2) {
-            bb = false;
-          }
-        }
-        !bb && (cb = void 0);
-        throw r2;
-      }
-    } else {
-      h = e2;
-      d = h + d;
-      e2 = [];
-      for (var k = null, l2, m2; h < d; ) l2 = a2[h++], 128 > l2 ? e2.push(l2) : 224 > l2 ? h >= d ? K() : (m2 = a2[h++], 194 > l2 || 128 !== (m2 & 192) ? (h--, K()) : e2.push((l2 & 31) << 6 | m2 & 63)) : 240 > l2 ? h >= d - 1 ? K() : (m2 = a2[h++], 128 !== (m2 & 192) || 224 === l2 && 160 > m2 || 237 === l2 && 160 <= m2 || 128 !== ((g = a2[h++]) & 192) ? (h--, K()) : e2.push((l2 & 15) << 12 | (m2 & 63) << 6 | g & 63)) : 244 >= l2 ? h >= d - 2 ? K() : (m2 = a2[h++], 128 !== (m2 & 192) || 0 !== (l2 << 28) + (m2 - 144) >> 30 || 128 !== ((g = a2[h++]) & 192) || 128 !== ((f = a2[h++]) & 192) ? (h--, K()) : (l2 = (l2 & 7) << 18 | (m2 & 63) << 12 | (g & 63) << 6 | f & 63, l2 -= 65536, e2.push((l2 >> 10 & 1023) + 55296, (l2 & 1023) + 56320))) : K(), 8192 <= e2.length && (k = ab(k, e2), e2.length = 0);
-      h = ab(k, e2);
-    }
-    U(b, c2, h);
-    return true;
-  }, function(a2, b, c2) {
-    b = S(b, c2);
-    if (null != b) {
-      var d = false;
-      d = void 0 === d ? false : d;
-      if (fb) {
-        if (d && /(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])/.test(b)) throw Error("Found an unpaired surrogate");
-        b = (eb || (eb = new TextEncoder())).encode(b);
-      } else {
-        for (var e2 = 0, g = new Uint8Array(3 * b.length), f = 0; f < b.length; f++) {
-          var h = b.charCodeAt(f);
-          if (128 > h) g[e2++] = h;
-          else {
-            if (2048 > h) g[e2++] = h >> 6 | 192;
-            else {
-              if (55296 <= h && 57343 >= h) {
-                if (56319 >= h && f < b.length) {
-                  var k = b.charCodeAt(++f);
-                  if (56320 <= k && 57343 >= k) {
-                    h = 1024 * (h - 55296) + k - 56320 + 65536;
-                    g[e2++] = h >> 18 | 240;
-                    g[e2++] = h >> 12 & 63 | 128;
-                    g[e2++] = h >> 6 & 63 | 128;
-                    g[e2++] = h & 63 | 128;
-                    continue;
-                  } else f--;
-                }
-                if (d) throw Error("Found an unpaired surrogate");
-                h = 65533;
-              }
-              g[e2++] = h >> 12 | 224;
-              g[e2++] = h >> 6 & 63 | 128;
-            }
-            g[e2++] = h & 63 | 128;
-          }
-        }
-        b = e2 === g.length ? g : g.subarray(0, e2);
-      }
-      M(a2.h, 8 * c2 + 2);
-      M(a2.h, b.length);
-      N(a2, a2.h.end());
-      N(a2, b);
-    }
-  }), Ec = Ac(function(a2, b, c2, d, e2) {
-    if (2 !== a2.i) return false;
-    b = Qb(b, c2, d);
-    c2 = a2.h.j;
-    d = ob(a2.h) >>> 0;
-    var g = a2.h.h + d, f = g - c2;
-    0 >= f && (a2.h.j = g, e2(b, a2, void 0, void 0, void 0), f = g - a2.h.h);
-    if (f) throw Error("Message parsing ended unexpectedly. Expected to read " + (d + " bytes, instead read " + (d - f) + " bytes, either the data ended unexpectedly or the message misreported its own length"));
-    a2.h.h = g;
-    a2.h.j = c2;
-    return true;
-  }, function(a2, b, c2, d, e2) {
-    b = Ob(b, d, c2);
-    if (null != b) for (d = 0; d < b.length; d++) {
-      var g = a2;
-      M(g.h, 8 * c2 + 2);
-      var f = g.h.end();
-      N(g, f);
-      f.push(g.i);
-      g = f;
-      e2(b[d], a2);
-      f = a2;
-      var h = g.pop();
-      for (h = f.i + f.h.length() - h; 127 < h; ) g.push(h & 127 | 128), h >>>= 7, f.i++;
-      g.push(h);
-      f.i++;
-    }
-  });
-  function Fc(a2) {
-    return function(b, c2) {
-      a: {
-        if (wb.length) {
-          var d = wb.pop();
-          d.setOptions(c2);
-          nb(d.h, b, c2);
-          b = d;
-        } else b = new tb(b, c2);
-        try {
-          var e2 = hc(a2);
-          var g = ic(new e2.P(), b, e2);
-          break a;
-        } finally {
-          e2 = b.h, e2.i = null, e2.m = false, e2.l = 0, e2.j = 0, e2.h = 0, e2.S = false, b.l = -1, b.i = -1, 100 > wb.length && wb.push(b);
-        }
-        g = void 0;
-      }
-      return g;
-    };
-  }
-  function Gc(a2) {
-    return function() {
-      var b = new xb();
-      rc(this, b, qc(a2));
-      N(b, b.h.end());
-      for (var c2 = new Uint8Array(b.i), d = b.j, e2 = d.length, g = 0, f = 0; f < e2; f++) {
-        var h = d[f];
-        c2.set(h, g);
-        g += h.length;
-      }
-      b.j = [c2];
-      return c2;
-    };
-  }
-  function Z(a2) {
-    X.call(this, a2);
-  }
-  na(Z, X);
-  var Hc = [Z, 1, Cc, 2, Y, 3, Dc, 4, Dc];
-  Z.prototype.l = Gc(Hc);
-  function Ic(a2) {
-    X.call(this, a2, -1, Jc);
-  }
-  na(Ic, X);
-  Ic.prototype.addClassification = function(a2, b) {
-    Qb(this, 1, Z, a2, b);
-    return this;
-  };
-  var Jc = [1], Kc = Fc([Ic, 1, Ec, Hc]);
-  function Lc(a2) {
-    X.call(this, a2);
-  }
-  na(Lc, X);
-  var Mc = [Lc, 1, Y, 2, Y, 3, Y, 4, Y, 5, Y];
-  Lc.prototype.l = Gc(Mc);
-  function Nc(a2) {
-    X.call(this, a2, -1, Oc);
-  }
-  na(Nc, X);
-  var Oc = [1], Pc = Fc([Nc, 1, Ec, Mc]);
-  function Qc(a2) {
-    X.call(this, a2);
-  }
-  na(Qc, X);
-  var Rc = [Qc, 1, Y, 2, Y, 3, Y, 4, Y, 5, Y, 6, Bc], Sc = Fc(Rc);
-  Qc.prototype.l = Gc(Rc);
-  function Tc(a2, b, c2) {
-    c2 = a2.createShader(0 === c2 ? a2.VERTEX_SHADER : a2.FRAGMENT_SHADER);
-    a2.shaderSource(c2, b);
-    a2.compileShader(c2);
-    if (!a2.getShaderParameter(c2, a2.COMPILE_STATUS)) throw Error("Could not compile WebGL shader.\n\n" + a2.getShaderInfoLog(c2));
-    return c2;
-  }
-  function Uc(a2) {
-    return Ob(a2, Z, 1).map(function(b) {
-      var c2 = S(b, 1);
-      return { index: null == c2 ? 0 : c2, qa: W(b, 2), label: null != S(b, 3) ? Rb(S(b, 3), "") : void 0, displayName: null != S(b, 4) ? Rb(S(b, 4), "") : void 0 };
-    });
-  }
-  function Vc(a2) {
-    return { x: W(a2, 1), y: W(a2, 2), z: W(a2, 3), visibility: null != Mb(a2, 4) ? W(a2, 4) : void 0 };
-  }
-  function Wc(a2, b) {
-    this.i = a2;
-    this.h = b;
-    this.m = 0;
-  }
-  function Xc(a2, b, c2) {
-    Yc(a2, b);
-    if ("function" === typeof a2.h.canvas.transferToImageBitmap) return Promise.resolve(a2.h.canvas.transferToImageBitmap());
-    if (c2) return Promise.resolve(a2.h.canvas);
-    if ("function" === typeof createImageBitmap) return createImageBitmap(a2.h.canvas);
-    void 0 === a2.j && (a2.j = document.createElement("canvas"));
-    return new Promise(function(d) {
-      a2.j.height = a2.h.canvas.height;
-      a2.j.width = a2.h.canvas.width;
-      a2.j.getContext("2d", {}).drawImage(a2.h.canvas, 0, 0, a2.h.canvas.width, a2.h.canvas.height);
-      d(a2.j);
-    });
-  }
-  function Yc(a2, b) {
-    var c2 = a2.h;
-    if (void 0 === a2.s) {
-      var d = Tc(c2, "\n  attribute vec2 aVertex;\n  attribute vec2 aTex;\n  varying vec2 vTex;\n  void main(void) {\n    gl_Position = vec4(aVertex, 0.0, 1.0);\n    vTex = aTex;\n  }", 0), e2 = Tc(c2, "\n  precision mediump float;\n  varying vec2 vTex;\n  uniform sampler2D sampler0;\n  void main(){\n    gl_FragColor = texture2D(sampler0, vTex);\n  }", 1), g = c2.createProgram();
-      c2.attachShader(g, d);
-      c2.attachShader(g, e2);
-      c2.linkProgram(g);
-      if (!c2.getProgramParameter(g, c2.LINK_STATUS)) throw Error("Could not compile WebGL program.\n\n" + c2.getProgramInfoLog(g));
-      d = a2.s = g;
-      c2.useProgram(d);
-      e2 = c2.getUniformLocation(d, "sampler0");
-      a2.l = { O: c2.getAttribLocation(d, "aVertex"), N: c2.getAttribLocation(d, "aTex"), ya: e2 };
-      a2.v = c2.createBuffer();
-      c2.bindBuffer(c2.ARRAY_BUFFER, a2.v);
-      c2.enableVertexAttribArray(a2.l.O);
-      c2.vertexAttribPointer(a2.l.O, 2, c2.FLOAT, false, 0, 0);
-      c2.bufferData(c2.ARRAY_BUFFER, new Float32Array([-1, -1, -1, 1, 1, 1, 1, -1]), c2.STATIC_DRAW);
-      c2.bindBuffer(c2.ARRAY_BUFFER, null);
-      a2.u = c2.createBuffer();
-      c2.bindBuffer(c2.ARRAY_BUFFER, a2.u);
-      c2.enableVertexAttribArray(a2.l.N);
-      c2.vertexAttribPointer(
-        a2.l.N,
-        2,
-        c2.FLOAT,
-        false,
-        0,
-        0
-      );
-      c2.bufferData(c2.ARRAY_BUFFER, new Float32Array([0, 1, 0, 0, 1, 0, 1, 1]), c2.STATIC_DRAW);
-      c2.bindBuffer(c2.ARRAY_BUFFER, null);
-      c2.uniform1i(e2, 0);
-    }
-    d = a2.l;
-    c2.useProgram(a2.s);
-    c2.canvas.width = b.width;
-    c2.canvas.height = b.height;
-    c2.viewport(0, 0, b.width, b.height);
-    c2.activeTexture(c2.TEXTURE0);
-    a2.i.bindTexture2d(b.glName);
-    c2.enableVertexAttribArray(d.O);
-    c2.bindBuffer(c2.ARRAY_BUFFER, a2.v);
-    c2.vertexAttribPointer(d.O, 2, c2.FLOAT, false, 0, 0);
-    c2.enableVertexAttribArray(d.N);
-    c2.bindBuffer(c2.ARRAY_BUFFER, a2.u);
-    c2.vertexAttribPointer(
-      d.N,
-      2,
-      c2.FLOAT,
-      false,
-      0,
-      0
-    );
-    c2.bindFramebuffer(c2.DRAW_FRAMEBUFFER ? c2.DRAW_FRAMEBUFFER : c2.FRAMEBUFFER, null);
-    c2.clearColor(0, 0, 0, 0);
-    c2.clear(c2.COLOR_BUFFER_BIT);
-    c2.colorMask(true, true, true, true);
-    c2.drawArrays(c2.TRIANGLE_FAN, 0, 4);
-    c2.disableVertexAttribArray(d.O);
-    c2.disableVertexAttribArray(d.N);
-    c2.bindBuffer(c2.ARRAY_BUFFER, null);
-    a2.i.bindTexture2d(0);
-  }
-  function Zc(a2) {
-    this.h = a2;
-  }
-  var $c = new Uint8Array([0, 97, 115, 109, 1, 0, 0, 0, 1, 4, 1, 96, 0, 0, 3, 2, 1, 0, 10, 9, 1, 7, 0, 65, 0, 253, 15, 26, 11]);
-  function ad(a2, b) {
-    return b + a2;
-  }
-  function bd(a2, b) {
-    window[a2] = b;
-  }
-  function cd(a2) {
-    var b = document.createElement("script");
-    b.setAttribute("src", a2);
-    b.setAttribute("crossorigin", "anonymous");
-    return new Promise(function(c2) {
-      b.addEventListener("load", function() {
-        c2();
-      }, false);
-      b.addEventListener("error", function() {
-        c2();
-      }, false);
-      document.body.appendChild(b);
-    });
-  }
-  function dd() {
-    return E(function(a2) {
-      switch (a2.h) {
-        case 1:
-          return a2.s = 2, D(a2, WebAssembly.instantiate($c), 4);
-        case 4:
-          a2.h = 3;
-          a2.s = 0;
-          break;
-        case 2:
-          return a2.s = 0, a2.l = null, a2.return(false);
-        case 3:
-          return a2.return(true);
-      }
-    });
-  }
-  function ed(a2) {
-    this.h = a2;
-    this.listeners = {};
-    this.l = {};
-    this.L = {};
-    this.s = {};
-    this.v = {};
-    this.M = this.u = this.ga = true;
-    this.I = Promise.resolve();
-    this.fa = "";
-    this.D = {};
-    this.locateFile = a2 && a2.locateFile || ad;
-    if ("object" === typeof window) var b = window.location.pathname.toString().substring(0, window.location.pathname.toString().lastIndexOf("/")) + "/";
-    else if ("undefined" !== typeof location) b = location.pathname.toString().substring(0, location.pathname.toString().lastIndexOf("/")) + "/";
-    else throw Error("solutions can only be loaded on a web page or in a web worker");
-    this.ha = b;
-    if (a2.options) {
-      b = A(Object.keys(a2.options));
-      for (var c2 = b.next(); !c2.done; c2 = b.next()) {
-        c2 = c2.value;
-        var d = a2.options[c2].default;
-        void 0 !== d && (this.l[c2] = "function" === typeof d ? d() : d);
-      }
-    }
-  }
-  x = ed.prototype;
-  x.close = function() {
-    this.j && this.j.delete();
-    return Promise.resolve();
-  };
-  function fd(a2) {
-    var b, c2, d, e2, g, f, h, k, l2, m2, r2;
-    return E(function(p2) {
-      switch (p2.h) {
-        case 1:
-          if (!a2.ga) return p2.return();
-          b = void 0 === a2.h.files ? [] : "function" === typeof a2.h.files ? a2.h.files(a2.l) : a2.h.files;
-          return D(p2, dd(), 2);
-        case 2:
-          c2 = p2.i;
-          if ("object" === typeof window) return bd("createMediapipeSolutionsWasm", { locateFile: a2.locateFile }), bd("createMediapipeSolutionsPackedAssets", { locateFile: a2.locateFile }), f = b.filter(function(n2) {
-            return void 0 !== n2.data;
-          }), h = b.filter(function(n2) {
-            return void 0 === n2.data;
-          }), k = Promise.all(f.map(function(n2) {
-            var q = gd(a2, n2.url);
-            if (void 0 !== n2.path) {
-              var t2 = n2.path;
-              q = q.then(function(w) {
-                a2.overrideFile(t2, w);
-                return Promise.resolve(w);
-              });
-            }
-            return q;
-          })), l2 = Promise.all(h.map(function(n2) {
-            return void 0 === n2.simd || n2.simd && c2 || !n2.simd && !c2 ? cd(a2.locateFile(n2.url, a2.ha)) : Promise.resolve();
-          })).then(function() {
-            var n2, q, t2;
-            return E(function(w) {
-              if (1 == w.h) return n2 = window.createMediapipeSolutionsWasm, q = window.createMediapipeSolutionsPackedAssets, t2 = a2, D(w, n2(q), 2);
-              t2.i = w.i;
-              w.h = 0;
-            });
-          }), m2 = function() {
-            return E(function(n2) {
-              a2.h.graph && a2.h.graph.url ? n2 = D(
-                n2,
-                gd(a2, a2.h.graph.url),
-                0
-              ) : (n2.h = 0, n2 = void 0);
-              return n2;
-            });
-          }(), D(p2, Promise.all([l2, k, m2]), 7);
-          if ("function" !== typeof importScripts) throw Error("solutions can only be loaded on a web page or in a web worker");
-          d = b.filter(function(n2) {
-            return void 0 === n2.simd || n2.simd && c2 || !n2.simd && !c2;
-          }).map(function(n2) {
-            return a2.locateFile(n2.url, a2.ha);
-          });
-          importScripts.apply(null, ea(d));
-          e2 = a2;
-          return D(p2, createMediapipeSolutionsWasm(Module), 6);
-        case 6:
-          e2.i = p2.i;
-          a2.m = new OffscreenCanvas(1, 1);
-          a2.i.canvas = a2.m;
-          g = a2.i.GL.createContext(a2.m, {
-            antialias: false,
-            alpha: false,
-            va: "undefined" !== typeof WebGL2RenderingContext ? 2 : 1
-          });
-          a2.i.GL.makeContextCurrent(g);
-          p2.h = 4;
-          break;
-        case 7:
-          a2.m = document.createElement("canvas");
-          r2 = a2.m.getContext("webgl2", {});
-          if (!r2 && (r2 = a2.m.getContext("webgl", {}), !r2)) return alert("Failed to create WebGL canvas context when passing video frame."), p2.return();
-          a2.K = r2;
-          a2.i.canvas = a2.m;
-          a2.i.createContext(a2.m, true, true, {});
-        case 4:
-          a2.j = new a2.i.SolutionWasm(), a2.ga = false, p2.h = 0;
-      }
-    });
-  }
-  function hd(a2) {
-    var b, c2, d, e2, g, f, h, k;
-    return E(function(l2) {
-      if (1 == l2.h) {
-        if (a2.h.graph && a2.h.graph.url && a2.fa === a2.h.graph.url) return l2.return();
-        a2.u = true;
-        if (!a2.h.graph || !a2.h.graph.url) {
-          l2.h = 2;
-          return;
-        }
-        a2.fa = a2.h.graph.url;
-        return D(l2, gd(a2, a2.h.graph.url), 3);
-      }
-      2 != l2.h && (b = l2.i, a2.j.loadGraph(b));
-      c2 = A(Object.keys(a2.D));
-      for (d = c2.next(); !d.done; d = c2.next()) e2 = d.value, a2.j.overrideFile(e2, a2.D[e2]);
-      a2.D = {};
-      if (a2.h.listeners) for (g = A(a2.h.listeners), f = g.next(); !f.done; f = g.next()) h = f.value, id(a2, h);
-      k = a2.l;
-      a2.l = {};
-      a2.setOptions(k);
-      l2.h = 0;
-    });
-  }
-  x.reset = function() {
-    var a2 = this;
-    return E(function(b) {
-      a2.j && (a2.j.reset(), a2.s = {}, a2.v = {});
-      b.h = 0;
-    });
-  };
-  x.setOptions = function(a2, b) {
-    var c2 = this;
-    if (b = b || this.h.options) {
-      for (var d = [], e2 = [], g = {}, f = A(Object.keys(a2)), h = f.next(); !h.done; g = { X: g.X, Y: g.Y }, h = f.next()) if (h = h.value, !(h in this.l && this.l[h] === a2[h])) {
-        this.l[h] = a2[h];
-        var k = b[h];
-        void 0 !== k && (k.onChange && (g.X = k.onChange, g.Y = a2[h], d.push(/* @__PURE__ */ function(l2) {
-          return function() {
-            var m2;
-            return E(function(r2) {
-              if (1 == r2.h) return D(r2, l2.X(l2.Y), 2);
-              m2 = r2.i;
-              true === m2 && (c2.u = true);
-              r2.h = 0;
-            });
-          };
-        }(g))), k.graphOptionXref && (h = Object.assign(
-          {},
-          { calculatorName: "", calculatorIndex: 0 },
-          k.graphOptionXref,
-          { valueNumber: 1 === k.type ? a2[h] : 0, valueBoolean: 0 === k.type ? a2[h] : false, valueString: 2 === k.type ? a2[h] : "" }
-        ), e2.push(h)));
-      }
-      if (0 !== d.length || 0 !== e2.length) this.u = true, this.H = (void 0 === this.H ? [] : this.H).concat(e2), this.F = (void 0 === this.F ? [] : this.F).concat(d);
-    }
-  };
-  function jd(a2) {
-    var b, c2, d, e2, g, f, h;
-    return E(function(k) {
-      switch (k.h) {
-        case 1:
-          if (!a2.u) return k.return();
-          if (!a2.F) {
-            k.h = 2;
-            break;
-          }
-          b = A(a2.F);
-          c2 = b.next();
-        case 3:
-          if (c2.done) {
-            k.h = 5;
-            break;
-          }
-          d = c2.value;
-          return D(k, d(), 4);
-        case 4:
-          c2 = b.next();
-          k.h = 3;
-          break;
-        case 5:
-          a2.F = void 0;
-        case 2:
-          if (a2.H) {
-            e2 = new a2.i.GraphOptionChangeRequestList();
-            g = A(a2.H);
-            for (f = g.next(); !f.done; f = g.next()) h = f.value, e2.push_back(h);
-            a2.j.changeOptions(e2);
-            e2.delete();
-            a2.H = void 0;
-          }
-          a2.u = false;
-          k.h = 0;
-      }
-    });
-  }
-  x.initialize = function() {
-    var a2 = this;
-    return E(function(b) {
-      return 1 == b.h ? D(b, fd(a2), 2) : 3 != b.h ? D(b, hd(a2), 3) : D(b, jd(a2), 0);
-    });
-  };
-  function gd(a2, b) {
-    var c2, d;
-    return E(function(e2) {
-      if (b in a2.L) return e2.return(a2.L[b]);
-      c2 = a2.locateFile(b, "");
-      d = fetch(c2).then(function(g) {
-        return g.arrayBuffer();
-      });
-      a2.L[b] = d;
-      return e2.return(d);
-    });
-  }
-  x.overrideFile = function(a2, b) {
-    this.j ? this.j.overrideFile(a2, b) : this.D[a2] = b;
-  };
-  x.clearOverriddenFiles = function() {
-    this.D = {};
-    this.j && this.j.clearOverriddenFiles();
-  };
-  x.send = function(a2, b) {
-    var c2 = this, d, e2, g, f, h, k, l2, m2, r2;
-    return E(function(p2) {
-      switch (p2.h) {
-        case 1:
-          if (!c2.h.inputs) return p2.return();
-          d = 1e3 * (void 0 === b || null === b ? performance.now() : b);
-          return D(p2, c2.I, 2);
-        case 2:
-          return D(p2, c2.initialize(), 3);
-        case 3:
-          e2 = new c2.i.PacketDataList();
-          g = A(Object.keys(a2));
-          for (f = g.next(); !f.done; f = g.next()) if (h = f.value, k = c2.h.inputs[h]) {
-            a: {
-              var n2 = a2[h];
-              switch (k.type) {
-                case "video":
-                  var q = c2.s[k.stream];
-                  q || (q = new Wc(c2.i, c2.K), c2.s[k.stream] = q);
-                  0 === q.m && (q.m = q.i.createTexture());
-                  if ("undefined" !== typeof HTMLVideoElement && n2 instanceof HTMLVideoElement) {
-                    var t2 = n2.videoWidth;
-                    var w = n2.videoHeight;
-                  } else "undefined" !== typeof HTMLImageElement && n2 instanceof HTMLImageElement ? (t2 = n2.naturalWidth, w = n2.naturalHeight) : (t2 = n2.width, w = n2.height);
-                  w = { glName: q.m, width: t2, height: w };
-                  t2 = q.h;
-                  t2.canvas.width = w.width;
-                  t2.canvas.height = w.height;
-                  t2.activeTexture(t2.TEXTURE0);
-                  q.i.bindTexture2d(q.m);
-                  t2.texImage2D(t2.TEXTURE_2D, 0, t2.RGBA, t2.RGBA, t2.UNSIGNED_BYTE, n2);
-                  q.i.bindTexture2d(0);
-                  q = w;
-                  break a;
-                case "detections":
-                  q = c2.s[k.stream];
-                  q || (q = new Zc(c2.i), c2.s[k.stream] = q);
-                  q.data || (q.data = new q.h.DetectionListData());
-                  q.data.reset(n2.length);
-                  for (w = 0; w < n2.length; ++w) {
-                    t2 = n2[w];
-                    var v = q.data, B = v.setBoundingBox, J = w;
-                    var I = t2.la;
-                    var u2 = new Qc();
-                    V(u2, 1, I.sa);
-                    V(u2, 2, I.ta);
-                    V(u2, 3, I.height);
-                    V(u2, 4, I.width);
-                    V(u2, 5, I.rotation);
-                    U(u2, 6, I.pa);
-                    I = u2.l();
-                    B.call(v, J, I);
-                    if (t2.ea) for (v = 0; v < t2.ea.length; ++v) {
-                      u2 = t2.ea[v];
-                      B = q.data;
-                      J = B.addNormalizedLandmark;
-                      I = w;
-                      u2 = Object.assign({}, u2, { visibility: u2.visibility ? u2.visibility : 0 });
-                      var C2 = new Lc();
-                      V(C2, 1, u2.x);
-                      V(C2, 2, u2.y);
-                      V(C2, 3, u2.z);
-                      u2.visibility && V(C2, 4, u2.visibility);
-                      u2 = C2.l();
-                      J.call(
-                        B,
-                        I,
-                        u2
-                      );
-                    }
-                    if (t2.ba) for (v = 0; v < t2.ba.length; ++v) B = q.data, J = B.addClassification, I = w, u2 = t2.ba[v], C2 = new Z(), V(C2, 2, u2.qa), u2.index && U(C2, 1, u2.index), u2.label && U(C2, 3, u2.label), u2.displayName && U(C2, 4, u2.displayName), u2 = C2.l(), J.call(B, I, u2);
-                  }
-                  q = q.data;
-                  break a;
-                default:
-                  q = {};
-              }
-            }
-            l2 = q;
-            m2 = k.stream;
-            switch (k.type) {
-              case "video":
-                e2.pushTexture2d(Object.assign({}, l2, { stream: m2, timestamp: d }));
-                break;
-              case "detections":
-                r2 = l2;
-                r2.stream = m2;
-                r2.timestamp = d;
-                e2.pushDetectionList(r2);
-                break;
-              default:
-                throw Error("Unknown input config type: '" + k.type + "'");
-            }
-          }
-          c2.j.send(e2);
-          return D(p2, c2.I, 4);
-        case 4:
-          e2.delete(), p2.h = 0;
-      }
-    });
-  };
-  function kd(a2, b, c2) {
-    var d, e2, g, f, h, k, l2, m2, r2, p2, n2, q, t2, w;
-    return E(function(v) {
-      switch (v.h) {
-        case 1:
-          if (!c2) return v.return(b);
-          d = {};
-          e2 = 0;
-          g = A(Object.keys(c2));
-          for (f = g.next(); !f.done; f = g.next()) h = f.value, k = c2[h], "string" !== typeof k && "texture" === k.type && void 0 !== b[k.stream] && ++e2;
-          1 < e2 && (a2.M = false);
-          l2 = A(Object.keys(c2));
-          f = l2.next();
-        case 2:
-          if (f.done) {
-            v.h = 4;
-            break;
-          }
-          m2 = f.value;
-          r2 = c2[m2];
-          if ("string" === typeof r2) return t2 = d, w = m2, D(v, ld(a2, m2, b[r2]), 14);
-          p2 = b[r2.stream];
-          if ("detection_list" === r2.type) {
-            if (p2) {
-              var B = p2.getRectList();
-              for (var J = p2.getLandmarksList(), I = p2.getClassificationsList(), u2 = [], C2 = 0; C2 < B.size(); ++C2) {
-                var T = Sc(B.get(C2)), od = W(T, 1), pd = W(T, 2), qd = W(T, 3), rd = W(T, 4), sd = W(T, 5, 0), za = void 0;
-                za = void 0 === za ? 0 : za;
-                T = { la: { sa: od, ta: pd, height: qd, width: rd, rotation: sd, pa: Rb(S(T, 6), za) }, ea: Ob(Pc(J.get(C2)), Lc, 1).map(Vc), ba: Uc(Kc(I.get(C2))) };
-                u2.push(T);
-              }
-              B = u2;
-            } else B = [];
-            d[m2] = B;
-            v.h = 7;
-            break;
-          }
-          if ("proto_list" === r2.type) {
-            if (p2) {
-              B = Array(p2.size());
-              for (J = 0; J < p2.size(); J++) B[J] = p2.get(J);
-              p2.delete();
-            } else B = [];
-            d[m2] = B;
-            v.h = 7;
-            break;
-          }
-          if (void 0 === p2) {
-            v.h = 3;
-            break;
-          }
-          if ("float_list" === r2.type) {
-            d[m2] = p2;
-            v.h = 7;
-            break;
-          }
-          if ("proto" === r2.type) {
-            d[m2] = p2;
-            v.h = 7;
-            break;
-          }
-          if ("texture" !== r2.type) throw Error("Unknown output config type: '" + r2.type + "'");
-          n2 = a2.v[m2];
-          n2 || (n2 = new Wc(a2.i, a2.K), a2.v[m2] = n2);
-          return D(v, Xc(n2, p2, a2.M), 13);
-        case 13:
-          q = v.i, d[m2] = q;
-        case 7:
-          r2.transform && d[m2] && (d[m2] = r2.transform(d[m2]));
-          v.h = 3;
-          break;
-        case 14:
-          t2[w] = v.i;
-        case 3:
-          f = l2.next();
-          v.h = 2;
-          break;
-        case 4:
-          return v.return(d);
-      }
-    });
-  }
-  function ld(a2, b, c2) {
-    var d;
-    return E(function(e2) {
-      return "number" === typeof c2 || c2 instanceof Uint8Array || c2 instanceof a2.i.Uint8BlobList ? e2.return(c2) : c2 instanceof a2.i.Texture2dDataOut ? (d = a2.v[b], d || (d = new Wc(a2.i, a2.K), a2.v[b] = d), e2.return(Xc(d, c2, a2.M))) : e2.return(void 0);
-    });
-  }
-  function id(a2, b) {
-    for (var c2 = b.name || "$", d = [].concat(ea(b.wants)), e2 = new a2.i.StringList(), g = A(b.wants), f = g.next(); !f.done; f = g.next()) e2.push_back(f.value);
-    g = a2.i.PacketListener.implement({ onResults: function(h) {
-      for (var k = {}, l2 = 0; l2 < b.wants.length; ++l2) k[d[l2]] = h.get(l2);
-      var m2 = a2.listeners[c2];
-      m2 && (a2.I = kd(a2, k, b.outs).then(function(r2) {
-        r2 = m2(r2);
-        for (var p2 = 0; p2 < b.wants.length; ++p2) {
-          var n2 = k[d[p2]];
-          "object" === typeof n2 && n2.hasOwnProperty && n2.hasOwnProperty("delete") && n2.delete();
-        }
-        r2 && (a2.I = r2);
-      }));
-    } });
-    a2.j.attachMultiListener(e2, g);
-    e2.delete();
-  }
-  x.onResults = function(a2, b) {
-    this.listeners[b || "$"] = a2;
-  };
-  Aa("Solution", ed);
-  Aa("OptionType", { BOOL: 0, NUMBER: 1, ua: 2, 0: "BOOL", 1: "NUMBER", 2: "STRING" });
-  function md(a2) {
-    void 0 === a2 && (a2 = 0);
-    switch (a2) {
-      case 1:
-        return "selfie_segmentation_landscape.tflite";
-      default:
-        return "selfie_segmentation.tflite";
-    }
-  }
-  function nd(a2) {
-    var b = this;
-    a2 = a2 || {};
-    this.h = new ed({ locateFile: a2.locateFile, files: function(c2) {
-      return [{ simd: true, url: "selfie_segmentation_solution_simd_wasm_bin.js" }, { simd: false, url: "selfie_segmentation_solution_wasm_bin.js" }, { data: true, url: md(c2.modelSelection) }];
-    }, graph: { url: "selfie_segmentation.binarypb" }, listeners: [{ wants: ["segmentation_mask", "image_transformed"], outs: { image: { type: "texture", stream: "image_transformed" }, segmentationMask: { type: "texture", stream: "segmentation_mask" } } }], inputs: { image: {
-      type: "video",
-      stream: "input_frames_gpu"
-    } }, options: { useCpuInference: { type: 0, graphOptionXref: { calculatorType: "InferenceCalculator", fieldName: "use_cpu_inference" }, default: "object" !== typeof window || void 0 === window.navigator ? false : "iPad Simulator;iPhone Simulator;iPod Simulator;iPad;iPhone;iPod".split(";").includes(navigator.platform) || navigator.userAgent.includes("Mac") && "ontouchend" in document }, selfieMode: { type: 0, graphOptionXref: { calculatorType: "GlScalerCalculator", calculatorIndex: 1, fieldName: "flip_horizontal" } }, modelSelection: {
-      type: 1,
-      graphOptionXref: { calculatorType: "ConstantSidePacketCalculator", calculatorName: "ConstantSidePacketCalculatorModelSelection", fieldName: "int_value" },
-      onChange: function(c2) {
-        var d, e2, g;
-        return E(function(f) {
-          if (1 == f.h) return d = md(c2), e2 = "third_party/mediapipe/modules/selfie_segmentation/" + d, D(f, gd(b.h, d), 2);
-          g = f.i;
-          b.h.overrideFile(e2, g);
-          return f.return(true);
-        });
-      }
-    } } });
-  }
-  x = nd.prototype;
-  x.close = function() {
-    this.h.close();
-    return Promise.resolve();
-  };
-  x.onResults = function(a2) {
-    this.h.onResults(a2);
-  };
-  x.initialize = function() {
-    var a2 = this;
-    return E(function(b) {
-      return D(b, a2.h.initialize(), 0);
-    });
-  };
-  x.reset = function() {
-    this.h.reset();
-  };
-  x.send = function(a2) {
-    var b = this;
-    return E(function(c2) {
-      return D(c2, b.h.send(a2), 0);
-    });
-  };
-  x.setOptions = function(a2) {
-    this.h.setOptions(a2);
-  };
-  Aa("SelfieSegmentation", nd);
-  Aa("VERSION", "0.1.1675465747");
-}).call(commonjsGlobal);
-class Mediapipe {
-  constructor() {
-    __publicField(this, "segmenter");
-    __publicField(this, "canvasId", "");
-    __publicField(this, "titleVideo", "");
-    __publicField(this, "mode", "none");
-    __publicField(this, "urlImage", "");
-    __publicField(this, "animationId", null);
-    __publicField(this, "loop", async () => {
-      const video = document.getElementById("local");
-      if (!video) {
-        this.animationId = requestAnimationFrame(this.loop);
-        return;
-      }
-      if (video.videoWidth === 0 || video.videoHeight === 0) {
-        this.animationId = requestAnimationFrame(this.loop);
-        return;
-      }
-      await this.segmenter.send({ image: video });
-      this.animationId = requestAnimationFrame(this.loop);
-    });
-  }
-  getElement() {
-    return this.segmenter;
-  }
-  initMediapipe({
-    canvasId,
-    titleVideo = "Khách hàng",
-    mode = "blur"
-  }) {
-    const SelfieSegmentationCtor = (
-      // Prefer module export when available
-      selfie_segmentation.SelfieSegmentation || // Fallback to global attached by the UMD build
-      (globalThis == null ? void 0 : globalThis.SelfieSegmentation)
-    );
-    if (!SelfieSegmentationCtor) {
-      throw new Error(
-        "SelfieSegmentation constructor not found. Ensure @mediapipe/selfie_segmentation is loaded."
-      );
-    }
-    this.segmenter = new SelfieSegmentationCtor({
-      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`
-    });
-    this.segmenter.setOptions({ modelSelection: 1 });
-    this.titleVideo = titleVideo;
-    this.canvasId = canvasId;
-    this.mode = mode;
-  }
-  async start() {
-    const video = document.getElementById("local");
-    let canvas = document.getElementById("outputCanvas");
-    if (!canvas) {
-      canvas = document.createElement("canvas");
-      canvas.id = "outputCanvas";
-      canvas.width = 640;
-      canvas.height = 480;
-      canvas.style.display = "none";
-      document.body.appendChild(canvas);
-    }
-    this.sendBackgroundBlur({
-      name: "Khách hàng",
-      mode: "none",
-      urlImage: "",
-      position: { x: 10, y: 470 }
-    });
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: true
-    });
-    video.srcObject = stream;
-    video.onloadedmetadata = () => {
-      const c2 = document.getElementById("outputCanvas");
-      if (c2) {
-        const vw = video.videoWidth || 640;
-        const vh = video.videoHeight || 480;
-        c2.width = vw;
-        c2.height = vh;
-      }
-      video.play();
-      this.loop();
-    };
-  }
-  async stop() {
-    this.segmenter.close();
-  }
-  async resetMediapipe() {
-    cancelAnimationFrame(this.animationId);
-    this.animationId = null;
-  }
-  async sendUnBlurBackground(userName = "Chưa có tên", position) {
-    const canvas = document.getElementById("outputCanvas");
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-    this.segmenter.onResults((results) => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
-      ctx.globalCompositeOperation = "source-over";
-      ctx.font = "20px Arial";
-      ctx.fillStyle = "white";
-      ctx.strokeStyle = "black";
-      ctx.lineWidth = 3;
-      const textMetrics = ctx.measureText(userName);
-      const textWidth = textMetrics.width;
-      const x = (position == null ? void 0 : position.x) || (canvas.width - textWidth) / 2;
-      const y = (position == null ? void 0 : position.y) || 20;
-      ctx.strokeText(userName, x, y);
-      ctx.fillText(userName, x, y);
-      ctx.restore();
-    });
-  }
-  async sendBackgroundBlur({
-    name: name2 = "Chưa có tên",
-    position = { x: 0, y: 0 },
-    mode = "none",
-    urlImage = ""
-  }, callback) {
-    const canvas = document.getElementById("outputCanvas");
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-    this.segmenter.onResults((results) => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      switch (mode) {
-        case "blur":
-          ctx.drawImage(
-            results.segmentationMask,
-            0,
-            0,
-            canvas.width,
-            canvas.height
-          );
-          ctx.globalCompositeOperation = "source-out";
-          ctx.filter = "blur(8px)";
-          ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
-          ctx.globalCompositeOperation = "destination-over";
-          ctx.filter = "none";
-          ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
-          break;
-        case "image":
-          if (!urlImage) {
-            ctx.globalCompositeOperation = "source-out";
-            ctx.filter = "blur(8px)";
-            ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
-            this.mode = "blur";
-          }
-          const image2 = new Image();
-          image2.src = urlImage;
-          ctx.globalCompositeOperation = "source-out";
-          ctx.filter = "none";
-          ctx.drawImage(image2, 0, 0, canvas.width, canvas.height);
-          this.urlImage = urlImage;
-          this.mode = "image";
-          break;
-        case "none":
-          ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
-          ctx.globalCompositeOperation = "destination-over";
-          ctx.filter = "none";
-          this.mode = "none";
-          break;
-      }
-      ctx.globalCompositeOperation = "source-over";
-      ctx.font = "20px Arial";
-      ctx.fillStyle = "white";
-      ctx.strokeStyle = "black";
-      ctx.lineWidth = 3;
-      const text = name2;
-      const textMetrics = ctx.measureText(text);
-      const textWidth = textMetrics.width;
-      const x = (position == null ? void 0 : position.x) || (canvas.width - textWidth) / 2;
-      const y = (position == null ? void 0 : position.y) || 20;
-      ctx.strokeText(text, x, y);
-      ctx.fillText(text, x, y);
-      ctx.restore();
-    });
-    setTimeout(() => {
-      callback && callback();
-    }, 1e3);
-  }
-  async mediaPipeReset() {
-    var _a;
-    const video = document.getElementById("local");
-    const canvas = document.getElementById("outputCanvas");
-    if (video || canvas) {
-      video.srcObject = null;
-      video == null ? void 0 : video.pause();
-      mediaPipe.resetMediapipe();
-      (_a = canvas.getContext("2d")) == null ? void 0 : _a.clearRect(0, 0, canvas.width, canvas.height);
-      canvas.captureStream(30).getVideoTracks()[0].stop();
-      this.stopUserMedia();
-    }
-  }
-  async stopUserMedia() {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      stream.getTracks().forEach((track) => track.stop());
-    } catch (error) {
-      console.log("error stopUserMedia", error);
-    }
-  }
-}
-const mediaPipe = new Mediapipe();
 class BubbleSDK {
   constructor() {
     // private _container: HTMLElement | null = null;
@@ -92685,16 +90352,40 @@ class BubbleSDK {
     this.msg = msg;
   }
   cameraOn_sdk() {
+    var _a, _b, _c, _d;
     if (this.socket) {
       const sessionId = this.socket.getSessionMain();
       const find = this.socket.searchSessionEstablished(sessionId);
+      traceLog(
+        "cameraOn_sdk",
+        { sessionId, find },
+        {
+          isLogServer: true,
+          isLogClient: false,
+          sessionId,
+          tenantId: (_b = (_a = this.info) == null ? void 0 : _a.tenant) == null ? void 0 : _b.id,
+          agentId: (_d = (_c = this.info) == null ? void 0 : _c.user) == null ? void 0 : _d.id
+        }
+      );
       if (find) this.socket.sendCamera(sessionId, true);
     }
   }
   cameraOff_sdk() {
+    var _a, _b, _c, _d;
     if (this.socket) {
       const sessionId = this.socket.getSessionMain();
       const find = this.socket.searchSessionEstablished(sessionId);
+      traceLog(
+        "cameraOff_sdk",
+        { sessionId, find },
+        {
+          isLogServer: true,
+          isLogClient: false,
+          sessionId,
+          tenantId: (_b = (_a = this.info) == null ? void 0 : _a.tenant) == null ? void 0 : _b.id,
+          agentId: (_d = (_c = this.info) == null ? void 0 : _c.user) == null ? void 0 : _d.id
+        }
+      );
       if (find) this.socket.sendCamera(sessionId, false);
     }
   }
@@ -93373,14 +91064,6 @@ class BubbleSDK {
     });
   }
   sendBackgroundBlur_sdk(options, enable = false) {
-    mediaPipe.sendBackgroundBlur(options, () => {
-      var _a, _b;
-      (_b = this.socket) == null ? void 0 : _b.blurBackground(
-        (_a = this.socket) == null ? void 0 : _a.main_id,
-        enable,
-        this.localVideoId
-      );
-    });
   }
   joinVideo_sdk(extension, delegate) {
     if (this.socket) {
@@ -93408,6 +91091,15 @@ class BubbleSDK {
       (options == null ? void 0 : options.quality) || 1
     );
   }
+  sendMessageSdk(message2, messageType, attachments = []) {
+    if (!this.socket) {
+      return Promise.reject({
+        success: false,
+        message: "Socket not initialized"
+      });
+    }
+    return this.socket.sendMessageSdk(message2, messageType, attachments);
+  }
 }
 var config_url = {
   base_url: CONFIG_URL,
@@ -93427,7 +91119,7 @@ const DEFAULT_OPTIONS = {
   baseUrl: config_url.base_url
 };
 const SDK_NAMESPACE = "OmiSDK";
-const SDK_VERSION = "1.0.12";
+const SDK_VERSION = "1.0.16";
 class OmiSDK extends BubbleSDK {
   /**
    * Creates a new SDK instance
@@ -93590,10 +91282,12 @@ class OmiSDK extends BubbleSDK {
     this.joinVideo_sdk(extension, delegate);
   }
   startBackgroundBlur() {
-    mediaPipe.start();
   }
   getStateSession(sessionId) {
     return this.sessionState_sdk(sessionId);
+  }
+  sendMessage(message2, messageType, attachments = []) {
+    return this.sendMessageSdk(message2, messageType, attachments);
   }
   async captureRemoteSnapshot(options) {
     return this.captureRemoteSnapshot_sdk(options);
@@ -93788,7 +91482,6 @@ class GuestSocket {
   constructor() {
     __publicField(this, "socket_config");
     __publicField(this, "port_sip_sdk");
-    __publicField(this, "base_url", "");
     __publicField(this, "data", /* @__PURE__ */ new Map());
   }
   getDataCallId(key) {
@@ -93833,7 +91526,7 @@ class GuestSocket {
       });
       return;
     }
-    this.socket_config = lookup(`${this.base_url}/`, {
+    this.socket_config = lookup(`${url2}/`, {
       path: "/live-connect",
       reconnection: true,
       autoConnect: false,
@@ -93850,6 +91543,13 @@ class GuestSocket {
     this.socket_config.on("connect", () => {
       var _a;
       console.log("Socket connected:", (_a = this.socket_config) == null ? void 0 : _a.id);
+      this.Socket_Emit("msg", {
+        text: "Bắt đầu phiên tương tác",
+        attachments: []
+      });
+      this.Socket_On("msg", (data) => {
+        client_socket.emit("msg", data);
+      });
     });
     this.socket_config.connect();
   }
@@ -94497,6 +92197,15 @@ class GuestSwitchBoard {
     try {
       const devices = await navigator.mediaDevices.enumerateDevices();
       const videoDevices = devices.filter((d) => d.kind === "videoinput");
+      traceLog(
+        "switchCamera enumerateDevices",
+        { videoDevices },
+        {
+          isLogServer: true,
+          isLogClient: true,
+          sessionId: this.getDataSessionId(this.getSessionMain())
+        }
+      );
       if (videoDevices.length > 1) {
         const video = document.getElementById(
           ((_a = this.mediaElement) == null ? void 0 : _a.localVideoID) ?? ""
@@ -94601,62 +92310,83 @@ class GuestSwitchBoard {
       reader.readAsDataURL(blob);
     });
   }
-  async captureStream(id, sessionId, userId, tenantId) {
-    var _a, _b, _c;
-    const localVideo = document.getElementById("local");
-    try {
-      const stream = localVideo.srcObject;
-      const track = stream.getVideoTracks()[0];
-      const imageCapture = new ImageCapture(track);
-      const blob = await imageCapture.takePhoto({});
-      const base64 = await this.blobToBase64(blob);
-      const response = await getConversion({ session_id: sessionId });
-      if ((_a = response == null ? void 0 : response.data) == null ? void 0 : _a._id) {
-        const base64Data = base64.split(",")[1];
-        const mimeType = `image/png`;
-        const responseApi = await postSendSession({
-          cloudAgentId: userId ?? 0,
-          sessionId,
-          cloudTenantId: tenantId,
-          intentName: "capture_snapshot",
-          text: "",
-          channel: "CALL",
-          attachments: [
-            {
-              fileName: `snapshot_${Date.now()}.png`,
-              buffer: base64Data,
-              type: mimeType,
-              name: `snapshot_${Date.now()}.png`
-              // size: blob?.size || 0,
-            }
-          ],
-          suggestionId: "",
-          conversationId: (_b = response == null ? void 0 : response.data) == null ? void 0 : _b._id,
-          messageType: "FILE"
-        });
-        console.log("base64", base64);
-      } else {
-        throw Error("Cannot get conversation for snapshot");
-      }
-    } catch (error) {
-      console.log("error", error);
-      (_c = this.port_sip_sdk) == null ? void 0 : _c.sendMessage(
-        JSON.stringify({
-          sessionId,
-          payload: {
-            type: CAPTURE_SNAPSHOT
-          }
-        }),
-        id,
-        true
-      );
-    }
+  /*
+   * khi nào ImageCapture thịnh hành hơn hỗ trợ nhiều trình duyệt trên mobile thì sẽ dùng
+   */
+  // async ImageCapture(
+  //   id: number,
+  //   sessionId: string,
+  //   userId: number,
+  //   tenantId: number,
+  // ) {
+  //   const localVideo = document.getElementById("local") as HTMLVideoElement;
+  //   try {
+  //     const stream = localVideo.srcObject as MediaStream;
+  //     const track = stream.getVideoTracks()[0];
+  //     const imageCapture = new ImageCapture(track);
+  //     const blob = await imageCapture.takePhoto({});
+  //     const base64 = await this.blobToBase64(blob);
+  //     const response = await getConversion({ session_id: sessionId });
+  //     if (response?.data?._id) {
+  //       const base64Data = base64.split(",")[1];
+  //       const mimeType = `image/png`;
+  //       const responseApi = await postSendSession({
+  //         cloudAgentId: userId ?? 0,
+  //         sessionId: sessionId,
+  //         cloudTenantId: tenantId,
+  //         intentName: "capture_snapshot",
+  //         text: "",
+  //         channel: "LIVE_CONNECT",
+  //         attachments: [
+  //           {
+  //             fileName: `snapshot_${Date.now()}.png`,
+  //             buffer: base64Data,
+  //             type: mimeType,
+  //             name: `snapshot_${Date.now()}.png`,
+  //             // size: blob?.size || 0,
+  //           },
+  //         ],
+  //         suggestionId: "",
+  //         conversationId: response?.data?._id,
+  //         messageType: "FILE",
+  //       });
+  //       console.log("base64", base64);
+  //     } else {
+  //       throw Error("Cannot get conversation for snapshot");
+  //     }
+  //   } catch (error) {
+  //     console.log("error", error);
+  //     this.port_sip_sdk?.sendMessage(
+  //       JSON.stringify({
+  //         sessionId,
+  //         payload: {
+  //           type: CAPTURE_SNAPSHOT,
+  //         },
+  //       }),
+  //       id,
+  //       true,
+  //     );
+  //   }
+  // }
+  pushMsgCaptureSnapshot(id, reason) {
+    var _a;
+    (_a = this.port_sip_sdk) == null ? void 0 : _a.sendMessage(
+      JSON.stringify({
+        type: CAPTURE_SNAPSHOT_RESPONSE.ERROR,
+        data: null,
+        reason,
+        sessionId: this.getDataSessionId(id)
+      }),
+      id,
+      false
+    );
   }
-  async captureStreamV2(id, sessionId, remoteVideoId, userId, tenantId) {
-    var _a, _b, _c, _d, _e;
+  async captureStream(id, sessionId, remoteVideoId, userId, tenantId) {
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j;
     try {
       const targetSessionId = sessionId || this.getDataSessionId(id);
       if (!targetSessionId) {
+        this.pushMsgCaptureSnapshot(id, "No active session found");
         return {
           success: false,
           error: "No active session found",
@@ -94665,6 +92395,7 @@ class GuestSwitchBoard {
       }
       const callId = this.getDataCallId(targetSessionId);
       if (!callId) {
+        this.pushMsgCaptureSnapshot(id, "Call ID not found for session");
         return {
           success: false,
           error: "Call ID not found for session",
@@ -94686,6 +92417,7 @@ class GuestSwitchBoard {
         }
       }
       if (!videoElement) {
+        this.pushMsgCaptureSnapshot(id, "Remote video element not found");
         return {
           success: false,
           error: "Remote video element not found",
@@ -94693,29 +92425,58 @@ class GuestSwitchBoard {
         };
       }
       if (videoElement.readyState < 2) {
+        this.pushMsgCaptureSnapshot(id, "Video is not ready for capture");
         return {
           success: false,
           error: "Video is not ready for capture",
           timestamp: Date.now()
         };
       }
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
-      if (!ctx) {
-        return {
-          success: false,
-          error: "Failed to get canvas context",
-          timestamp: Date.now()
-        };
-      }
-      canvas.width = videoElement.videoWidth || videoElement.clientWidth;
-      canvas.height = videoElement.videoHeight || videoElement.clientHeight;
-      ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
       const format = "png";
       const mimeType = `image/${format}`;
-      const dataURL = canvas.toDataURL(mimeType, 1);
+      const canvas = document.createElement("canvas");
+      const nativeWidth = videoElement.videoWidth;
+      const nativeHeight = videoElement.videoHeight;
+      let dataURL;
+      const videoTrack = (_b = (_a = videoElement.srcObject) == null ? void 0 : _a.getVideoTracks()) == null ? void 0 : _b[0];
+      if (videoTrack && typeof ImageCapture !== "undefined") {
+        try {
+          const capture = new ImageCapture(videoTrack);
+          const bitmap = await capture.grabFrame();
+          canvas.width = bitmap.width;
+          canvas.height = bitmap.height;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(bitmap, 0, 0);
+          bitmap.close();
+          dataURL = canvas.toDataURL(mimeType, 1);
+        } catch {
+          canvas.width = nativeWidth;
+          canvas.height = nativeHeight;
+          const ctx = canvas.getContext("2d");
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = "high";
+          ctx.drawImage(videoElement, 0, 0, nativeWidth, nativeHeight);
+          dataURL = canvas.toDataURL(mimeType, 1);
+        }
+      } else {
+        canvas.width = nativeWidth;
+        canvas.height = nativeHeight;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          this.pushMsgCaptureSnapshot(id, "Failed to get canvas context");
+          return {
+            success: false,
+            error: "Failed to get canvas context",
+            timestamp: Date.now()
+          };
+        }
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = "high";
+        ctx.drawImage(videoElement, 0, 0, nativeWidth, nativeHeight);
+        dataURL = canvas.toDataURL(mimeType, 1);
+      }
       const response = await getConversion({ session_id: targetSessionId });
-      if ((_a = response == null ? void 0 : response.data) == null ? void 0 : _a._id) {
+      if ((_c = response == null ? void 0 : response.data) == null ? void 0 : _c._id) {
         const base64Data = dataURL.split(",")[1];
         const responseApi = await postSendSession({
           cloudAgentId: userId ?? 0,
@@ -94723,7 +92484,7 @@ class GuestSwitchBoard {
           cloudTenantId: tenantId ?? 0,
           intentName: "capture_snapshot",
           text: "",
-          channel: (_b = response.data) == null ? void 0 : _b.channel,
+          channel: (_d = response.data) == null ? void 0 : _d.channel,
           attachments: [
             {
               fileName: `snapshot_${Date.now()}.${format}`,
@@ -94734,9 +92495,22 @@ class GuestSwitchBoard {
             }
           ],
           suggestionId: "",
-          conversationId: (_c = response == null ? void 0 : response.data) == null ? void 0 : _c._id,
+          conversationId: (_e = response == null ? void 0 : response.data) == null ? void 0 : _e._id,
           messageType: "FILE"
         });
+        if ((_f = responseApi.data) == null ? void 0 : _f.success) {
+          (_h = this.port_sip_sdk) == null ? void 0 : _h.sendMessage(
+            JSON.stringify({
+              type: CAPTURE_SNAPSHOT_RESPONSE.SUCCESS,
+              data: (_g = responseApi.data.data) == null ? void 0 : _g.attachment,
+              sessionId: targetSessionId
+            }),
+            id,
+            false
+          );
+        } else {
+          this.pushMsgCaptureSnapshot(id, "Capture snapshot failed");
+        }
         traceLog(
           "captureRemoteSnapshot success",
           {
@@ -94756,13 +92530,17 @@ class GuestSwitchBoard {
         );
         return {
           success: true,
-          data: (_e = (_d = responseApi.data) == null ? void 0 : _d.data) == null ? void 0 : _e.attachment,
+          data: (_j = (_i = responseApi.data) == null ? void 0 : _i.data) == null ? void 0 : _j.attachment,
           timestamp: Date.now()
         };
       } else {
         throw Error("Cannot get conversation for snapshot");
       }
     } catch (error) {
+      this.pushMsgCaptureSnapshot(
+        id,
+        error instanceof Error ? error == null ? void 0 : error.message : "Unknown error"
+      );
       traceLog(
         "captureRemoteSnapshot error",
         {
@@ -94787,14 +92565,44 @@ class GuestSwitchBoard {
   switchMsgTypeSip(payload, id, sessionId) {
     switch (payload == null ? void 0 : payload.type) {
       case CAPTURE_SNAPSHOT:
-        this.captureStreamV2(
-          id,
-          sessionId,
-          "video1",
-          payload == null ? void 0 : payload.userId,
-          payload == null ? void 0 : payload.tenantId
-        );
+        {
+          this.captureStream(
+            id,
+            sessionId,
+            "local",
+            payload == null ? void 0 : payload.userId,
+            payload == null ? void 0 : payload.tenantId
+          );
+        }
         break;
+    }
+  }
+  async ZoomVideo() {
+    var _a, _b, _c;
+    try {
+      const callId = this.getSessionMain();
+      const session2 = (_a = this.port_sip_sdk) == null ? void 0 : _a.sessions.get(callId);
+      if (!session2) throw new Error("session does not exist");
+      const pc = (_c = (_b = session2.session) == null ? void 0 : _b.sessionDescriptionHandler) == null ? void 0 : _c.peerConnection;
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      const track = stream.getVideoTracks()[0];
+      const capabilities = track.getCapabilities();
+      if (capabilities == null ? void 0 : capabilities.zoom) {
+        await track.applyConstraints({
+          advanced: [{ zoom: 2 }]
+        });
+      }
+      return Promise.resolve({
+        success: true,
+        message: "ZoomVideo success"
+      });
+    } catch (error) {
+      alert(`${error} error ZoomVideo`);
+      return Promise.reject({
+        success: false,
+        message: "Lỗi ZoomVideo",
+        description: error
+      });
     }
   }
 }
@@ -94816,6 +92624,7 @@ class GuestService extends GuestSocket {
     });
     __publicField(this, "eventEmitter");
     __publicField(this, "sip");
+    __publicField(this, "fileList", []);
     this.instance.base_url = options.baseUrl;
     this.instance.api_key = options.apiKey;
     this.appId = options.appId;
@@ -94851,14 +92660,11 @@ class GuestService extends GuestSocket {
     if (!this.instance.base_url || !this.instance.api_key) {
       return Promise.reject(new Error("Base URL or API key is missing"));
     }
-    if (!options.phone || !options.name) {
-      return Promise.reject(new Error("Phone or name is missing"));
-    }
     try {
       const response = await postGuestToken({
-        phone: options.phone,
-        name: options.name,
-        email: (options == null ? void 0 : options.email) ?? "",
+        phone: options.phone || randomNumber(),
+        name: options.name || randomName(),
+        email: (options == null ? void 0 : options.email) || randomEmail(),
         appId: this.appId
       });
       if ((_a = response.data) == null ? void 0 : _a.data.token) {
@@ -94898,7 +92704,7 @@ class GuestService extends GuestSocket {
    * @returns {SdkResponse}
    */
   async makeCall(phone, option) {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n;
     traceLog(
       "Guest makeCall called with phone:",
       { phone },
@@ -94912,6 +92718,7 @@ class GuestService extends GuestSocket {
     }
     try {
       await navigator.permissions.query({ name: "microphone" });
+      this.init({ phone, name: "", email: "" });
       const response = await postExtMakeCall({ phone_number: phone });
       if (!((_a = response.data) == null ? void 0 : _a.data)) {
         return Promise.reject({
@@ -94929,10 +92736,14 @@ class GuestService extends GuestSocket {
         extraInfo: (option == null ? void 0 : option.extraInfo) ?? "",
         mediaElement: this.mediaId,
         requestDelegate: {
-          onHangup: (_l = option == null ? void 0 : option.requestDelegate) == null ? void 0 : _l.onHangup,
-          onConnection: (_m = option == null ? void 0 : option.requestDelegate) == null ? void 0 : _m.onConnection,
-          onConnectedSuccessfully: (_n = option == null ? void 0 : option.requestDelegate) == null ? void 0 : _n.onConnectedSuccessfully,
-          onAccept: (_o = option == null ? void 0 : option.requestDelegate) == null ? void 0 : _o.onAccept
+          onHangup: (sessionId, record) => {
+            var _a2, _b2;
+            this.disconnectSocket();
+            (_b2 = (_a2 = option == null ? void 0 : option.requestDelegate) == null ? void 0 : _a2.onHangup) == null ? void 0 : _b2.call(_a2, sessionId || "", record || {});
+          },
+          onConnection: (_l = option == null ? void 0 : option.requestDelegate) == null ? void 0 : _l.onConnection,
+          onConnectedSuccessfully: (_m = option == null ? void 0 : option.requestDelegate) == null ? void 0 : _m.onConnectedSuccessfully,
+          onAccept: (_n = option == null ? void 0 : option.requestDelegate) == null ? void 0 : _n.onAccept
         },
         phone
       });
@@ -95030,20 +92841,15 @@ class GuestService extends GuestSocket {
     });
   }
   /**
-   *
-   * handle user
-   *
+   * Converts an ArrayBuffer to a Base64-encoded Data URI string.
+   * @param buffer - The raw binary data from a file
+   * @param type - The MIME type of the file (e.g. "image/png", "application/pdf")
+   * @returns A Data URI string in the format `data:<type>;base64,<encoded>`
    */
   arrayBufferToBase64(buffer, type) {
-    let binary = "";
-    const bytes = new Uint8Array(buffer);
-    bytes.forEach((byte) => {
-      binary += String.fromCharCode(byte);
-    });
-    return `data:${type};base64,${window.btoa(binary)}`;
+    return convertBufferToBase64(buffer, type);
   }
   upLoadFile(files) {
-    let fileList = [];
     if (!this.instance.base_url || !this.instance.api_key) {
       return Promise.reject(new Error("Base URL or API key is missing"));
     }
@@ -95063,7 +92869,7 @@ class GuestService extends GuestSocket {
         if (reader.result instanceof ArrayBuffer) {
           const buffer = reader.result;
           const base64 = outerThis.arrayBufferToBase64(buffer, v.type);
-          fileList.push({
+          outerThis.fileList.push({
             id: i2,
             buffer: reader.result,
             originalname: v.name,
@@ -95075,6 +92881,28 @@ class GuestService extends GuestSocket {
         }
       };
     });
+  }
+  /** Send message to the conversation */
+  sendMessage(message2) {
+    this.Socket_Emit("msg", {
+      text: message2,
+      attachments: []
+    });
+  }
+  /** Send attachments to the conversation */
+  sendAttachments() {
+    this.Socket_Emit("msg", {
+      text: "",
+      attachments: this.fileList
+    });
+    setTimeout(() => {
+      this.fileList = [];
+    }, 150);
+  }
+  ZoomVideoCall() {
+    var _a;
+    if (!this.sip) return this.notConnected();
+    return (_a = this.sip) == null ? void 0 : _a.ZoomVideo();
   }
 }
 class OmiGuestSDK extends GuestService {
