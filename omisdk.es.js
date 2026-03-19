@@ -92577,7 +92577,7 @@ class GuestSwitchBoard {
         break;
     }
   }
-  async ZoomVideo(zoom = 1, torch = false, facingMode2 = "user") {
+  async ZoomVideo(zoom = 1) {
     var _a, _b, _c;
     try {
       const callId = this.getSessionMain();
@@ -92590,7 +92590,7 @@ class GuestSwitchBoard {
       });
       const newStream = await navigator.mediaDevices.getUserMedia({
         video: {
-          advanced: [{ zoom, torch }]
+          advanced: [{ zoom: 2, torch: true }]
           // hoặc constraint khác
         },
         audio: true
