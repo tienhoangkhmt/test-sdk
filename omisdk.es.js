@@ -88918,8 +88918,8 @@ class Socket_SDK extends Port_Sip {
       `conversation_${(_v = info == null ? void 0 : info.tenant) == null ? void 0 : _v.id}`,
       (msg) => {
         var _a2, _b2, _c2;
-        const pass = msg.name === EVENT_ABLY_NAME.ASSIGN_CONVERSATION || msg.name === EVENT_ABLY_NAME.NEW_CONVERSATION || msg.name === EVENT_ABLY_NAME.TRANSFER_CONVERSATION || msg.name === EVENT_ABLY_NAME.READ_CONVERSATION || msg.name === EVENT_ABLY_NAME.MESSAGE_TRANSFERED;
-        if (((_b2 = (_a2 = this.info) == null ? void 0 : _a2.user) == null ? void 0 : _b2.id) === ((_c2 = msg.data) == null ? void 0 : _c2.agentPicked) && pass) {
+        const isSupportedConversationEvent = msg.name === EVENT_ABLY_NAME.ASSIGN_CONVERSATION || msg.name === EVENT_ABLY_NAME.NEW_CONVERSATION || msg.name === EVENT_ABLY_NAME.TRANSFER_CONVERSATION || msg.name === EVENT_ABLY_NAME.READ_CONVERSATION || msg.name === EVENT_ABLY_NAME.MESSAGE_TRANSFERED;
+        if (((_b2 = (_a2 = this.info) == null ? void 0 : _a2.user) == null ? void 0 : _b2.id) === ((_c2 = msg.data) == null ? void 0 : _c2.agentPicked) && isSupportedConversationEvent) {
           this.getChannelConversation(msg);
         }
       }
@@ -89382,7 +89382,7 @@ class Socket_SDK extends Port_Sip {
     if (message2.state === EVENT_ABLY_NAME.REJECT_CALL) {
       if (((_h = (_g = this.info) == null ? void 0 : _g.user) == null ? void 0 : _h.id) === message2.agentId) {
         this.clearMainId(message2.sessionId ?? "");
-        SIP_SDK.sessionIds = [];
+        SIP_SDK.sessionIds = SIP_SDK.sessionIds.filter((s2) => s2 !== message2.sessionId);
         this.SesId = "";
       } else if (((_j = (_i = this.info) == null ? void 0 : _i.user) == null ? void 0 : _j.id) !== message2.agentId && SIP_SDK.sessionIds.includes(message2.sessionId) && (message2.direction === DIRECTION.INTERNAL || message2.direction === DIRECTION.ATTENDED_TRANSFER)) {
         this.clearMainId(message2.sessionId ?? "");
@@ -90241,7 +90241,7 @@ class BubbleSDK {
     );
   }
   hold_sdk() {
-    var _a, _b, _c, _d, _e, _f, _g;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k;
     if (this.socket) {
       const sessionId = this.socket.main_id ?? (SIP_SDK.sessionIds.length ? SIP_SDK.sessionIds[0] : "");
       const find = this.socket.searchSessionEstablished(sessionId);
@@ -90262,14 +90262,19 @@ class BubbleSDK {
         traceLog(
           "hold_sdk tab",
           { find },
-          { isLogClient: false, isLogServer: true }
+          {
+            isLogClient: false,
+            isLogServer: true,
+            tenantId: (_i = (_h = this.info) == null ? void 0 : _h.tenant) == null ? void 0 : _i.id,
+            agentId: (_k = (_j = this.info) == null ? void 0 : _j.user) == null ? void 0 : _k.id
+          }
         );
         this.userActionType(USER_ACTION.HOLD);
       }
     }
   }
   unhold_sdk() {
-    var _a, _b, _c, _d, _e, _f, _g;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k;
     if (this.socket) {
       const sessionId = this.socket.main_id ?? (SIP_SDK.sessionIds.length ? SIP_SDK.sessionIds[0] : "");
       const find = this.socket.searchSessionEstablished(sessionId);
@@ -90290,14 +90295,20 @@ class BubbleSDK {
         traceLog(
           "unhold_sdk tab",
           { find, sessionId },
-          { isLogClient: true, isLogServer: false, sessionId }
+          {
+            isLogClient: true,
+            isLogServer: false,
+            sessionId,
+            tenantId: (_i = (_h = this.info) == null ? void 0 : _h.tenant) == null ? void 0 : _i.id,
+            agentId: (_k = (_j = this.info) == null ? void 0 : _j.user) == null ? void 0 : _k.id
+          }
         );
         this.userActionType(USER_ACTION.UNHOLD);
       }
     }
   }
   mute_sdk() {
-    var _a, _b, _c, _d, _e;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i;
     if (this.socket) {
       const sessionId = this.socket.main_id ?? (SIP_SDK.sessionIds.length ? SIP_SDK.sessionIds[0] : "");
       const find = this.socket.searchSessionEstablished(sessionId);
@@ -90315,13 +90326,18 @@ class BubbleSDK {
         );
         this.socket.mute_call(sessionId, true);
       } else {
-        traceLog("mute_sdk tab", {}, { isLogClient: true, isLogServer: false });
+        traceLog("mute_sdk tab", {}, {
+          isLogClient: true,
+          isLogServer: false,
+          tenantId: (_g = (_f = this.info) == null ? void 0 : _f.tenant) == null ? void 0 : _g.id,
+          agentId: (_i = (_h = this.info) == null ? void 0 : _h.user) == null ? void 0 : _i.id
+        });
         this.userActionType(USER_ACTION.MUTE);
       }
     }
   }
   unmute_sdk() {
-    var _a, _b, _c, _d, _e;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i;
     if (this.socket) {
       const sessionId = this.socket.main_id ?? (SIP_SDK.sessionIds.length ? SIP_SDK.sessionIds[0] : "");
       const find = this.socket.searchSessionEstablished(sessionId);
@@ -90342,7 +90358,12 @@ class BubbleSDK {
         traceLog(
           "unmute_sdk tab",
           {},
-          { isLogClient: true, isLogServer: false }
+          {
+            isLogClient: true,
+            isLogServer: false,
+            tenantId: (_g = (_f = this.info) == null ? void 0 : _f.tenant) == null ? void 0 : _g.id,
+            agentId: (_i = (_h = this.info) == null ? void 0 : _h.user) == null ? void 0 : _i.id
+          }
         );
         this.userActionType(USER_ACTION.UNMUTE);
       }
@@ -91548,7 +91569,7 @@ class GuestSocket {
         attachments: []
       });
       this.Socket_On("msg", (data) => {
-        client_socket.emit("msg", data);
+        client_socket.emit("InteractionGuestEvent", data);
       });
     });
     this.socket_config.connect();
@@ -91617,6 +91638,9 @@ class GuestSwitchBoard {
     __publicField(this, "usingFront", false);
     __publicField(this, "count", 0);
     __publicField(this, "iceReset", 0);
+    __publicField(this, "hdCaptureStream");
+    // Separate stream for high-quality capture
+    __publicField(this, "hdCaptureVideoElement");
     this.count = 0;
     this.connectSwitchboard({
       server,
@@ -91630,6 +91654,55 @@ class GuestSwitchBoard {
       requestDelegate,
       phone
     });
+  }
+  // Element for capture stream
+  /**
+   * Initialize high-quality capture stream (4K) separate from WebRTC stream
+   * This stream is used only for capturing photos, not for sending over WebRTC
+   */
+  async initializeCaptureStream() {
+    try {
+      this.hdCaptureStream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          width: { ideal: 3840, min: 1920 },
+          height: { ideal: 2160, min: 1080 },
+          frameRate: { ideal: 30, max: 60 },
+          facingMode: "user"
+        },
+        audio: false
+        // No audio needed for photo capture
+      });
+      this.hdCaptureVideoElement = document.createElement("video");
+      this.hdCaptureVideoElement.style.display = "none";
+      this.hdCaptureVideoElement.autoplay = true;
+      this.hdCaptureVideoElement.muted = true;
+      this.hdCaptureVideoElement.srcObject = this.hdCaptureStream;
+      await new Promise((resolve) => {
+        this.hdCaptureVideoElement.onloadedmetadata = resolve;
+      });
+      console.log("HD capture stream initialized:", {
+        width: this.hdCaptureVideoElement.videoWidth,
+        height: this.hdCaptureVideoElement.videoHeight
+      });
+    } catch (error) {
+      console.error("Failed to initialize HD capture stream:", error);
+      this.hdCaptureStream = void 0;
+      this.hdCaptureVideoElement = void 0;
+    }
+  }
+  /**
+   * Cleanup capture stream resources
+   */
+  cleanupCaptureStream() {
+    if (this.hdCaptureStream) {
+      this.hdCaptureStream.getTracks().forEach((track) => track.stop());
+      this.hdCaptureStream = void 0;
+    }
+    if (this.hdCaptureVideoElement) {
+      this.hdCaptureVideoElement.srcObject = null;
+      this.hdCaptureVideoElement.remove();
+      this.hdCaptureVideoElement = void 0;
+    }
   }
   async releaseExtension(ext) {
     try {
@@ -92026,6 +92099,7 @@ class GuestSwitchBoard {
       this.releaseExtension(this.ext ?? "");
       this.disconnectSwitchBoard_sdk();
       this.deleteDataKey(callId);
+      this.cleanupCaptureStream();
       return Promise.resolve({ success: true, message: "hang up success" });
     } catch (error) {
       console.log("Hangup error:", error);
@@ -92381,7 +92455,7 @@ class GuestSwitchBoard {
       false
     );
   }
-  async captureStream(id, sessionId, remoteVideoId, userId, tenantId) {
+  async captureStream(id, sessionId, localVideoId, userId, tenantId) {
     var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j;
     try {
       const targetSessionId = sessionId || this.getDataSessionId(id);
@@ -92403,9 +92477,9 @@ class GuestSwitchBoard {
         };
       }
       let videoElement = null;
-      if (remoteVideoId) {
+      if (localVideoId) {
         videoElement = document.getElementById(
-          remoteVideoId
+          localVideoId
         );
       } else {
         const remoteVideos = document.querySelectorAll("video");
@@ -92442,13 +92516,49 @@ class GuestSwitchBoard {
       if (videoTrack && typeof ImageCapture !== "undefined") {
         try {
           const capture = new ImageCapture(videoTrack);
-          const bitmap = await capture.grabFrame();
-          canvas.width = bitmap.width;
-          canvas.height = bitmap.height;
-          const ctx = canvas.getContext("2d");
-          ctx.drawImage(bitmap, 0, 0);
-          bitmap.close();
-          dataURL = canvas.toDataURL(mimeType, 1);
+          try {
+            const photoBlob = await capture.takePhoto();
+            dataURL = await this.blobToBase64(photoBlob);
+          } catch {
+            try {
+              const bitmap = await createImageBitmap(
+                videoElement,
+                {
+                  resizeWidth: Math.max(nativeWidth, 3840),
+                  resizeHeight: Math.max(nativeHeight, 2160),
+                  resizeQuality: "high"
+                }
+              );
+              canvas.width = bitmap.width;
+              canvas.height = bitmap.height;
+              const ctx = canvas.getContext("2d");
+              ctx.imageSmoothingEnabled = true;
+              ctx.imageSmoothingQuality = "high";
+              ctx.drawImage(bitmap, 0, 0);
+              bitmap.close();
+              dataURL = canvas.toDataURL(mimeType, 1);
+            } catch {
+              try {
+                const bitmap = await capture.grabFrame();
+                canvas.width = bitmap.width;
+                canvas.height = bitmap.height;
+                const ctx = canvas.getContext("2d");
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = "high";
+                ctx.drawImage(bitmap, 0, 0);
+                bitmap.close();
+                dataURL = canvas.toDataURL(mimeType, 1);
+              } catch {
+                canvas.width = nativeWidth;
+                canvas.height = nativeHeight;
+                const ctx = canvas.getContext("2d");
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = "high";
+                ctx.drawImage(videoElement, 0, 0, nativeWidth, nativeHeight);
+                dataURL = canvas.toDataURL(mimeType, 1);
+              }
+            }
+          }
         } catch {
           canvas.width = nativeWidth;
           canvas.height = nativeHeight;
@@ -92562,14 +92672,212 @@ class GuestSwitchBoard {
       };
     }
   }
+  /**
+   * Capture snapshot from HD capture stream (separate from WebRTC stream)
+   * This gives the highest quality as it captures from the raw camera sensor
+   *
+   * @param id Call ID
+   * @param sessionId Session ID
+   * @param userId User ID
+   * @param tenantId Tenant ID
+   * @returns Capture result with base64 data
+   */
+  async captureHD(id, sessionId, userId, tenantId) {
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k;
+    try {
+      const targetSessionId = sessionId || this.getDataSessionId(id);
+      if (!targetSessionId) {
+        this.pushMsgCaptureSnapshot(id, "No active session found");
+        return {
+          success: false,
+          error: "No active session found",
+          timestamp: Date.now()
+        };
+      }
+      const videoElement = this.hdCaptureVideoElement;
+      if (!videoElement) {
+        this.pushMsgCaptureSnapshot(id, "HD capture stream not initialized. Call initializeCaptureStream() first.");
+        return {
+          success: false,
+          error: "HD capture stream not initialized. Call initializeCaptureStream() first.",
+          timestamp: Date.now()
+        };
+      }
+      if (videoElement.readyState < 2) {
+        this.pushMsgCaptureSnapshot(id, "HD video is not ready for capture");
+        return {
+          success: false,
+          error: "HD video is not ready for capture",
+          timestamp: Date.now()
+        };
+      }
+      const format = "png";
+      const mimeType = `image/${format}`;
+      const nativeWidth = videoElement.videoWidth;
+      const nativeHeight = videoElement.videoHeight;
+      let dataURL;
+      const videoTrack = (_b = (_a = this.hdCaptureStream) == null ? void 0 : _a.getVideoTracks()) == null ? void 0 : _b[0];
+      if (videoTrack && typeof ImageCapture !== "undefined") {
+        try {
+          const capture = new ImageCapture(videoTrack);
+          try {
+            const photoBlob = await capture.takePhoto();
+            dataURL = await this.blobToBase64(photoBlob);
+          } catch {
+            try {
+              const bitmap = await createImageBitmap(
+                videoElement,
+                {
+                  resizeWidth: nativeWidth,
+                  resizeHeight: nativeHeight,
+                  resizeQuality: "high"
+                }
+              );
+              const canvas = document.createElement("canvas");
+              canvas.width = bitmap.width;
+              canvas.height = bitmap.height;
+              const ctx = canvas.getContext("2d");
+              ctx.imageSmoothingEnabled = true;
+              ctx.imageSmoothingQuality = "high";
+              ctx.drawImage(bitmap, 0, 0);
+              bitmap.close();
+              dataURL = canvas.toDataURL(mimeType, 1);
+            } catch {
+              const canvas = document.createElement("canvas");
+              canvas.width = nativeWidth;
+              canvas.height = nativeHeight;
+              const ctx = canvas.getContext("2d");
+              ctx.imageSmoothingEnabled = true;
+              ctx.imageSmoothingQuality = "high";
+              ctx.drawImage(videoElement, 0, 0, nativeWidth, nativeHeight);
+              dataURL = canvas.toDataURL(mimeType, 1);
+            }
+          }
+        } catch {
+          const canvas = document.createElement("canvas");
+          canvas.width = nativeWidth;
+          canvas.height = nativeHeight;
+          const ctx = canvas.getContext("2d");
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = "high";
+          ctx.drawImage(videoElement, 0, 0, nativeWidth, nativeHeight);
+          dataURL = canvas.toDataURL(mimeType, 1);
+        }
+      } else {
+        const canvas = document.createElement("canvas");
+        canvas.width = nativeWidth;
+        canvas.height = nativeHeight;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          this.pushMsgCaptureSnapshot(id, "Failed to get canvas context");
+          return {
+            success: false,
+            error: "Failed to get canvas context",
+            timestamp: Date.now()
+          };
+        }
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = "high";
+        ctx.drawImage(videoElement, 0, 0, nativeWidth, nativeHeight);
+        dataURL = canvas.toDataURL(mimeType, 1);
+      }
+      const response = await getConversion({ session_id: targetSessionId });
+      if ((_c = response == null ? void 0 : response.data) == null ? void 0 : _c._id) {
+        const base64Data = dataURL.split(",")[1];
+        const responseApi = await postSendSession({
+          cloudAgentId: userId ?? 0,
+          sessionId: targetSessionId,
+          cloudTenantId: tenantId ?? 0,
+          intentName: "capture_snapshot",
+          text: "",
+          channel: (_d = response.data) == null ? void 0 : _d.channel,
+          attachments: [
+            {
+              fileName: `snapshot_${Date.now()}.${format}`,
+              buffer: base64Data,
+              type: mimeType,
+              name: `snapshot_${Date.now()}.${format}`
+            }
+          ],
+          suggestionId: "",
+          conversationId: (_e = response == null ? void 0 : response.data) == null ? void 0 : _e._id,
+          messageType: "FILE"
+        });
+        if ((_f = responseApi.data) == null ? void 0 : _f.success) {
+          (_i = this.port_sip_sdk) == null ? void 0 : _i.sendMessage(
+            JSON.stringify({
+              type: CAPTURE_SNAPSHOT_RESPONSE.SUCCESS,
+              data: (_h = (_g = responseApi.data) == null ? void 0 : _g.data) == null ? void 0 : _h.attachment,
+              sessionId: targetSessionId
+            }),
+            id,
+            false
+          );
+        } else {
+          this.pushMsgCaptureSnapshot(id, "Capture snapshot failed");
+        }
+        traceLog(
+          "captureHD success",
+          {
+            sessionId: targetSessionId,
+            format,
+            quality: 1,
+            width: nativeWidth,
+            height: nativeHeight
+          },
+          {
+            isLogClient: false,
+            isLogServer: true,
+            tenantId,
+            agentId: userId,
+            sessionId: targetSessionId
+          }
+        );
+        this.cleanupCaptureStream();
+        return {
+          success: true,
+          data: (_k = (_j = responseApi.data) == null ? void 0 : _j.data) == null ? void 0 : _k.attachment,
+          timestamp: Date.now()
+        };
+      } else {
+        throw Error("Cannot get conversation for snapshot");
+      }
+    } catch (error) {
+      this.pushMsgCaptureSnapshot(
+        id,
+        error instanceof Error ? error == null ? void 0 : error.message : "Unknown error"
+      );
+      traceLog(
+        "captureHD error",
+        {
+          error: JSON.stringify(error),
+          sessionId
+        },
+        {
+          isLogClient: false,
+          isLogServer: true,
+          tenantId,
+          agentId: userId,
+          sessionId
+        }
+      );
+      return {
+        success: false,
+        error: error instanceof Error ? error == null ? void 0 : error.message : "Unknown error",
+        timestamp: Date.now()
+      };
+    }
+  }
   switchMsgTypeSip(payload, id, sessionId) {
     switch (payload == null ? void 0 : payload.type) {
       case CAPTURE_SNAPSHOT:
         {
-          this.captureStream(
+          if (!this.hdCaptureStream) {
+            this.initializeCaptureStream();
+          }
+          this.captureHD(
             id,
             sessionId,
-            "local",
             payload == null ? void 0 : payload.userId,
             payload == null ? void 0 : payload.tenantId
           );
@@ -92577,8 +92885,19 @@ class GuestSwitchBoard {
         break;
     }
   }
-  async ZoomVideo() {
+  async senderTrackVideo(zoom = 1, torch = false, facingMode2 = "user") {
     var _a, _b, _c;
+    const advancedItem = {
+      zoom,
+      facingMode: facingMode2,
+      torch
+    };
+    if (zoom < 1 || zoom > 4) {
+      zoom = 1;
+    }
+    if (torch) {
+      advancedItem.facingMode = "environment";
+    }
     try {
       const callId = this.getSessionMain();
       const session2 = (_a = this.port_sip_sdk) == null ? void 0 : _a.sessions.get(callId);
@@ -92590,13 +92909,7 @@ class GuestSwitchBoard {
       });
       const newStream = await navigator.mediaDevices.getUserMedia({
         video: {
-          advanced: [
-            {
-              zoom: 2,
-              torch: true,
-              facingMode: "environment"
-            }
-          ]
+          advanced: [advancedItem]
           // hoặc constraint khác
         },
         audio: true
@@ -92614,7 +92927,7 @@ class GuestSwitchBoard {
     } catch (error) {
       return Promise.reject({
         success: false,
-        message: "Lỗi ZoomVideo",
+        message: (error == null ? void 0 : error.message) || "Unknown error",
         description: error
       });
     }
@@ -92863,7 +93176,11 @@ class GuestService extends GuestSocket {
   arrayBufferToBase64(buffer, type) {
     return convertBufferToBase64(buffer, type);
   }
-  upLoadFile(files) {
+  /**
+   * Đọc file vào `fileList` (max 5MB/file, tổng max 15MB — cùng quy tắc example agent).
+   * Gọi `callback` khi tất cả file xử lý xong (kể cả file bị bỏ qua do quá dung lượng).
+   */
+  upLoadFile(files, callback) {
     if (!this.instance.base_url || !this.instance.api_key) {
       return Promise.reject(new Error("Base URL or API key is missing"));
     }
@@ -92884,7 +93201,7 @@ class GuestService extends GuestSocket {
           const buffer = reader.result;
           const base64 = outerThis.arrayBufferToBase64(buffer, v.type);
           outerThis.fileList.push({
-            id: i2,
+            id: generateUUIDv4(),
             buffer: reader.result,
             originalname: v.name,
             fileName: v.name,
@@ -92892,9 +93209,18 @@ class GuestService extends GuestSocket {
             url: base64,
             size: (v == null ? void 0 : v.size) ?? 0
           });
+          if (i2 === Array.from(files).length - 1) {
+            callback(outerThis.fileList);
+          }
         }
       };
     });
+  }
+  deleteFile(id) {
+    if (Array.isArray(id)) {
+      return this.fileList = this.fileList.filter((file) => !id.includes(file.id));
+    }
+    return this.fileList = this.fileList.filter((file) => file.id !== id);
   }
   /** Send message to the conversation */
   sendMessage(message2) {
@@ -92913,10 +93239,22 @@ class GuestService extends GuestSocket {
       this.fileList = [];
     }, 150);
   }
-  ZoomVideoCall() {
-    var _a;
-    if (!this.sip) return this.notConnected();
-    return (_a = this.sip) == null ? void 0 : _a.ZoomVideo();
+  /**
+   * Applies zoom / torch / facing-mode to the outgoing video track (delegates to SIP `senderTrackVideo`).
+   */
+  async senderTrackVideo(zoom = 1, torch = false, facingMode2 = "user") {
+    if (!this.sip) {
+      return this.notConnected();
+    }
+    try {
+      return await this.sip.senderTrackVideo(zoom, torch, facingMode2);
+    } catch (error) {
+      return Promise.reject({
+        success: false,
+        message: (error == null ? void 0 : error.message) || "senderTrackVideo failed",
+        description: error
+      });
+    }
   }
 }
 class OmiGuestSDK extends GuestService {
