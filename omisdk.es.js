@@ -91665,8 +91665,8 @@ class GuestSwitchBoard {
     try {
       this.hdCaptureStream = await navigator.mediaDevices.getUserMedia({
         video: {
-          width: { ideal: 1920 },
-          height: { ideal: 1080 },
+          width: { ideal: 2560 },
+          height: { ideal: 1440 },
           frameRate: { ideal: 30 },
           facingMode: this.facingMode
         },
@@ -92881,7 +92881,7 @@ class GuestSwitchBoard {
           this.initializeCaptureStream();
           setTimeout(() => {
             this.captureHD(id, sessionId, payload == null ? void 0 : payload.userId, payload == null ? void 0 : payload.tenantId);
-          }, 3e3);
+          }, 0);
         }
         break;
     }
