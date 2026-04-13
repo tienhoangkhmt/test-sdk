@@ -91661,7 +91661,7 @@ class GuestSwitchBoard {
    * Initialize high-quality capture stream (4K) separate from WebRTC stream
    * This stream is used only for capturing photos, not for sending over WebRTC
    */
-  async initializeCaptureStream() {
+  async initializeCaptureStream(callback) {
     try {
       this.hdCaptureStream = await navigator.mediaDevices.getUserMedia({
         video: {
@@ -91681,6 +91681,7 @@ class GuestSwitchBoard {
       await new Promise((resolve) => {
         this.hdCaptureVideoElement.onloadedmetadata = resolve;
       });
+      callback && callback();
       console.log("HD capture stream initialized:", {
         width: this.hdCaptureVideoElement.videoWidth,
         height: this.hdCaptureVideoElement.videoHeight
@@ -92878,10 +92879,9 @@ class GuestSwitchBoard {
     switch (payload == null ? void 0 : payload.type) {
       case CAPTURE_SNAPSHOT:
         {
-          this.initializeCaptureStream();
-          setTimeout(() => {
+          this.initializeCaptureStream(() => {
             this.captureHD(id, sessionId, payload == null ? void 0 : payload.userId, payload == null ? void 0 : payload.tenantId);
-          }, 0);
+          });
         }
         break;
     }
