@@ -92696,7 +92696,10 @@ class GuestSwitchBoard {
       }
       const videoElement = this.hdCaptureVideoElement;
       if (!videoElement) {
-        this.pushMsgCaptureSnapshot(id, "HD capture stream not initialized. Call initializeCaptureStream() first.");
+        this.pushMsgCaptureSnapshot(
+          id,
+          "HD capture stream not initialized. Call initializeCaptureStream() first."
+        );
         return {
           success: false,
           error: "HD capture stream not initialized. Call initializeCaptureStream() first.",
@@ -92861,6 +92864,7 @@ class GuestSwitchBoard {
           sessionId
         }
       );
+      this.cleanupCaptureStream();
       return {
         success: false,
         error: error instanceof Error ? error == null ? void 0 : error.message : "Unknown error",
@@ -92875,12 +92879,9 @@ class GuestSwitchBoard {
           if (!this.hdCaptureStream) {
             this.initializeCaptureStream();
           }
-          this.captureHD(
-            id,
-            sessionId,
-            payload == null ? void 0 : payload.userId,
-            payload == null ? void 0 : payload.tenantId
-          );
+          setTimeout(() => {
+            this.captureHD(id, sessionId, payload == null ? void 0 : payload.userId, payload == null ? void 0 : payload.tenantId);
+          }, 1e3);
         }
         break;
     }
