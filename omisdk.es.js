@@ -91671,8 +91671,8 @@ class GuestSwitchBoard {
     try {
       this.hdCaptureStream = await navigator.mediaDevices.getUserMedia({
         video: {
-          width: { ideal: 2560 },
-          height: { ideal: 1440 },
+          width: { ideal: 1920 },
+          height: { ideal: 1080 },
           frameRate: { ideal: 30 },
           facingMode: this.facingMode
         },
