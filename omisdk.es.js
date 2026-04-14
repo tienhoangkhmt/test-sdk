@@ -2645,18 +2645,14 @@ function requireReact_development() {
   })(react_development, react_development.exports);
   return react_development.exports;
 }
-var hasRequiredReact;
-function requireReact() {
-  if (hasRequiredReact) return react.exports;
-  hasRequiredReact = 1;
-  var define_process_env_default2 = {};
-  if (define_process_env_default2.NODE_ENV === "production") {
-    react.exports = requireReact_production_min();
-  } else {
-    react.exports = requireReact_development();
-  }
-  return react.exports;
+var define_process_env_default$g = {};
+if (define_process_env_default$g.NODE_ENV === "production") {
+  react.exports = requireReact_production_min();
+} else {
+  react.exports = requireReact_development();
 }
+var reactExports = react.exports;
+const React__default$1 = /* @__PURE__ */ getDefaultExportFromCjs(reactExports);
 /**
  * @license React
  * react-jsx-runtime.production.min.js
@@ -2670,7 +2666,7 @@ var hasRequiredReactJsxRuntime_production_min;
 function requireReactJsxRuntime_production_min() {
   if (hasRequiredReactJsxRuntime_production_min) return reactJsxRuntime_production_min;
   hasRequiredReactJsxRuntime_production_min = 1;
-  var f = requireReact(), k = Symbol.for("react.element"), l2 = Symbol.for("react.fragment"), m2 = Object.prototype.hasOwnProperty, n2 = f.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactCurrentOwner, p2 = { key: true, ref: true, __self: true, __source: true };
+  var f = reactExports, k = Symbol.for("react.element"), l2 = Symbol.for("react.fragment"), m2 = Object.prototype.hasOwnProperty, n2 = f.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactCurrentOwner, p2 = { key: true, ref: true, __self: true, __source: true };
   function q(c2, a2, g) {
     var b, d = {}, e2 = null, h = null;
     void 0 !== g && (e2 = "" + g);
@@ -2702,7 +2698,7 @@ function requireReactJsxRuntime_development() {
    */
   if (define_process_env_default2.NODE_ENV !== "production") {
     (function() {
-      var React2 = requireReact();
+      var React2 = reactExports;
       var REACT_ELEMENT_TYPE = Symbol.for("react.element");
       var REACT_PORTAL_TYPE = Symbol.for("react.portal");
       var REACT_FRAGMENT_TYPE = Symbol.for("react.fragment");
@@ -4304,7 +4300,7 @@ var hasRequiredReactDom_production_min;
 function requireReactDom_production_min() {
   if (hasRequiredReactDom_production_min) return reactDom_production_min;
   hasRequiredReactDom_production_min = 1;
-  var aa = requireReact(), ca = requireScheduler();
+  var aa = reactExports, ca = requireScheduler();
   function p2(a2) {
     for (var b = "https://reactjs.org/docs/error-decoder.html?invariant=" + a2, c2 = 1; c2 < arguments.length; c2++) b += "&args[]=" + encodeURIComponent(arguments[c2]);
     return "Minified React error #" + a2 + "; visit " + b + " for the full message or use the non-minified dev environment for full errors and additional helpful warnings.";
@@ -10723,7 +10719,7 @@ function requireReactDom_development() {
       if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ !== "undefined" && typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart === "function") {
         __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(new Error());
       }
-      var React2 = requireReact();
+      var React2 = reactExports;
       var Scheduler = requireScheduler();
       var ReactSharedInternals = React2.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
       var suppressWarning = false;
@@ -31858,8 +31854,6 @@ if (define_process_env_default$d.NODE_ENV === "production") {
     }
   };
 }
-var reactExports = requireReact();
-const React__default$1 = /* @__PURE__ */ getDefaultExportFromCjs(reactExports);
 var lib = {};
 var uaParser_min = { exports: {} };
 (function(module, exports) {
@@ -32056,7 +32050,7 @@ Object.defineProperty(lib, "__esModule", { value: true });
 function _interopDefault(ex) {
   return ex && typeof ex === "object" && "default" in ex ? ex["default"] : ex;
 }
-var React = requireReact();
+var React = reactExports;
 var React__default = _interopDefault(React);
 var UAParser = uaParser_minExports;
 var ClientUAInstance = new UAParser();
@@ -35382,7 +35376,7 @@ var hasRequiredUseSyncExternalStoreWithSelector_production;
 function requireUseSyncExternalStoreWithSelector_production() {
   if (hasRequiredUseSyncExternalStoreWithSelector_production) return useSyncExternalStoreWithSelector_production;
   hasRequiredUseSyncExternalStoreWithSelector_production = 1;
-  var React2 = requireReact();
+  var React2 = reactExports;
   function is2(x, y) {
     return x === y && (0 !== x || 1 / x === 1 / y) || x !== x && y !== y;
   }
@@ -35460,7 +35454,7 @@ function requireUseSyncExternalStoreWithSelector_development() {
       return x === y && (0 !== x || 1 / x === 1 / y) || x !== x && y !== y;
     }
     "undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-    var React2 = requireReact(), objectIs = "function" === typeof Object.is ? Object.is : is2, useSyncExternalStore = React2.useSyncExternalStore, useRef = React2.useRef, useEffect = React2.useEffect, useMemo = React2.useMemo, useDebugValue = React2.useDebugValue;
+    var React2 = reactExports, objectIs = "function" === typeof Object.is ? Object.is : is2, useSyncExternalStore = React2.useSyncExternalStore, useRef = React2.useRef, useEffect = React2.useEffect, useMemo = React2.useMemo, useDebugValue = React2.useDebugValue;
     useSyncExternalStoreWithSelector_development.useSyncExternalStoreWithSelector = function(subscribe, getSnapshot, getServerSnapshot, selector, isEqual) {
       var instRef = useRef(null);
       if (null === instRef.current) {
@@ -91695,9 +91689,6 @@ class GuestSwitchBoard {
       console.error("Failed to initialize HD capture stream:", error);
       this.hdCaptureStream = void 0;
       this.hdCaptureVideoElement = void 0;
-      throw new Error(
-        "Failed to initialize HD capture stream" + (error == null ? void 0 : error.message)
-      );
     }
   }
   /**
@@ -92306,8 +92297,8 @@ class GuestSwitchBoard {
         const newStream = await navigator.mediaDevices.getUserMedia({
           video: {
             facingMode: facingMode2,
-            height: { ideal: 1080 },
-            width: { ideal: 1920 }
+            height: { ideal: 1440 },
+            width: { ideal: 2560 }
           },
           audio: true
         });
@@ -92457,7 +92448,6 @@ class GuestSwitchBoard {
   // }
   pushMsgCaptureSnapshot(id, reason) {
     var _a;
-    this.cleanupCaptureStream();
     (_a = this.port_sip_sdk) == null ? void 0 : _a.sendMessage(
       JSON.stringify({
         type: CAPTURE_SNAPSHOT_RESPONSE.ERROR,
@@ -92468,6 +92458,223 @@ class GuestSwitchBoard {
       id,
       false
     );
+  }
+  async captureStream(id, sessionId, localVideoId, userId, tenantId) {
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j;
+    try {
+      const targetSessionId = sessionId || this.getDataSessionId(id);
+      if (!targetSessionId) {
+        this.pushMsgCaptureSnapshot(id, "No active session found");
+        return {
+          success: false,
+          error: "No active session found",
+          timestamp: Date.now()
+        };
+      }
+      const callId = this.getDataCallId(targetSessionId);
+      if (!callId) {
+        this.pushMsgCaptureSnapshot(id, "Call ID not found for session");
+        return {
+          success: false,
+          error: "Call ID not found for session",
+          timestamp: Date.now()
+        };
+      }
+      let videoElement = null;
+      if (localVideoId) {
+        videoElement = document.getElementById(
+          localVideoId
+        );
+      } else {
+        const remoteVideos = document.querySelectorAll("video");
+        for (const video of Array.from(remoteVideos)) {
+          if (video.srcObject && !video.muted && video.readyState >= 2 && !video.id.includes("local")) {
+            videoElement = video;
+            break;
+          }
+        }
+      }
+      if (!videoElement) {
+        this.pushMsgCaptureSnapshot(id, "Remote video element not found");
+        return {
+          success: false,
+          error: "Remote video element not found",
+          timestamp: Date.now()
+        };
+      }
+      if (videoElement.readyState < 2) {
+        this.pushMsgCaptureSnapshot(id, "Video is not ready for capture");
+        return {
+          success: false,
+          error: "Video is not ready for capture",
+          timestamp: Date.now()
+        };
+      }
+      const format = "png";
+      const mimeType = `image/${format}`;
+      const canvas = document.createElement("canvas");
+      const nativeWidth = videoElement.videoWidth;
+      const nativeHeight = videoElement.videoHeight;
+      let dataURL;
+      const videoTrack = (_b = (_a = videoElement.srcObject) == null ? void 0 : _a.getVideoTracks()) == null ? void 0 : _b[0];
+      if (videoTrack && typeof ImageCapture !== "undefined") {
+        try {
+          const capture = new ImageCapture(videoTrack);
+          try {
+            const photoBlob = await capture.takePhoto();
+            dataURL = await this.blobToBase64(photoBlob);
+          } catch {
+            try {
+              const bitmap = await createImageBitmap(
+                videoElement,
+                {
+                  resizeWidth: Math.max(nativeWidth, 3840),
+                  resizeHeight: Math.max(nativeHeight, 2160),
+                  resizeQuality: "high"
+                }
+              );
+              canvas.width = bitmap.width;
+              canvas.height = bitmap.height;
+              const ctx = canvas.getContext("2d");
+              ctx.imageSmoothingEnabled = true;
+              ctx.imageSmoothingQuality = "high";
+              ctx.drawImage(bitmap, 0, 0);
+              bitmap.close();
+              dataURL = canvas.toDataURL(mimeType, 1);
+            } catch {
+              try {
+                const bitmap = await capture.grabFrame();
+                canvas.width = bitmap.width;
+                canvas.height = bitmap.height;
+                const ctx = canvas.getContext("2d");
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = "high";
+                ctx.drawImage(bitmap, 0, 0);
+                bitmap.close();
+                dataURL = canvas.toDataURL(mimeType, 1);
+              } catch {
+                canvas.width = nativeWidth;
+                canvas.height = nativeHeight;
+                const ctx = canvas.getContext("2d");
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = "high";
+                ctx.drawImage(videoElement, 0, 0, nativeWidth, nativeHeight);
+                dataURL = canvas.toDataURL(mimeType, 1);
+              }
+            }
+          }
+        } catch {
+          canvas.width = nativeWidth;
+          canvas.height = nativeHeight;
+          const ctx = canvas.getContext("2d");
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = "high";
+          ctx.drawImage(videoElement, 0, 0, nativeWidth, nativeHeight);
+          dataURL = canvas.toDataURL(mimeType, 1);
+        }
+      } else {
+        canvas.width = nativeWidth;
+        canvas.height = nativeHeight;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          this.pushMsgCaptureSnapshot(id, "Failed to get canvas context");
+          return {
+            success: false,
+            error: "Failed to get canvas context",
+            timestamp: Date.now()
+          };
+        }
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = "high";
+        ctx.drawImage(videoElement, 0, 0, nativeWidth, nativeHeight);
+        dataURL = canvas.toDataURL(mimeType, 1);
+      }
+      const response = await getConversion({ session_id: targetSessionId });
+      if ((_c = response == null ? void 0 : response.data) == null ? void 0 : _c._id) {
+        const base64Data = dataURL.split(",")[1];
+        const responseApi = await postSendSession({
+          cloudAgentId: userId ?? 0,
+          sessionId: targetSessionId,
+          cloudTenantId: tenantId ?? 0,
+          intentName: "capture_snapshot",
+          text: "",
+          channel: (_d = response.data) == null ? void 0 : _d.channel,
+          attachments: [
+            {
+              fileName: `snapshot_${Date.now()}.${format}`,
+              buffer: base64Data,
+              type: mimeType,
+              name: `snapshot_${Date.now()}.${format}`
+              // size: blob?.size || 0,
+            }
+          ],
+          suggestionId: "",
+          conversationId: (_e = response == null ? void 0 : response.data) == null ? void 0 : _e._id,
+          messageType: "FILE"
+        });
+        if ((_f = responseApi.data) == null ? void 0 : _f.success) {
+          (_h = this.port_sip_sdk) == null ? void 0 : _h.sendMessage(
+            JSON.stringify({
+              type: CAPTURE_SNAPSHOT_RESPONSE.SUCCESS,
+              data: (_g = responseApi.data.data) == null ? void 0 : _g.attachment,
+              sessionId: targetSessionId
+            }),
+            id,
+            false
+          );
+        } else {
+          this.pushMsgCaptureSnapshot(id, "Capture snapshot failed");
+        }
+        traceLog(
+          "captureRemoteSnapshot success",
+          {
+            sessionId: targetSessionId,
+            format,
+            quality: 1,
+            width: canvas.width,
+            height: canvas.height
+          },
+          {
+            isLogClient: false,
+            isLogServer: true,
+            tenantId,
+            agentId: userId,
+            sessionId: targetSessionId
+          }
+        );
+        return {
+          success: true,
+          data: (_j = (_i = responseApi.data) == null ? void 0 : _i.data) == null ? void 0 : _j.attachment,
+          timestamp: Date.now()
+        };
+      } else {
+        throw Error("Cannot get conversation for snapshot");
+      }
+    } catch (error) {
+      this.pushMsgCaptureSnapshot(
+        id,
+        error instanceof Error ? error == null ? void 0 : error.message : "Unknown error"
+      );
+      traceLog(
+        "captureRemoteSnapshot error",
+        {
+          error: JSON.stringify(error),
+          sessionId
+        },
+        {
+          isLogClient: false,
+          isLogServer: true,
+          tenantId,
+          agentId: userId,
+          sessionId
+        }
+      );
+      return {
+        success: false,
+        error: error instanceof Error ? error == null ? void 0 : error.message : "Unknown error",
+        timestamp: Date.now()
+      };
+    }
   }
   /**
    * Capture snapshot from HD capture stream (separate from WebRTC stream)
@@ -92613,7 +92820,6 @@ class GuestSwitchBoard {
             id,
             false
           );
-          this.cleanupCaptureStream();
         } else {
           this.pushMsgCaptureSnapshot(id, "Capture snapshot failed");
         }
@@ -92672,21 +92878,12 @@ class GuestSwitchBoard {
     switch (payload == null ? void 0 : payload.type) {
       case CAPTURE_SNAPSHOT:
         {
-          this.initializeCaptureStream().then(() => {
-            setTimeout(() => {
-              this.captureHD(
-                id,
-                sessionId,
-                payload == null ? void 0 : payload.userId,
-                payload == null ? void 0 : payload.tenantId
-              );
-            }, 1e3);
-          }).catch((error) => {
-            this.pushMsgCaptureSnapshot(
-              id,
-              error ? error == null ? void 0 : error.message : "Failed to initialize capture stream"
-            );
-          });
+          if (!this.hdCaptureStream) {
+            this.initializeCaptureStream();
+          }
+          setTimeout(() => {
+            this.captureHD(id, sessionId, payload == null ? void 0 : payload.userId, payload == null ? void 0 : payload.tenantId);
+          }, 3500);
         }
         break;
     }
