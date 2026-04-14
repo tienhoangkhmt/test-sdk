@@ -91672,7 +91672,7 @@ class GuestSwitchBoard {
       this.hdCaptureStream = await navigator.mediaDevices.getUserMedia({
         video: {
           width: { ideal: 2560 },
-          height: { ideal: 1080 },
+          height: { ideal: 1440 },
           frameRate: { ideal: 30 },
           facingMode: this.facingMode
         },
