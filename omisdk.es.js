@@ -93074,11 +93074,11 @@ class GuestService extends GuestSocket {
         extraInfo: (option == null ? void 0 : option.extraInfo) ?? "",
         mediaElement: this.mediaId,
         requestDelegate: {
-          onHangup: async (sessionId, record) => {
+          onHangup: (sessionId, record) => {
             var _a2, _b2;
             this.disconnectSocket();
             (_b2 = (_a2 = option == null ? void 0 : option.requestDelegate) == null ? void 0 : _a2.onHangup) == null ? void 0 : _b2.call(_a2, sessionId || "", record || {});
-            await navigator.mediaDevices.enumerateDevices();
+            this.clearMediaTracks();
           },
           onConnection: (_l = option == null ? void 0 : option.requestDelegate) == null ? void 0 : _l.onConnection,
           onConnectedSuccessfully: (_m = option == null ? void 0 : option.requestDelegate) == null ? void 0 : _m.onConnectedSuccessfully,
@@ -93267,6 +93267,20 @@ class GuestService extends GuestSocket {
         description: error
       });
     }
+  }
+  /**
+   * Clear all media tracks from video and audio elements
+   * @param mediaIds - Media element IDs to clear
+   */
+  clearMediaTracks() {
+    const mediaElements = document.querySelectorAll("video, audio");
+    mediaElements.forEach((el) => {
+      const stream = el.srcObject;
+      if (stream == null ? void 0 : stream.getTracks) {
+        stream.getTracks().forEach((track) => track.stop());
+      }
+      el.srcObject = null;
+    });
   }
 }
 class OmiGuestSDK extends GuestService {
