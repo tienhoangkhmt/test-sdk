@@ -93082,10 +93082,11 @@ class GuestService extends GuestSocket {
         extraInfo: (option == null ? void 0 : option.extraInfo) ?? "",
         mediaElement: this.mediaId,
         requestDelegate: {
-          onHangup: (sessionId, record) => {
+          onHangup: async (sessionId, record) => {
             var _a2, _b2;
             this.disconnectSocket();
             (_b2 = (_a2 = option == null ? void 0 : option.requestDelegate) == null ? void 0 : _a2.onHangup) == null ? void 0 : _b2.call(_a2, sessionId || "", record || {});
+            await navigator.mediaDevices.enumerateDevices();
           },
           onConnection: (_l = option == null ? void 0 : option.requestDelegate) == null ? void 0 : _l.onConnection,
           onConnectedSuccessfully: (_m = option == null ? void 0 : option.requestDelegate) == null ? void 0 : _m.onConnectedSuccessfully,
