@@ -91769,6 +91769,19 @@ class GuestSwitchBoard {
     }
     return s2;
   }
+  clearWebRTCData(id) {
+    var _a, _b, _c;
+    const session2 = (_a = this.port_sip_sdk) == null ? void 0 : _a.sessions.get(id);
+    const pc = (_c = (_b = session2 == null ? void 0 : session2.session) == null ? void 0 : _b.sessionDescriptionHandler) == null ? void 0 : _c.peerConnection;
+    if (pc) {
+      pc.getSenders().forEach((sender) => {
+        if (sender.track) {
+          sender.track.stop();
+        }
+      });
+      pc.close();
+    }
+  }
   async connectSwitchboard({
     server,
     ext,
@@ -91921,6 +91934,7 @@ class GuestSwitchBoard {
         },
         onInviteClosed: async (id) => {
           var _a;
+          this.clearWebRTCData(id);
           const sessionId = this.getDataSessionId(id);
           this.deleteDataKey(id);
           this.releaseExtension(ext ?? "");
