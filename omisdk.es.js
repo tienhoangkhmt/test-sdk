@@ -91675,7 +91675,7 @@ class GuestSwitchBoard {
    */
   async initializeCaptureStream(videoType = VideoType.FULL_HD) {
     if (this.hdCaptureStream) {
-      return;
+      return Promise.resolve();
     }
     const resolutionMap = resolutionVideoCallMap.get(videoType);
     try {
@@ -91694,7 +91694,14 @@ class GuestSwitchBoard {
       this.hdCaptureVideoElement.muted = true;
       this.hdCaptureVideoElement.srcObject = this.hdCaptureStream;
       await new Promise((resolve) => {
-        this.hdCaptureVideoElement.onloadedmetadata = resolve;
+        const checkReady = () => {
+          if (this.hdCaptureVideoElement.readyState >= 4) {
+            resolve(true);
+          } else {
+            setTimeout(checkReady, 250);
+          }
+        };
+        checkReady();
       });
       console.log("HD capture stream initialized:", {
         width: this.hdCaptureVideoElement.videoWidth,
@@ -92756,15 +92763,37 @@ class GuestSwitchBoard {
             bitmap.close();
             dataURL = canvas.toDataURL(mimeType, 1);
           } catch {
-            const canvas = document.createElement("canvas");
-            canvas.width = nativeWidth;
-            canvas.height = nativeHeight;
-            const ctx = canvas.getContext("2d");
-            ctx.imageSmoothingEnabled = true;
-            ctx.imageSmoothingQuality = "high";
-            ctx.filter = "brightness(1.15) contrast(1.1) saturate(1.2)";
-            ctx.drawImage(videoElement, 0, 0, nativeWidth, nativeHeight);
-            dataURL = canvas.toDataURL(mimeType, 1);
+            try {
+              const bitmap = await createImageBitmap(
+                videoElement,
+                {
+                  resizeWidth: nativeWidth,
+                  resizeHeight: nativeHeight,
+                  resizeQuality: "high",
+                  colorSpaceConversion: "default"
+                }
+              );
+              const canvas = document.createElement("canvas");
+              canvas.width = bitmap.width;
+              canvas.height = bitmap.height;
+              const ctx = canvas.getContext("2d");
+              ctx.imageSmoothingEnabled = true;
+              ctx.imageSmoothingQuality = "high";
+              ctx.filter = "brightness(1.15) contrast(1.1) saturate(1.2)";
+              ctx.drawImage(bitmap, 0, 0);
+              bitmap.close();
+              dataURL = canvas.toDataURL(mimeType, 1);
+            } catch {
+              const canvas = document.createElement("canvas");
+              canvas.width = nativeWidth;
+              canvas.height = nativeHeight;
+              const ctx = canvas.getContext("2d");
+              ctx.imageSmoothingEnabled = true;
+              ctx.imageSmoothingQuality = "high";
+              ctx.filter = "brightness(1.15) contrast(1.1) saturate(1.2)";
+              ctx.drawImage(videoElement, 0, 0, nativeWidth, nativeHeight);
+              dataURL = canvas.toDataURL(mimeType, 1);
+            }
           }
         } catch {
           const canvas = document.createElement("canvas");
@@ -92883,14 +92912,12 @@ class GuestSwitchBoard {
       };
     }
   }
-  switchMsgTypeSip(payload, id, sessionId) {
+  async switchMsgTypeSip(payload, id, sessionId) {
     switch (payload == null ? void 0 : payload.type) {
       case CAPTURE_SNAPSHOT:
         {
-          this.initializeCaptureStream(VideoType.FULL_HD);
-          setTimeout(() => {
-            this.captureHD(id, sessionId, payload == null ? void 0 : payload.userId, payload == null ? void 0 : payload.tenantId);
-          }, 5e3);
+          await this.initializeCaptureStream(VideoType.FULL_HD);
+          this.captureHD(id, sessionId, payload == null ? void 0 : payload.userId, payload == null ? void 0 : payload.tenantId);
         }
         break;
     }
