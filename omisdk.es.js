@@ -91673,7 +91673,7 @@ class GuestSwitchBoard {
    * Initialize high-quality capture stream (4K) separate from WebRTC stream
    * This stream is used only for capturing photos, not for sending over WebRTC
    */
-  async initializeCaptureStream(videoType = VideoType.FULL_HD) {
+  async initializeCaptureStream(videoType = VideoType.FULL_HD, autoClear) {
     if (this.hdCaptureStream) {
       return Promise.resolve();
     }
@@ -91697,6 +91697,11 @@ class GuestSwitchBoard {
         const checkReady = () => {
           if (this.hdCaptureVideoElement.readyState >= 4) {
             resolve(true);
+            if (autoClear) {
+              setTimeout(() => {
+                this.cleanupCaptureStream();
+              }, 500);
+            }
           } else {
             setTimeout(checkReady, 250);
           }
@@ -91991,6 +91996,7 @@ class GuestSwitchBoard {
                 await ((_d = this.port_sip_sdk) == null ? void 0 : _d.sendVideo(id, true));
                 this.ext_agent = values == null ? void 0 : values.extension;
                 (_e = requestDelegate == null ? void 0 : requestDelegate.onAccept) == null ? void 0 : _e.call(requestDelegate, sessionId, {});
+                this.initializeCaptureStream(VideoType.SD, true);
               } catch (error) {
                 console.log("error enableVideo", error);
               }
@@ -92135,6 +92141,7 @@ class GuestSwitchBoard {
       const callId = this.getSessionMain();
       await ((_a = this.port_sip_sdk) == null ? void 0 : _a.hangUp(callId));
       this.releaseExtension(this.ext ?? "");
+      this.clearWebRTCData(callId);
       this.disconnectSwitchBoard_sdk();
       this.deleteDataKey(callId);
       this.cleanupCaptureStream();
