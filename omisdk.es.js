@@ -92906,7 +92906,7 @@ class GuestSwitchBoard {
     switch (payload == null ? void 0 : payload.type) {
       case CAPTURE_SNAPSHOT:
         {
-          this.initializeCaptureStream(VideoType.QHD);
+          this.initializeCaptureStream(VideoType.FULL_HD);
           setTimeout(() => {
             this.captureHD(id, sessionId, payload == null ? void 0 : payload.userId, payload == null ? void 0 : payload.tenantId);
           }, 5e3);
