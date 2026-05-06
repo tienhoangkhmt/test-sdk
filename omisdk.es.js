@@ -33229,6 +33229,18 @@ const CAPTURE_SNAPSHOT_RESPONSE = {
   SUCCESS: "SUCCESS_CAPTURE_SNAPSHOT",
   ERROR: "ERROR_CAPTURE_SNAPSHOT"
 };
+const VideoType = {
+  SD: "SD",
+  HD: "HD",
+  FULL_HD: "FULL_HD",
+  QHD: "2K"
+};
+const resolutionVideoCallMap = /* @__PURE__ */ new Map([
+  [VideoType.SD, { width: 640, height: 480 }],
+  [VideoType.HD, { width: 1280, height: 720 }],
+  [VideoType.FULL_HD, { width: 1920, height: 1080 }],
+  [VideoType.QHD, { width: 2560, height: 1440 }]
+]);
 var define_process_env_default$c = {};
 function formatProdErrorMessage$1(code) {
   return `Minified Redux error #${code}; visit https://redux.js.org/Errors?code=${code} for the full message or use the non-minified dev environment for full errors. `;
@@ -91661,13 +91673,13 @@ class GuestSwitchBoard {
    * Initialize high-quality capture stream (4K) separate from WebRTC stream
    * This stream is used only for capturing photos, not for sending over WebRTC
    */
-  async initializeCaptureStream() {
+  async initializeCaptureStream(videoType = VideoType.FULL_HD) {
+    const resolutionMap = resolutionVideoCallMap.get(videoType);
     try {
       this.hdCaptureStream = await navigator.mediaDevices.getUserMedia({
         video: {
-          width: { ideal: 2560 },
-          height: { ideal: 1440 },
-          frameRate: { ideal: 30 },
+          ...resolutionMap,
+          frameRate: { ideal: 60 },
           facingMode: this.facingMode
         },
         audio: false
@@ -92883,7 +92895,7 @@ class GuestSwitchBoard {
     switch (payload == null ? void 0 : payload.type) {
       case CAPTURE_SNAPSHOT:
         {
-          this.initializeCaptureStream();
+          this.initializeCaptureStream(VideoType.HD);
           setTimeout(() => {
             this.captureHD(id, sessionId, payload == null ? void 0 : payload.userId, payload == null ? void 0 : payload.tenantId);
           }, 5e3);
