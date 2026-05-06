@@ -92741,7 +92741,17 @@ class GuestSwitchBoard {
           const capture = new ImageCapture(videoTrack);
           try {
             const photoBlob = await capture.takePhoto();
-            dataURL = await this.blobToBase64(photoBlob);
+            const bitmap = await createImageBitmap(photoBlob);
+            const canvas = document.createElement("canvas");
+            canvas.width = bitmap.width;
+            canvas.height = bitmap.height;
+            const ctx = canvas.getContext("2d");
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = "high";
+            ctx.filter = "brightness(1.15) contrast(1.1) saturate(1.2)";
+            ctx.drawImage(bitmap, 0, 0);
+            bitmap.close();
+            dataURL = canvas.toDataURL(mimeType, 1);
           } catch {
             try {
               const bitmap = await createImageBitmap(
@@ -92749,7 +92759,8 @@ class GuestSwitchBoard {
                 {
                   resizeWidth: nativeWidth,
                   resizeHeight: nativeHeight,
-                  resizeQuality: "high"
+                  resizeQuality: "high",
+                  colorSpaceConversion: "default"
                 }
               );
               const canvas = document.createElement("canvas");
@@ -92895,7 +92906,7 @@ class GuestSwitchBoard {
     switch (payload == null ? void 0 : payload.type) {
       case CAPTURE_SNAPSHOT:
         {
-          this.initializeCaptureStream(VideoType.HD);
+          this.initializeCaptureStream(VideoType.QHD);
           setTimeout(() => {
             this.captureHD(id, sessionId, payload == null ? void 0 : payload.userId, payload == null ? void 0 : payload.tenantId);
           }, 5e3);
