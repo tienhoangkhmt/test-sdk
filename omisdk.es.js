@@ -91674,6 +91674,9 @@ class GuestSwitchBoard {
    * This stream is used only for capturing photos, not for sending over WebRTC
    */
   async initializeCaptureStream(videoType = VideoType.FULL_HD) {
+    if (this.hdCaptureStream) {
+      return;
+    }
     const resolutionMap = resolutionVideoCallMap.get(videoType);
     try {
       this.hdCaptureStream = await navigator.mediaDevices.getUserMedia({
@@ -92753,37 +92756,15 @@ class GuestSwitchBoard {
             bitmap.close();
             dataURL = canvas.toDataURL(mimeType, 1);
           } catch {
-            try {
-              const bitmap = await createImageBitmap(
-                videoElement,
-                {
-                  resizeWidth: nativeWidth,
-                  resizeHeight: nativeHeight,
-                  resizeQuality: "high",
-                  colorSpaceConversion: "default"
-                }
-              );
-              const canvas = document.createElement("canvas");
-              canvas.width = bitmap.width;
-              canvas.height = bitmap.height;
-              const ctx = canvas.getContext("2d");
-              ctx.imageSmoothingEnabled = true;
-              ctx.imageSmoothingQuality = "high";
-              ctx.filter = "brightness(1.15) contrast(1.1) saturate(1.2)";
-              ctx.drawImage(bitmap, 0, 0);
-              bitmap.close();
-              dataURL = canvas.toDataURL(mimeType, 1);
-            } catch {
-              const canvas = document.createElement("canvas");
-              canvas.width = nativeWidth;
-              canvas.height = nativeHeight;
-              const ctx = canvas.getContext("2d");
-              ctx.imageSmoothingEnabled = true;
-              ctx.imageSmoothingQuality = "high";
-              ctx.filter = "brightness(1.15) contrast(1.1) saturate(1.2)";
-              ctx.drawImage(videoElement, 0, 0, nativeWidth, nativeHeight);
-              dataURL = canvas.toDataURL(mimeType, 1);
-            }
+            const canvas = document.createElement("canvas");
+            canvas.width = nativeWidth;
+            canvas.height = nativeHeight;
+            const ctx = canvas.getContext("2d");
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = "high";
+            ctx.filter = "brightness(1.15) contrast(1.1) saturate(1.2)";
+            ctx.drawImage(videoElement, 0, 0, nativeWidth, nativeHeight);
+            dataURL = canvas.toDataURL(mimeType, 1);
           }
         } catch {
           const canvas = document.createElement("canvas");
