@@ -981,7 +981,11 @@
                   font-size: 14px;
                 "
               >
-                <!-- Options will be populated by SDK -->
+                <option value="SD">SD (720x480)</option>
+                <option value="HD" selected>HD (1280x720)</option>
+                <option value="FULL_HD">Full HD (1920x1080)</option>
+                <option value="QHD">2K (2560x1440)</option>
+                <option value="UHD">4K (3840x2160)</option>
               </select>
             </div>
 
@@ -1105,6 +1109,27 @@
         switchCameraBtn.addEventListener("click", handleSwitchCamera);
         zoomBtn.addEventListener("click", handleZoom);
         hangupBtn.addEventListener("click", handleHangup);
+
+        // Resolution select
+        document
+          .getElementById("resolutionSelect")
+          .addEventListener("change", (e) => {
+            const resolution = e.target.value;
+            if (!resolution || !guest) return;
+            console.log("Changing resolution to:", resolution);
+            guest
+              .changeResolutionVideo(resolution)
+              .then((res) => {
+                console.log("changeResolutionVideo success:", res);
+                notyf.success(`Đã thay đổi độ phân giải: ${resolution}`);
+              })
+              .catch((err) => {
+                console.log("changeResolutionVideo error:", err);
+                notyf.error(
+                  `Không thể thay đổi độ phân giải: ${err?.message || ""}`,
+                );
+              });
+          });
       }
 
       // Screen management functions
@@ -1188,17 +1213,6 @@
           });
           // Setup event listeners
           setupSDKEventListeners();
-
-          // Populate resolution options
-          const resolutionSelect = document.getElementById("resolutionSelect");
-          const resolutions = guest.getResolutionOptions();
-          resolutions.forEach((res) => {
-            const option = document.createElement("option");
-            option.value = res.key;
-            option.textContent = `${res.label} (${res.width}x${res.height})`;
-            resolutionSelect.appendChild(option);
-          });
-
           facingMode = "environment";
           // Make the call using the entered phone number
           const result = await guest.makeCall(phoneNumber, {
@@ -1246,26 +1260,6 @@
         guest.on("GuestEvent", (event) => {
           console.log("Guest event received:", event, new Date().getTime());
           handleGuestEvent(event);
-        });
-
-        // Resolution change handler
-        const resolutionSelect = document.getElementById("resolutionSelect");
-        resolutionSelect.addEventListener("change", (e) => {
-          const resolution = e.target.value;
-          if (!resolution) return;
-          console.log("Changing resolution to:", resolution);
-          guest
-            .changeResolutionVideo(resolution)
-            .then((res) => {
-              console.log("changeResolutionVideo success:", res);
-              notyf.success(`Đã thay đổi độ phân giải: ${resolution}`);
-            })
-            .catch((err) => {
-              console.log("changeResolutionVideo error:", err);
-              notyf.error(
-                `Không thể thay đổi độ phân giải: ${err?.message || ""}`,
-              );
-            });
         });
       }
 
