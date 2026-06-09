@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="vi">
   <head>
     <meta charset="UTF-8" />
@@ -959,28 +959,9 @@
               Zoom
             </button>
 
-            <div
-              style="
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                margin-top: 15px;
-              "
-            >
-              <label
-                for="resolutionSelect"
-                style="color: var(--text-muted); font-size: 14px"
-                >Độ phân giải:</label
-              >
-              <select
-                id="resolutionSelect"
-                style="
-                  padding: 8px 12px;
-                  border: 1px solid var(--border-color);
-                  border-radius: 6px;
-                  font-size: 14px;
-                "
-              >
+            <div style="display: flex; align-items: center; gap: 10px; margin-top: 15px">
+              <label for="resolutionSelect" style="color: var(--text-muted); font-size: 14px">Độ phân giải:</label>
+              <select id="resolutionSelect" style="padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px">
                 <option value="SD">SD (720x480)</option>
                 <option value="HD" selected>HD (1280x720)</option>
                 <option value="FULL_HD">Full HD (1920x1080)</option>
@@ -1111,25 +1092,21 @@
         hangupBtn.addEventListener("click", handleHangup);
 
         // Resolution select
-        document
-          .getElementById("resolutionSelect")
-          .addEventListener("change", (e) => {
-            const resolution = e.target.value;
-            if (!resolution || !guest) return;
-            console.log("Changing resolution to:", resolution);
-            guest
-              .changeResolutionVideo(resolution, facingMode)
-              .then((res) => {
-                console.log("changeResolutionVideo success:", res);
-                notyf.success(`Đã thay đổi độ phân giải: ${resolution}`);
-              })
-              .catch((err) => {
-                console.log("changeResolutionVideo error:", err);
-                notyf.error(
-                  `Không thể thay đổi độ phân giải: ${err?.message || ""}`,
-                );
-              });
-          });
+        document.getElementById("resolutionSelect").addEventListener("change", (e) => {
+          const resolution = e.target.value;
+          if (!resolution || !guest) return;
+          console.log("Changing resolution to:", resolution);
+          guest
+            .changeResolutionVideo(resolution, facingMode === "user" ? "environment" : "user")
+            .then((res) => {
+              console.log("changeResolutionVideo success:", res);
+              notyf.success(`Đã thay đổi độ phân giải: ${resolution}`);
+            })
+            .catch((err) => {
+              console.log("changeResolutionVideo error:", err);
+              notyf.error(`Không thể thay đổi độ phân giải: ${err?.message || ""}`);
+            });
+        });
       }
 
       // Screen management functions
@@ -1187,7 +1164,7 @@
         const phoneRegex = /^(0|\+84)[0-9]{8,10}$/;
         if (!phoneRegex.test(phoneNumber)) {
           notyf.error(
-            "Số điện thoại không hợp lệ! Vui lòng nhập đúng định dạng.",
+            "Số điện thoại không hợp lệ! Vui lòng nhập đúng định dạng."
           );
           return;
         }
@@ -1250,7 +1227,7 @@
           console.error("Failed to make call:", error);
           addLog("Call error: " + error?.message || error);
           notyf.error(
-            error?.message || "Không thể kết nối. Vui lòng thử lại sau!",
+            error?.message || "Không thể kết nối. Vui lòng thử lại sau!"
           );
           showScreen("call"); // Go back to call screen
         }
@@ -1331,8 +1308,7 @@
       function handleZoom() {
         if (!guest) return;
 
-        guest
-          .ZoomVideoCall()
+        guest.ZoomVideoCall()
           .then((res) => {
             console.log("ZoomVideoCall success", res);
             zoomBtn.classList.add("active");
@@ -1340,9 +1316,7 @@
           })
           .catch((err) => {
             console.error("ZoomVideoCall error", err);
-            notyf.error(
-              "Không thể zoom: " + (err?.message || err?.description || ""),
-            );
+            notyf.error("Không thể zoom: " + (err?.message || err?.description || ""));
           });
       }
 
