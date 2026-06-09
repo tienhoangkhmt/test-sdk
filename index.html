@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi">
   <head>
     <meta charset="UTF-8" />
@@ -959,6 +959,32 @@
               Zoom
             </button>
 
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                margin-top: 15px;
+              "
+            >
+              <label
+                for="resolutionSelect"
+                style="color: var(--text-muted); font-size: 14px"
+                >Độ phân giải:</label
+              >
+              <select
+                id="resolutionSelect"
+                style="
+                  padding: 8px 12px;
+                  border: 1px solid var(--border-color);
+                  border-radius: 6px;
+                  font-size: 14px;
+                "
+              >
+                <!-- Options will be populated by SDK -->
+              </select>
+            </div>
+
             <button class="control-btn danger" id="hangup">
               <i class="fas fa-phone-slash"></i>
               Kết thúc
@@ -1136,7 +1162,7 @@
         const phoneRegex = /^(0|\+84)[0-9]{8,10}$/;
         if (!phoneRegex.test(phoneNumber)) {
           notyf.error(
-            "Số điện thoại không hợp lệ! Vui lòng nhập đúng định dạng."
+            "Số điện thoại không hợp lệ! Vui lòng nhập đúng định dạng.",
           );
           return;
         }
@@ -1162,6 +1188,17 @@
           });
           // Setup event listeners
           setupSDKEventListeners();
+
+          // Populate resolution options
+          const resolutionSelect = document.getElementById("resolutionSelect");
+          const resolutions = guest.getResolutionOptions();
+          resolutions.forEach((res) => {
+            const option = document.createElement("option");
+            option.value = res.key;
+            option.textContent = `${res.label} (${res.width}x${res.height})`;
+            resolutionSelect.appendChild(option);
+          });
+
           facingMode = "environment";
           // Make the call using the entered phone number
           const result = await guest.makeCall(phoneNumber, {
@@ -1199,7 +1236,7 @@
           console.error("Failed to make call:", error);
           addLog("Call error: " + error?.message || error);
           notyf.error(
-            error?.message || "Không thể kết nối. Vui lòng thử lại sau!"
+            error?.message || "Không thể kết nối. Vui lòng thử lại sau!",
           );
           showScreen("call"); // Go back to call screen
         }
@@ -1209,6 +1246,26 @@
         guest.on("GuestEvent", (event) => {
           console.log("Guest event received:", event, new Date().getTime());
           handleGuestEvent(event);
+        });
+
+        // Resolution change handler
+        const resolutionSelect = document.getElementById("resolutionSelect");
+        resolutionSelect.addEventListener("change", (e) => {
+          const resolution = e.target.value;
+          if (!resolution) return;
+          console.log("Changing resolution to:", resolution);
+          guest
+            .changeResolutionVideo(resolution)
+            .then((res) => {
+              console.log("changeResolutionVideo success:", res);
+              notyf.success(`Đã thay đổi độ phân giải: ${resolution}`);
+            })
+            .catch((err) => {
+              console.log("changeResolutionVideo error:", err);
+              notyf.error(
+                `Không thể thay đổi độ phân giải: ${err?.message || ""}`,
+              );
+            });
         });
       }
 
@@ -1280,7 +1337,8 @@
       function handleZoom() {
         if (!guest) return;
 
-        guest.ZoomVideoCall()
+        guest
+          .ZoomVideoCall()
           .then((res) => {
             console.log("ZoomVideoCall success", res);
             zoomBtn.classList.add("active");
@@ -1288,7 +1346,9 @@
           })
           .catch((err) => {
             console.error("ZoomVideoCall error", err);
-            notyf.error("Không thể zoom: " + (err?.message || err?.description || ""));
+            notyf.error(
+              "Không thể zoom: " + (err?.message || err?.description || ""),
+            );
           });
       }
 

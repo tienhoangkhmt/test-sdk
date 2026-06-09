@@ -33229,17 +33229,12 @@ const CAPTURE_SNAPSHOT_RESPONSE = {
   SUCCESS: "SUCCESS_CAPTURE_SNAPSHOT",
   ERROR: "ERROR_CAPTURE_SNAPSHOT"
 };
-const VideoType = {
-  SD: "SD",
-  HD: "HD",
-  FULL_HD: "FULL_HD",
-  QHD: "2K"
-};
-const resolutionVideoCallMap = /* @__PURE__ */ new Map([
-  [VideoType.SD, { width: 640, height: 480 }],
-  [VideoType.HD, { width: 1280, height: 720 }],
-  [VideoType.FULL_HD, { width: 1920, height: 1080 }],
-  [VideoType.QHD, { width: 2560, height: 1440 }]
+const SCREEN_RESOLUTION = /* @__PURE__ */ new Map([
+  ["SD", { width: { ideal: 720 }, height: { ideal: 480 }, label: "SD" }],
+  ["HD", { width: { ideal: 1280 }, height: { ideal: 720 }, label: "HD" }],
+  ["FULL_HD", { width: { ideal: 1920 }, height: { ideal: 1080 }, label: "Full HD" }],
+  ["QHD", { width: { ideal: 2560 }, height: { ideal: 1440 }, label: "2K" }],
+  ["UHD", { width: { ideal: 3840 }, height: { ideal: 2160 }, label: "4K" }]
 ]);
 var define_process_env_default$c = {};
 function formatProdErrorMessage$1(code) {
@@ -46154,6 +46149,7 @@ class ApiConfig {
   init(options) {
     this.base_url = options.base_url;
     this.api_key = options.api_key;
+    config_url.base_url = options.base_url;
   }
   callApi({
     url: url2,
@@ -89394,8 +89390,12 @@ class Socket_SDK extends Port_Sip {
     if (message2.state === EVENT_ABLY_NAME.REJECT_CALL) {
       if (((_h = (_g = this.info) == null ? void 0 : _g.user) == null ? void 0 : _h.id) === message2.agentId) {
         this.clearMainId(message2.sessionId ?? "");
-        SIP_SDK.sessionIds = SIP_SDK.sessionIds.filter((s2) => s2 !== message2.sessionId);
-        this.SesId = "";
+        SIP_SDK.sessionIds = SIP_SDK.sessionIds.filter(
+          (s2) => s2 !== message2.sessionId
+        );
+        if (this.SesId === message2.sessionId) {
+          this.SesId = "";
+        }
       } else if (((_j = (_i = this.info) == null ? void 0 : _i.user) == null ? void 0 : _j.id) !== message2.agentId && SIP_SDK.sessionIds.includes(message2.sessionId) && (message2.direction === DIRECTION.INTERNAL || message2.direction === DIRECTION.ATTENDED_TRANSFER)) {
         this.clearMainId(message2.sessionId ?? "");
         this.pushCallEventEmitter(CallEventType.CALL_REJECTED, {
@@ -91133,6 +91133,28 @@ class BubbleSDK {
     }
     return this.socket.sendMessageSdk(message2, messageType, attachments);
   }
+  async getConversationBySessionId(sessionId) {
+    if (!sessionId)
+      return Promise.reject({
+        success: false,
+        message: "invalid sesionId",
+        data: null
+      });
+    try {
+      const res = await getConversion({ session_id: sessionId });
+      return Promise.resolve({
+        data: res.data,
+        success: true,
+        message: "get data success"
+      });
+    } catch (error) {
+      return Promise.reject({
+        success: false,
+        message: (error == null ? void 0 : error.message) ?? "unkonw error",
+        data: null
+      });
+    }
+  }
 }
 var config_url = {
   base_url: CONFIG_URL,
@@ -91152,7 +91174,7 @@ const DEFAULT_OPTIONS = {
   baseUrl: config_url.base_url
 };
 const SDK_NAMESPACE = "OmiSDK";
-const SDK_VERSION = "1.0.16";
+const SDK_VERSION = "1.0.18";
 class OmiSDK extends BubbleSDK {
   /**
    * Creates a new SDK instance
@@ -91650,11 +91672,6 @@ class GuestSwitchBoard {
     __publicField(this, "usingFront", false);
     __publicField(this, "count", 0);
     __publicField(this, "iceReset", 0);
-    __publicField(this, "hdCaptureStream");
-    // Separate stream for high-quality capture
-    __publicField(this, "hdCaptureVideoElement");
-    // Element for capture stream
-    __publicField(this, "facingMode", "user");
     this.count = 0;
     this.connectSwitchboard({
       server,
@@ -91669,68 +91686,16 @@ class GuestSwitchBoard {
       phone
     });
   }
-  /**
-   * Initialize high-quality capture stream (4K) separate from WebRTC stream
-   * This stream is used only for capturing photos, not for sending over WebRTC
-   */
-  async initializeCaptureStream(videoType = VideoType.FULL_HD, autoClear) {
-    if (this.hdCaptureStream) {
-      return Promise.resolve();
-    }
-    const resolutionMap = resolutionVideoCallMap.get(videoType);
-    try {
-      this.hdCaptureStream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          ...resolutionMap,
-          frameRate: { ideal: 60 },
-          facingMode: this.facingMode
-        },
-        audio: false
-      });
-      console.log("initalze");
-      this.hdCaptureVideoElement = document.createElement("video");
-      this.hdCaptureVideoElement.style.display = "none";
-      this.hdCaptureVideoElement.autoplay = true;
-      this.hdCaptureVideoElement.muted = true;
-      this.hdCaptureVideoElement.srcObject = this.hdCaptureStream;
-      await new Promise((resolve) => {
-        const checkReady = () => {
-          if (this.hdCaptureVideoElement.readyState >= 4) {
-            resolve(true);
-            if (autoClear) {
-              setTimeout(() => {
-                this.cleanupCaptureStream();
-              }, 500);
-            }
-          } else {
-            setTimeout(checkReady, 250);
-          }
-        };
-        checkReady();
-      });
-      console.log("HD capture stream initialized:", {
-        width: this.hdCaptureVideoElement.videoWidth,
-        height: this.hdCaptureVideoElement.videoHeight
-      });
-    } catch (error) {
-      console.error("Failed to initialize HD capture stream:", error);
-      this.hdCaptureStream = void 0;
-      this.hdCaptureVideoElement = void 0;
-    }
+  getResolutionKeys() {
+    return Array.from(SCREEN_RESOLUTION.keys());
   }
-  /**
-   * Cleanup capture stream resources
-   */
-  cleanupCaptureStream() {
-    if (this.hdCaptureStream) {
-      this.hdCaptureStream.getTracks().forEach((track) => track.stop());
-      this.hdCaptureStream = void 0;
-    }
-    if (this.hdCaptureVideoElement) {
-      this.hdCaptureVideoElement.srcObject = null;
-      this.hdCaptureVideoElement.remove();
-      this.hdCaptureVideoElement = void 0;
-    }
+  getResolutionOptions() {
+    return Array.from(SCREEN_RESOLUTION.entries()).map(([key, value2]) => ({
+      key,
+      label: value2.label,
+      width: value2.width.ideal,
+      height: value2.height.ideal
+    }));
   }
   async releaseExtension(ext) {
     try {
@@ -91773,19 +91738,6 @@ class GuestSwitchBoard {
       s2 += Math.floor(Math.random() * 10);
     }
     return s2;
-  }
-  clearWebRTCData(id) {
-    var _a, _b, _c;
-    const session2 = (_a = this.port_sip_sdk) == null ? void 0 : _a.sessions.get(id);
-    const pc = (_c = (_b = session2 == null ? void 0 : session2.session) == null ? void 0 : _b.sessionDescriptionHandler) == null ? void 0 : _c.peerConnection;
-    if (pc) {
-      pc.getSenders().forEach((sender) => {
-        if (sender.track) {
-          sender.track.stop();
-        }
-      });
-      pc.close();
-    }
   }
   async connectSwitchboard({
     server,
@@ -91939,14 +91891,12 @@ class GuestSwitchBoard {
         },
         onInviteClosed: async (id) => {
           var _a;
-          this.clearWebRTCData(id);
           const sessionId = this.getDataSessionId(id);
           this.deleteDataKey(id);
           this.releaseExtension(ext ?? "");
           this.disconnectSwitchBoard_sdk();
           console.log("onInviteClosed", id);
           (_a = requestDelegate == null ? void 0 : requestDelegate.onHangup) == null ? void 0 : _a.call(requestDelegate, sessionId, {});
-          this.cleanupCaptureStream();
         },
         onInviteUpdated: (id, existsAudio, existsVideo, existsScreen) => {
           console.log(
@@ -91996,7 +91946,6 @@ class GuestSwitchBoard {
                 await ((_d = this.port_sip_sdk) == null ? void 0 : _d.sendVideo(id, true));
                 this.ext_agent = values == null ? void 0 : values.extension;
                 (_e = requestDelegate == null ? void 0 : requestDelegate.onAccept) == null ? void 0 : _e.call(requestDelegate, sessionId, {});
-                this.initializeCaptureStream(VideoType.SD, true);
               } catch (error) {
                 console.log("error enableVideo", error);
               }
@@ -92141,10 +92090,8 @@ class GuestSwitchBoard {
       const callId = this.getSessionMain();
       await ((_a = this.port_sip_sdk) == null ? void 0 : _a.hangUp(callId));
       this.releaseExtension(this.ext ?? "");
-      this.clearWebRTCData(callId);
       this.disconnectSwitchBoard_sdk();
       this.deleteDataKey(callId);
-      this.cleanupCaptureStream();
       return Promise.resolve({ success: true, message: "hang up success" });
     } catch (error) {
       console.log("Hangup error:", error);
@@ -92339,8 +92286,8 @@ class GuestSwitchBoard {
         const newStream = await navigator.mediaDevices.getUserMedia({
           video: {
             facingMode: facingMode2,
-            height: { ideal: 1440 },
-            width: { ideal: 2560 }
+            height: { ideal: 1080 },
+            width: { ideal: 1920 }
           },
           audio: true
         });
@@ -92353,7 +92300,6 @@ class GuestSwitchBoard {
         });
         if (sender && newTrack) {
           await sender.replaceTrack(newTrack);
-          this.facingMode = facingMode2;
           return Promise.resolve({
             success: true,
             message: "switchCamera success"
@@ -92430,64 +92376,6 @@ class GuestSwitchBoard {
       reader.readAsDataURL(blob);
     });
   }
-  /*
-   * khi nào ImageCapture thịnh hành hơn hỗ trợ nhiều trình duyệt trên mobile thì sẽ dùng
-   */
-  // async ImageCapture(
-  //   id: number,
-  //   sessionId: string,
-  //   userId: number,
-  //   tenantId: number,
-  // ) {
-  //   const localVideo = document.getElementById("local") as HTMLVideoElement;
-  //   try {
-  //     const stream = localVideo.srcObject as MediaStream;
-  //     const track = stream.getVideoTracks()[0];
-  //     const imageCapture = new ImageCapture(track);
-  //     const blob = await imageCapture.takePhoto({});
-  //     const base64 = await this.blobToBase64(blob);
-  //     const response = await getConversion({ session_id: sessionId });
-  //     if (response?.data?._id) {
-  //       const base64Data = base64.split(",")[1];
-  //       const mimeType = `image/png`;
-  //       const responseApi = await postSendSession({
-  //         cloudAgentId: userId ?? 0,
-  //         sessionId: sessionId,
-  //         cloudTenantId: tenantId,
-  //         intentName: "capture_snapshot",
-  //         text: "",
-  //         channel: "LIVE_CONNECT",
-  //         attachments: [
-  //           {
-  //             fileName: `snapshot_${Date.now()}.png`,
-  //             buffer: base64Data,
-  //             type: mimeType,
-  //             name: `snapshot_${Date.now()}.png`,
-  //             // size: blob?.size || 0,
-  //           },
-  //         ],
-  //         suggestionId: "",
-  //         conversationId: response?.data?._id,
-  //         messageType: "FILE",
-  //       });
-  //       console.log("base64", base64);
-  //     } else {
-  //       throw Error("Cannot get conversation for snapshot");
-  //     }
-  //   } catch (error) {
-  //     console.log("error", error);
-  //     this.port_sip_sdk?.sendMessage(
-  //       JSON.stringify({
-  //         sessionId,
-  //         payload: {
-  //           type: CAPTURE_SNAPSHOT,
-  //         },
-  //       }),
-  //       id,
-  //       true,
-  //     );
-  //   }
-  // }
   pushMsgCaptureSnapshot(id, reason) {
     var _a;
     (_a = this.port_sip_sdk) == null ? void 0 : _a.sendMessage(
@@ -92500,9 +92388,8 @@ class GuestSwitchBoard {
       id,
       false
     );
-    this.cleanupCaptureStream();
   }
-  async captureStream(id, sessionId, localVideoId, userId, tenantId) {
+  async captureStream(id, sessionId, remoteVideoId, userId, tenantId) {
     var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j;
     try {
       const targetSessionId = sessionId || this.getDataSessionId(id);
@@ -92524,9 +92411,9 @@ class GuestSwitchBoard {
         };
       }
       let videoElement = null;
-      if (localVideoId) {
+      if (remoteVideoId) {
         videoElement = document.getElementById(
-          localVideoId
+          remoteVideoId
         );
       } else {
         const remoteVideos = document.querySelectorAll("video");
@@ -92563,49 +92450,13 @@ class GuestSwitchBoard {
       if (videoTrack && typeof ImageCapture !== "undefined") {
         try {
           const capture = new ImageCapture(videoTrack);
-          try {
-            const photoBlob = await capture.takePhoto();
-            dataURL = await this.blobToBase64(photoBlob);
-          } catch {
-            try {
-              const bitmap = await createImageBitmap(
-                videoElement,
-                {
-                  resizeWidth: Math.max(nativeWidth, 3840),
-                  resizeHeight: Math.max(nativeHeight, 2160),
-                  resizeQuality: "high"
-                }
-              );
-              canvas.width = bitmap.width;
-              canvas.height = bitmap.height;
-              const ctx = canvas.getContext("2d");
-              ctx.imageSmoothingEnabled = true;
-              ctx.imageSmoothingQuality = "high";
-              ctx.drawImage(bitmap, 0, 0);
-              bitmap.close();
-              dataURL = canvas.toDataURL(mimeType, 1);
-            } catch {
-              try {
-                const bitmap = await capture.grabFrame();
-                canvas.width = bitmap.width;
-                canvas.height = bitmap.height;
-                const ctx = canvas.getContext("2d");
-                ctx.imageSmoothingEnabled = true;
-                ctx.imageSmoothingQuality = "high";
-                ctx.drawImage(bitmap, 0, 0);
-                bitmap.close();
-                dataURL = canvas.toDataURL(mimeType, 1);
-              } catch {
-                canvas.width = nativeWidth;
-                canvas.height = nativeHeight;
-                const ctx = canvas.getContext("2d");
-                ctx.imageSmoothingEnabled = true;
-                ctx.imageSmoothingQuality = "high";
-                ctx.drawImage(videoElement, 0, 0, nativeWidth, nativeHeight);
-                dataURL = canvas.toDataURL(mimeType, 1);
-              }
-            }
-          }
+          const bitmap = await capture.grabFrame();
+          canvas.width = bitmap.width;
+          canvas.height = bitmap.height;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(bitmap, 0, 0);
+          bitmap.close();
+          dataURL = canvas.toDataURL(mimeType, 1);
         } catch {
           canvas.width = nativeWidth;
           canvas.height = nativeHeight;
@@ -92719,226 +92570,17 @@ class GuestSwitchBoard {
       };
     }
   }
-  /**
-   * Capture snapshot from HD capture stream (separate from WebRTC stream)
-   * This gives the highest quality as it captures from the raw camera sensor
-   *
-   * @param id Call ID
-   * @param sessionId Session ID
-   * @param userId User ID
-   * @param tenantId Tenant ID
-   * @returns Capture result with base64 data
-   */
-  async captureHD(id, sessionId, userId, tenantId) {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k;
-    try {
-      const targetSessionId = sessionId || this.getDataSessionId(id);
-      if (!targetSessionId) {
-        this.pushMsgCaptureSnapshot(id, "No active session found");
-        return {
-          success: false,
-          error: "No active session found",
-          timestamp: Date.now()
-        };
-      }
-      const videoElement = this.hdCaptureVideoElement;
-      if (!videoElement) {
-        this.pushMsgCaptureSnapshot(
-          id,
-          "HD capture stream not initialized. Call initializeCaptureStream() first."
-        );
-        return {
-          success: false,
-          error: "HD capture stream not initialized. Call initializeCaptureStream() first.",
-          timestamp: Date.now()
-        };
-      }
-      if (videoElement.readyState < 2) {
-        this.pushMsgCaptureSnapshot(id, "HD video is not ready for capture");
-        return {
-          success: false,
-          error: "HD video is not ready for capture",
-          timestamp: Date.now()
-        };
-      }
-      const format = "png";
-      const mimeType = `image/${format}`;
-      const nativeWidth = videoElement.videoWidth;
-      const nativeHeight = videoElement.videoHeight;
-      let dataURL;
-      const videoTrack = (_b = (_a = this.hdCaptureStream) == null ? void 0 : _a.getVideoTracks()) == null ? void 0 : _b[0];
-      if (videoTrack && typeof ImageCapture !== "undefined") {
-        try {
-          const capture = new ImageCapture(videoTrack);
-          try {
-            const photoBlob = await capture.takePhoto();
-            const bitmap = await createImageBitmap(photoBlob);
-            const canvas = document.createElement("canvas");
-            canvas.width = bitmap.width;
-            canvas.height = bitmap.height;
-            const ctx = canvas.getContext("2d");
-            ctx.imageSmoothingEnabled = true;
-            ctx.imageSmoothingQuality = "high";
-            ctx.filter = "brightness(1.15) contrast(1.1) saturate(1.2)";
-            ctx.drawImage(bitmap, 0, 0);
-            bitmap.close();
-            dataURL = canvas.toDataURL(mimeType, 1);
-          } catch {
-            try {
-              const bitmap = await createImageBitmap(
-                videoElement,
-                {
-                  resizeWidth: nativeWidth,
-                  resizeHeight: nativeHeight,
-                  resizeQuality: "high",
-                  colorSpaceConversion: "default"
-                }
-              );
-              const canvas = document.createElement("canvas");
-              canvas.width = bitmap.width;
-              canvas.height = bitmap.height;
-              const ctx = canvas.getContext("2d");
-              ctx.imageSmoothingEnabled = true;
-              ctx.imageSmoothingQuality = "high";
-              ctx.filter = "brightness(1.15) contrast(1.1) saturate(1.2)";
-              ctx.drawImage(bitmap, 0, 0);
-              bitmap.close();
-              dataURL = canvas.toDataURL(mimeType, 1);
-            } catch {
-              const canvas = document.createElement("canvas");
-              canvas.width = nativeWidth;
-              canvas.height = nativeHeight;
-              const ctx = canvas.getContext("2d");
-              ctx.imageSmoothingEnabled = true;
-              ctx.imageSmoothingQuality = "high";
-              ctx.filter = "brightness(1.15) contrast(1.1) saturate(1.2)";
-              ctx.drawImage(videoElement, 0, 0, nativeWidth, nativeHeight);
-              dataURL = canvas.toDataURL(mimeType, 1);
-            }
-          }
-        } catch {
-          const canvas = document.createElement("canvas");
-          canvas.width = nativeWidth;
-          canvas.height = nativeHeight;
-          const ctx = canvas.getContext("2d");
-          ctx.imageSmoothingEnabled = true;
-          ctx.imageSmoothingQuality = "high";
-          ctx.filter = "brightness(1.15) contrast(1.1) saturate(1.2)";
-          ctx.drawImage(videoElement, 0, 0, nativeWidth, nativeHeight);
-          dataURL = canvas.toDataURL(mimeType, 1);
-        }
-      } else {
-        const canvas = document.createElement("canvas");
-        canvas.width = nativeWidth;
-        canvas.height = nativeHeight;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) {
-          this.pushMsgCaptureSnapshot(id, "Failed to get canvas context");
-          return {
-            success: false,
-            error: "Failed to get canvas context",
-            timestamp: Date.now()
-          };
-        }
-        ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = "high";
-        ctx.filter = "brightness(1.15) contrast(1.1) saturate(1.2)";
-        ctx.drawImage(videoElement, 0, 0, nativeWidth, nativeHeight);
-        dataURL = canvas.toDataURL(mimeType, 1);
-      }
-      const response = await getConversion({ session_id: targetSessionId });
-      if ((_c = response == null ? void 0 : response.data) == null ? void 0 : _c._id) {
-        const base64Data = dataURL.split(",")[1];
-        const responseApi = await postSendSession({
-          cloudAgentId: userId ?? 0,
-          sessionId: targetSessionId,
-          cloudTenantId: tenantId ?? 0,
-          intentName: "capture_snapshot",
-          text: "",
-          channel: (_d = response.data) == null ? void 0 : _d.channel,
-          attachments: [
-            {
-              fileName: `snapshot_${Date.now()}.${format}`,
-              buffer: base64Data,
-              type: mimeType,
-              name: `snapshot_${Date.now()}.${format}`
-            }
-          ],
-          suggestionId: "",
-          conversationId: (_e = response == null ? void 0 : response.data) == null ? void 0 : _e._id,
-          messageType: "FILE"
-        });
-        if ((_f = responseApi.data) == null ? void 0 : _f.success) {
-          (_i = this.port_sip_sdk) == null ? void 0 : _i.sendMessage(
-            JSON.stringify({
-              type: CAPTURE_SNAPSHOT_RESPONSE.SUCCESS,
-              data: (_h = (_g = responseApi.data) == null ? void 0 : _g.data) == null ? void 0 : _h.attachment,
-              sessionId: targetSessionId
-            }),
-            id,
-            false
-          );
-          this.cleanupCaptureStream();
-        } else {
-          this.pushMsgCaptureSnapshot(id, "Capture snapshot failed");
-        }
-        traceLog(
-          "captureHD success",
-          {
-            sessionId: targetSessionId,
-            format,
-            quality: 1,
-            width: nativeWidth,
-            height: nativeHeight
-          },
-          {
-            isLogClient: false,
-            isLogServer: true,
-            tenantId,
-            agentId: userId,
-            sessionId: targetSessionId
-          }
-        );
-        return {
-          success: true,
-          data: (_k = (_j = responseApi.data) == null ? void 0 : _j.data) == null ? void 0 : _k.attachment,
-          timestamp: Date.now()
-        };
-      } else {
-        throw Error("Cannot get conversation for snapshot");
-      }
-    } catch (error) {
-      this.pushMsgCaptureSnapshot(
-        id,
-        error instanceof Error ? error == null ? void 0 : error.message : "Unknown error"
-      );
-      traceLog(
-        "captureHD error",
-        {
-          error: JSON.stringify(error),
-          sessionId
-        },
-        {
-          isLogClient: false,
-          isLogServer: true,
-          tenantId,
-          agentId: userId,
-          sessionId
-        }
-      );
-      return {
-        success: false,
-        error: error instanceof Error ? error == null ? void 0 : error.message : "Unknown error",
-        timestamp: Date.now()
-      };
-    }
-  }
-  async switchMsgTypeSip(payload, id, sessionId) {
+  switchMsgTypeSip(payload, id, sessionId) {
     switch (payload == null ? void 0 : payload.type) {
       case CAPTURE_SNAPSHOT:
         {
-          await this.initializeCaptureStream(VideoType.FULL_HD);
-          this.captureHD(id, sessionId, payload == null ? void 0 : payload.userId, payload == null ? void 0 : payload.tenantId);
+          this.captureStream(
+            id,
+            sessionId,
+            "local",
+            payload == null ? void 0 : payload.userId,
+            payload == null ? void 0 : payload.tenantId
+          );
         }
         break;
     }
@@ -92975,10 +92617,44 @@ class GuestSwitchBoard {
       const newTrack = newStream.getVideoTracks()[0];
       if (sender && newTrack) {
         await sender.replaceTrack(newTrack);
-        this.facingMode = advancedItem.facingMode;
         return Promise.resolve({
           success: true,
           message: "ZoomVideo success"
+        });
+      } else {
+        throw new Error("Sender or new track not found");
+      }
+    } catch (error) {
+      return Promise.reject({
+        success: false,
+        message: (error == null ? void 0 : error.message) || "Unknown error",
+        description: error
+      });
+    }
+  }
+  async changeResolutionVideo(resolution) {
+    var _a, _b, _c;
+    try {
+      const callId = this.getSessionMain();
+      const session2 = (_a = this.port_sip_sdk) == null ? void 0 : _a.sessions.get(callId);
+      if (!session2) throw new Error("session does not exist");
+      const pc = (_c = (_b = session2.session) == null ? void 0 : _b.sessionDescriptionHandler) == null ? void 0 : _c.peerConnection;
+      const sender = pc.getSenders().find((s2) => {
+        var _a2;
+        return ((_a2 = s2.track) == null ? void 0 : _a2.kind) === "video";
+      });
+      const newStream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          ...SCREEN_RESOLUTION.get(resolution) || { height: { ideal: 1080 }, width: { ideal: 1920 } }
+        },
+        audio: true
+      });
+      const newTrack = newStream.getVideoTracks()[0];
+      if (sender && newTrack) {
+        await sender.replaceTrack(newTrack);
+        return Promise.resolve({
+          success: true,
+          message: "changeResolutionVideo success"
         });
       } else {
         throw new Error("Sender or new track not found");
@@ -93008,6 +92684,7 @@ class GuestService extends GuestSocket {
       remoteVideoID: "",
       remoteScreenID: ""
     });
+    __publicField(this, "sdkId", "");
     __publicField(this, "eventEmitter");
     __publicField(this, "sip");
     __publicField(this, "fileList", []);
@@ -93017,6 +92694,7 @@ class GuestService extends GuestSocket {
     this.mediaId = options.mediaIds;
     apiConfig.init({ base_url: options.baseUrl, api_key: options.apiKey });
     this.eventEmitter = new SimpleEventEmitter();
+    this.sdkId = (options == null ? void 0 : options.sdkId) ?? "";
   }
   /** 
     Listener event socket
@@ -93051,7 +92729,7 @@ class GuestService extends GuestSocket {
         phone: options.phone || randomNumber(),
         name: options.name || randomName(),
         email: (options == null ? void 0 : options.email) || randomEmail(),
-        appId: this.appId
+        appId: this.sdkId || this.appId
       });
       if ((_a = response.data) == null ? void 0 : _a.data.token) {
         this.instance.token = response.data.data.token;
@@ -93090,7 +92768,7 @@ class GuestService extends GuestSocket {
    * @returns {SdkResponse}
    */
   async makeCall(phone, option) {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p;
     traceLog(
       "Guest makeCall called with phone:",
       { phone },
@@ -93113,10 +92791,10 @@ class GuestService extends GuestSocket {
         });
       }
       this.sip = new GuestSwitchBoard({
-        server: `wss://${(_c = (_b = response.data) == null ? void 0 : _b.data) == null ? void 0 : _c.wssServer}:${(_e = (_d = response.data) == null ? void 0 : _d.data) == null ? void 0 : _e.wssPort}`,
-        password: ((_g = (_f = response.data) == null ? void 0 : _f.data) == null ? void 0 : _g.password) ?? "",
-        ext: ((_i = (_h = response.data) == null ? void 0 : _h.data) == null ? void 0 : _i.username) ?? "",
-        domainContext: ((_k = (_j = response.data) == null ? void 0 : _j.data) == null ? void 0 : _k.domain) ?? "",
+        server: `wss://${((_c = (_b = response.data) == null ? void 0 : _b.data) == null ? void 0 : _c.wssServer) || ((_e = (_d = response.data) == null ? void 0 : _d.data) == null ? void 0 : _e.sipServer)}:${(_g = (_f = response.data) == null ? void 0 : _f.data) == null ? void 0 : _g.wssPort}`,
+        password: ((_i = (_h = response.data) == null ? void 0 : _h.data) == null ? void 0 : _i.password) ?? "",
+        ext: ((_k = (_j = response.data) == null ? void 0 : _j.data) == null ? void 0 : _k.username) ?? "",
+        domainContext: ((_m = (_l = response.data) == null ? void 0 : _l.data) == null ? void 0 : _m.domain) ?? "",
         appId: this.appId,
         isVideo: (option == null ? void 0 : option.enableVideo) || false,
         extraInfo: (option == null ? void 0 : option.extraInfo) ?? "",
@@ -93128,9 +92806,9 @@ class GuestService extends GuestSocket {
             (_b2 = (_a2 = option == null ? void 0 : option.requestDelegate) == null ? void 0 : _a2.onHangup) == null ? void 0 : _b2.call(_a2, sessionId || "", record || {});
             this.clearMediaTracks();
           },
-          onConnection: (_l = option == null ? void 0 : option.requestDelegate) == null ? void 0 : _l.onConnection,
-          onConnectedSuccessfully: (_m = option == null ? void 0 : option.requestDelegate) == null ? void 0 : _m.onConnectedSuccessfully,
-          onAccept: (_n = option == null ? void 0 : option.requestDelegate) == null ? void 0 : _n.onAccept
+          onConnection: (_n = option == null ? void 0 : option.requestDelegate) == null ? void 0 : _n.onConnection,
+          onConnectedSuccessfully: (_o = option == null ? void 0 : option.requestDelegate) == null ? void 0 : _o.onConnectedSuccessfully,
+          onAccept: (_p = option == null ? void 0 : option.requestDelegate) == null ? void 0 : _p.onAccept
         },
         phone
       });
@@ -93278,7 +92956,9 @@ class GuestService extends GuestSocket {
   }
   deleteFile(id) {
     if (Array.isArray(id)) {
-      return this.fileList = this.fileList.filter((file) => !id.includes(file.id));
+      return this.fileList = this.fileList.filter(
+        (file) => !id.includes(file.id)
+      );
     }
     return this.fileList = this.fileList.filter((file) => file.id !== id);
   }
@@ -93329,6 +93009,39 @@ class GuestService extends GuestSocket {
       }
       el.srcObject = null;
     });
+  }
+  changeResolutionVideo(resolution) {
+    if (!this.sip) {
+      return this.notConnected();
+    }
+    if (!SCREEN_RESOLUTION.has(resolution)) {
+      return Promise.reject({
+        success: false,
+        message: `Invalid resolution "${resolution}". Valid values: ${[...SCREEN_RESOLUTION.keys()].join(", ")}`,
+        description: null
+      });
+    }
+    try {
+      return this.sip.changeResolutionVideo(resolution);
+    } catch (error) {
+      return Promise.reject({
+        success: false,
+        message: (error == null ? void 0 : error.message) || "changeResolutionVideo failed",
+        description: error
+      });
+    }
+  }
+  getResolutionKeys() {
+    if (!this.sip) {
+      return [];
+    }
+    return this.sip.getResolutionKeys();
+  }
+  getResolutionOptions() {
+    if (!this.sip) {
+      return [];
+    }
+    return this.sip.getResolutionOptions();
   }
 }
 class OmiGuestSDK extends GuestService {
