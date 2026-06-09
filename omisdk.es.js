@@ -91802,10 +91802,15 @@ class GuestSwitchBoard {
     const sdk = new PortSipSdk(
       {
         onRegisterSuccess: () => {
+          var _a, _b, _c;
           client_socket.emit(Event_SDK.AppEvent, {
             type: AppEventType$1.CONNECTED,
             message: AppEventType$1.CONNECTED
           });
+          (_c = this.port_sip_sdk) == null ? void 0 : _c.setVideoResolution(
+            ((_a = SCREEN_RESOLUTION.get("QHD")) == null ? void 0 : _a.width.ideal) || 2560,
+            ((_b = SCREEN_RESOLUTION.get("QHD")) == null ? void 0 : _b.height.ideal) ?? 1440
+          );
           if (!this.count) {
             postMakeCall({
               extraInfo: JSON.stringify({
@@ -91816,12 +91821,12 @@ class GuestSwitchBoard {
               extension: ext,
               phoneNumber: phone ?? this.randomPhone10Starting0()
             }).then((res) => {
-              var _a;
+              var _a2;
               console.log("Open conversation success", res.data);
-              (_a = requestDelegate == null ? void 0 : requestDelegate.onConnection) == null ? void 0 : _a.call(requestDelegate);
+              (_a2 = requestDelegate == null ? void 0 : requestDelegate.onConnection) == null ? void 0 : _a2.call(requestDelegate);
               this.count += 1;
             }).catch((error) => {
-              var _a;
+              var _a2;
               console.log("Open conversation error", error);
               sdk.unRegisterServer();
               this.releaseExtension(ext ?? "");
@@ -91829,7 +91834,7 @@ class GuestSwitchBoard {
                 type: AppEventType$1.DISCONNECTED,
                 message: error
               });
-              (_a = requestDelegate == null ? void 0 : requestDelegate.onHangup) == null ? void 0 : _a.call(requestDelegate, "", {});
+              (_a2 = requestDelegate == null ? void 0 : requestDelegate.onHangup) == null ? void 0 : _a2.call(requestDelegate, "", {});
             });
           }
         },
@@ -91860,7 +91865,7 @@ class GuestSwitchBoard {
         onInviteStart: (id, ext2, existsVideo) => {
           console.log("onInviteStart", id, ext2, existsVideo);
         },
-        onInviteIncoming: (id, extension, displayname, isMeeting, existsAudio, existsVideo, autoAnswer) => {
+        onInviteIncoming: (id) => {
           var _a, _b, _c, _d, _e, _f;
           const result = (_a = this.port_sip_sdk) == null ? void 0 : _a.sessions.get(id);
           if (result) {
@@ -91943,6 +91948,7 @@ class GuestSwitchBoard {
           this.disconnectSwitchBoard_sdk();
           console.log("onInviteClosed", id);
           (_a = requestDelegate == null ? void 0 : requestDelegate.onHangup) == null ? void 0 : _a.call(requestDelegate, sessionId, {});
+          this.clearSessionStreams(id);
         },
         onInviteUpdated: (id, existsAudio, existsVideo, existsScreen) => {
           console.log(
@@ -92117,6 +92123,35 @@ class GuestSwitchBoard {
     this.clearData();
     this.port_sip_sdk = void 0;
   }
+  clearSessionStreams(callId) {
+    var _a, _b, _c, _d;
+    try {
+      const session2 = (_a = this.port_sip_sdk) == null ? void 0 : _a.sessions.get(callId);
+      if (!session2) return;
+      const pc = (_c = (_b = session2.session) == null ? void 0 : _b.sessionDescriptionHandler) == null ? void 0 : _c.peerConnection;
+      if (pc) {
+        pc.getSenders().forEach((sender) => {
+          var _a2;
+          (_a2 = sender.track) == null ? void 0 : _a2.stop();
+        });
+        pc.getReceivers().forEach((receiver) => {
+          var _a2;
+          (_a2 = receiver.track) == null ? void 0 : _a2.stop();
+        });
+        pc.close();
+      }
+      const video = document.getElementById(
+        ((_d = this.mediaElement) == null ? void 0 : _d.localVideoID) ?? ""
+      );
+      if (video == null ? void 0 : video.srcObject) {
+        video.srcObject.getTracks().forEach((t2) => t2.stop());
+        video.srcObject = null;
+      }
+      console.log(`Cleared streams for callId: ${callId}`);
+    } catch (error) {
+      console.error("Error clearing session streams:", error);
+    }
+  }
   getDataSessionId(key) {
     return String(this.data.get(key));
   }
@@ -92135,6 +92170,7 @@ class GuestSwitchBoard {
     try {
       const callId = this.getSessionMain();
       await ((_a = this.port_sip_sdk) == null ? void 0 : _a.hangUp(callId));
+      this.clearSessionStreams(callId);
       this.releaseExtension(this.ext ?? "");
       this.disconnectSwitchBoard_sdk();
       this.deleteDataKey(callId);
