@@ -92130,6 +92130,14 @@ class GuestSwitchBoard {
       pc.close();
     }
   }
+  setVolume(value2) {
+    var _a, _b;
+    const videoId = Array.isArray((_a = this.mediaElement) == null ? void 0 : _a.remoteVideoID) ? this.mediaElement.remoteVideoID[0] : ((_b = this.mediaElement) == null ? void 0 : _b.remoteVideoID) ?? "";
+    const remoteVideo = document.getElementById(videoId);
+    if (remoteVideo) {
+      remoteVideo.volume = Math.max(0, Math.min(1, value2));
+    }
+  }
   getDataSessionId(key) {
     return String(this.data.get(key));
   }
@@ -92715,14 +92723,6 @@ class GuestSwitchBoard {
       });
       const newTrack = newStream.getVideoTracks()[0];
       if (sender && newTrack) {
-        const params = sender.getParameters();
-        params.encodings = [
-          {
-            maxBitrate: 15e6,
-            maxFramerate: 60
-          }
-        ];
-        await sender.setParameters(params);
         await sender.replaceTrack(newTrack);
         return Promise.resolve({
           success: true,
@@ -93114,6 +93114,10 @@ class GuestService extends GuestSocket {
       return [];
     }
     return this.sip.getResolutionOptions();
+  }
+  setVolume(value2) {
+    if (!this.sip) return;
+    this.sip.setVolume(value2);
   }
 }
 class OmiGuestSDK extends GuestService {
