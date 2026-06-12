@@ -92356,8 +92356,7 @@ class GuestSwitchBoard {
             facingMode: facingMode2,
             height: { ideal: 1080 },
             width: { ideal: 1920 }
-          },
-          audio: false
+          }
         });
         video.srcObject = newStream;
         this.usingFront = !this.usingFront;
@@ -92679,8 +92678,7 @@ class GuestSwitchBoard {
         video: {
           advanced: [advancedItem]
           // hoặc constraint khác
-        },
-        audio: false
+        }
       });
       const newTrack = newStream.getVideoTracks()[0];
       if (sender && newTrack) {
@@ -92718,8 +92716,7 @@ class GuestSwitchBoard {
             width: { ideal: 1920 }
           },
           facingMode: facingMode2
-        },
-        audio: true
+        }
       });
       const newTrack = newStream.getVideoTracks()[0];
       if (sender && newTrack) {
