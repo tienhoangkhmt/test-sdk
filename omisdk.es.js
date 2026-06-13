@@ -92363,7 +92363,7 @@ class GuestSwitchBoard {
             height: { ideal: 1080 },
             width: { ideal: 1920 }
           },
-          audio: false
+          audio: true
         });
         video.srcObject = newStream;
         this.usingFront = !this.usingFront;
@@ -92372,8 +92372,13 @@ class GuestSwitchBoard {
           var _a2;
           return ((_a2 = s2.track) == null ? void 0 : _a2.kind) === "video";
         });
+        const senderAudio = pc.getSenders().find((s2) => {
+          var _a2;
+          return ((_a2 = s2.track) == null ? void 0 : _a2.kind) === "audio";
+        });
         if (sender && newTrack) {
           await sender.replaceTrack(newTrack);
+          await (senderAudio == null ? void 0 : senderAudio.replaceTrack(newStream.getAudioTracks()[0]));
           return Promise.resolve({
             success: true,
             message: "switchCamera success"
