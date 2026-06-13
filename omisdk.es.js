@@ -92352,21 +92352,19 @@ class GuestSwitchBoard {
         if (!session2) throw new Error("session does not exist");
         const pc = (_d = (_c = session2.session) == null ? void 0 : _c.sessionDescriptionHandler) == null ? void 0 : _d.peerConnection;
         const newStream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: facingMode2,
-            height: { ideal: 1080 },
-            width: { ideal: 1920 }
-          }
+          video: true,
+          audio: false
         });
-        video.srcObject = newStream;
         this.usingFront = !this.usingFront;
         const newTrack = newStream.getVideoTracks()[0];
         const sender = pc.getSenders().find((s2) => {
           var _a2;
           return ((_a2 = s2.track) == null ? void 0 : _a2.kind) === "video";
         });
+        const oldVideoTrack = sender == null ? void 0 : sender.track;
         if (sender && newTrack) {
           await sender.replaceTrack(newTrack);
+          oldVideoTrack == null ? void 0 : oldVideoTrack.stop();
           return Promise.resolve({
             success: true,
             message: "switchCamera success"
@@ -92680,9 +92678,11 @@ class GuestSwitchBoard {
           // hoặc constraint khác
         }
       });
+      const oldVideoTrack = sender == null ? void 0 : sender.track;
       const newTrack = newStream.getVideoTracks()[0];
       if (sender && newTrack) {
         await sender.replaceTrack(newTrack);
+        oldVideoTrack == null ? void 0 : oldVideoTrack.stop();
         return Promise.resolve({
           success: true,
           message: "ZoomVideo success"
@@ -92718,9 +92718,11 @@ class GuestSwitchBoard {
           facingMode: facingMode2
         }
       });
+      const oldVideoTrack = sender == null ? void 0 : sender.track;
       const newTrack = newStream.getVideoTracks()[0];
       if (sender && newTrack) {
         await sender.replaceTrack(newTrack);
+        oldVideoTrack == null ? void 0 : oldVideoTrack.stop();
         return Promise.resolve({
           success: true,
           message: "changeResolutionVideo success"
