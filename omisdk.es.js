@@ -92361,10 +92361,8 @@ class GuestSwitchBoard {
           var _a2;
           return ((_a2 = s2.track) == null ? void 0 : _a2.kind) === "video";
         });
-        const oldVideoTrack = sender == null ? void 0 : sender.track;
         if (sender && newTrack) {
           await sender.replaceTrack(newTrack);
-          oldVideoTrack == null ? void 0 : oldVideoTrack.stop();
           return Promise.resolve({
             success: true,
             message: "switchCamera success"
