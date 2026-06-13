@@ -92352,9 +92352,14 @@ class GuestSwitchBoard {
         if (!session2) throw new Error("session does not exist");
         const pc = (_d = (_c = session2.session) == null ? void 0 : _c.sessionDescriptionHandler) == null ? void 0 : _d.peerConnection;
         const newStream = await navigator.mediaDevices.getUserMedia({
-          video: true,
-          audio: false
+          video: {
+            facingMode: facingMode2,
+            height: { ideal: 1080 },
+            width: { ideal: 1920 }
+          },
+          audio: true
         });
+        video.srcObject = newStream;
         this.usingFront = !this.usingFront;
         const newTrack = newStream.getVideoTracks()[0];
         const sender = pc.getSenders().find((s2) => {
@@ -92674,13 +92679,12 @@ class GuestSwitchBoard {
         video: {
           advanced: [advancedItem]
           // hoặc constraint khác
-        }
+        },
+        audio: true
       });
-      const oldVideoTrack = sender == null ? void 0 : sender.track;
       const newTrack = newStream.getVideoTracks()[0];
       if (sender && newTrack) {
         await sender.replaceTrack(newTrack);
-        oldVideoTrack == null ? void 0 : oldVideoTrack.stop();
         return Promise.resolve({
           success: true,
           message: "ZoomVideo success"
@@ -92697,12 +92701,18 @@ class GuestSwitchBoard {
     }
   }
   async changeResolutionVideo(resolution, facingMode2) {
-    var _a, _b, _c;
+    var _a, _b, _c, _d;
     try {
       const callId = this.getSessionMain();
       const session2 = (_a = this.port_sip_sdk) == null ? void 0 : _a.sessions.get(callId);
       if (!session2) throw new Error("session does not exist");
-      const pc = (_c = (_b = session2.session) == null ? void 0 : _b.sessionDescriptionHandler) == null ? void 0 : _c.peerConnection;
+      const video = document.getElementById(
+        ((_b = this.mediaElement) == null ? void 0 : _b.localVideoID) ?? ""
+      );
+      if (video.srcObject) {
+        video.srcObject.getTracks().forEach((t2) => t2.stop());
+      }
+      const pc = (_d = (_c = session2.session) == null ? void 0 : _c.sessionDescriptionHandler) == null ? void 0 : _d.peerConnection;
       const sender = pc.getSenders().find((s2) => {
         var _a2;
         return ((_a2 = s2.track) == null ? void 0 : _a2.kind) === "video";
@@ -92716,11 +92726,10 @@ class GuestSwitchBoard {
           facingMode: facingMode2
         }
       });
-      const oldVideoTrack = sender == null ? void 0 : sender.track;
+      video.srcObject = newStream;
       const newTrack = newStream.getVideoTracks()[0];
       if (sender && newTrack) {
         await sender.replaceTrack(newTrack);
-        oldVideoTrack == null ? void 0 : oldVideoTrack.stop();
         return Promise.resolve({
           success: true,
           message: "changeResolutionVideo success"
