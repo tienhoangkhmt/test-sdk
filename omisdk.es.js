@@ -91796,14 +91796,14 @@ class GuestSwitchBoard {
     const sdk = new PortSipSdk(
       {
         onRegisterSuccess: () => {
-          var _a, _b, _c;
+          var _a, _b;
           client_socket.emit(Event_SDK.AppEvent, {
             type: AppEventType$1.CONNECTED,
             message: AppEventType$1.CONNECTED
           });
-          (_c = this.port_sip_sdk) == null ? void 0 : _c.setVideoResolution(
-            ((_a = SCREEN_RESOLUTION.get("QHD")) == null ? void 0 : _a.width.ideal) || 2560,
-            ((_b = SCREEN_RESOLUTION.get("QHD")) == null ? void 0 : _b.height.ideal) ?? 1440
+          sdk == null ? void 0 : sdk.setVideoResolution(
+            ((_a = SCREEN_RESOLUTION.get("FULL_HD")) == null ? void 0 : _a.width.ideal) || 2560,
+            ((_b = SCREEN_RESOLUTION.get("FULL_HD")) == null ? void 0 : _b.height.ideal) ?? 1440
           );
           if (!this.count) {
             postMakeCall({
