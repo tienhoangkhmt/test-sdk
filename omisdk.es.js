@@ -58,6 +58,12 @@ var InteractionEventType$1 = /* @__PURE__ */ ((InteractionEventType2) => {
   InteractionEventType2["CONVERSATION_ENDED"] = "conversation_ended";
   return InteractionEventType2;
 })(InteractionEventType$1 || {});
+var ModeBlur = /* @__PURE__ */ ((ModeBlur2) => {
+  ModeBlur2["none"] = "none";
+  ModeBlur2["blur"] = "blur";
+  ModeBlur2["image"] = "image";
+  return ModeBlur2;
+})(ModeBlur || {});
 var TransferType = /* @__PURE__ */ ((TransferType2) => {
   TransferType2["BLIND_TRANSFER"] = "BLIND_TRANSFER";
   TransferType2["ATTENDED_TRANSFER"] = "ATTENDED_TRANSFER";
@@ -2645,14 +2651,18 @@ function requireReact_development() {
   })(react_development, react_development.exports);
   return react_development.exports;
 }
-var define_process_env_default$g = {};
-if (define_process_env_default$g.NODE_ENV === "production") {
-  react.exports = requireReact_production_min();
-} else {
-  react.exports = requireReact_development();
+var hasRequiredReact;
+function requireReact() {
+  if (hasRequiredReact) return react.exports;
+  hasRequiredReact = 1;
+  var define_process_env_default2 = {};
+  if (define_process_env_default2.NODE_ENV === "production") {
+    react.exports = requireReact_production_min();
+  } else {
+    react.exports = requireReact_development();
+  }
+  return react.exports;
 }
-var reactExports = react.exports;
-const React__default$1 = /* @__PURE__ */ getDefaultExportFromCjs(reactExports);
 /**
  * @license React
  * react-jsx-runtime.production.min.js
@@ -2666,7 +2676,7 @@ var hasRequiredReactJsxRuntime_production_min;
 function requireReactJsxRuntime_production_min() {
   if (hasRequiredReactJsxRuntime_production_min) return reactJsxRuntime_production_min;
   hasRequiredReactJsxRuntime_production_min = 1;
-  var f = reactExports, k = Symbol.for("react.element"), l2 = Symbol.for("react.fragment"), m2 = Object.prototype.hasOwnProperty, n2 = f.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactCurrentOwner, p2 = { key: true, ref: true, __self: true, __source: true };
+  var f = requireReact(), k = Symbol.for("react.element"), l2 = Symbol.for("react.fragment"), m2 = Object.prototype.hasOwnProperty, n2 = f.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactCurrentOwner, p2 = { key: true, ref: true, __self: true, __source: true };
   function q(c2, a2, g) {
     var b, d = {}, e2 = null, h = null;
     void 0 !== g && (e2 = "" + g);
@@ -2698,7 +2708,7 @@ function requireReactJsxRuntime_development() {
    */
   if (define_process_env_default2.NODE_ENV !== "production") {
     (function() {
-      var React2 = reactExports;
+      var React2 = requireReact();
       var REACT_ELEMENT_TYPE = Symbol.for("react.element");
       var REACT_PORTAL_TYPE = Symbol.for("react.portal");
       var REACT_FRAGMENT_TYPE = Symbol.for("react.fragment");
@@ -4300,7 +4310,7 @@ var hasRequiredReactDom_production_min;
 function requireReactDom_production_min() {
   if (hasRequiredReactDom_production_min) return reactDom_production_min;
   hasRequiredReactDom_production_min = 1;
-  var aa = reactExports, ca = requireScheduler();
+  var aa = requireReact(), ca = requireScheduler();
   function p2(a2) {
     for (var b = "https://reactjs.org/docs/error-decoder.html?invariant=" + a2, c2 = 1; c2 < arguments.length; c2++) b += "&args[]=" + encodeURIComponent(arguments[c2]);
     return "Minified React error #" + a2 + "; visit " + b + " for the full message or use the non-minified dev environment for full errors and additional helpful warnings.";
@@ -10719,7 +10729,7 @@ function requireReactDom_development() {
       if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ !== "undefined" && typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart === "function") {
         __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(new Error());
       }
-      var React2 = reactExports;
+      var React2 = requireReact();
       var Scheduler = requireScheduler();
       var ReactSharedInternals = React2.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
       var suppressWarning = false;
@@ -31854,6 +31864,8 @@ if (define_process_env_default$d.NODE_ENV === "production") {
     }
   };
 }
+var reactExports = requireReact();
+const React__default$1 = /* @__PURE__ */ getDefaultExportFromCjs(reactExports);
 var lib = {};
 var uaParser_min = { exports: {} };
 (function(module, exports) {
@@ -32050,7 +32062,7 @@ Object.defineProperty(lib, "__esModule", { value: true });
 function _interopDefault(ex) {
   return ex && typeof ex === "object" && "default" in ex ? ex["default"] : ex;
 }
-var React = reactExports;
+var React = requireReact();
 var React__default = _interopDefault(React);
 var UAParser = uaParser_minExports;
 var ClientUAInstance = new UAParser();
@@ -32978,6 +32990,34 @@ var StatusRenderAssistant = /* @__PURE__ */ ((StatusRenderAssistant2) => {
   StatusRenderAssistant2["SUCCESS"] = "SUCCESS";
   return StatusRenderAssistant2;
 })(StatusRenderAssistant || {});
+var TypeAssistants = /* @__PURE__ */ ((TypeAssistants2) => {
+  TypeAssistants2["CREATE_TASK"] = "CREATE_TASK";
+  TypeAssistants2["TAKE_NOTE"] = "TAKE_NOTE";
+  TypeAssistants2["TRANSCRIPT"] = "TRANSCRIPT";
+  TypeAssistants2["REWRITER"] = "REWRITER";
+  TypeAssistants2["TRANSLATE"] = "TRANSLATE";
+  TypeAssistants2["CONTACT_ANALYSIS"] = "CONTACT_ANALYSIS";
+  return TypeAssistants2;
+})(TypeAssistants || {});
+function transcriptAssistant(prev = [], values) {
+  if (!(prev == null ? void 0 : prev.length)) {
+    return [values];
+  }
+  const arr = [...prev];
+  let lastIndex = arr.length - 1;
+  let found = false;
+  for (let i2 = lastIndex; i2 > 0; i2--) {
+    if (!arr[i2].finish && arr[i2].channel == (values == null ? void 0 : values.channel)) {
+      arr[i2] = values;
+      found = true;
+      break;
+    }
+  }
+  if (!found) {
+    arr.push(values);
+  }
+  return arr;
+}
 var CallStatusInfo = /* @__PURE__ */ ((CallStatusInfo2) => {
   CallStatusInfo2["ConnectionEstablish"] = "ConnectionEstablish";
   CallStatusInfo2["WaitingCall"] = "WaitingCall";
@@ -33100,7 +33140,8 @@ const EVENT_ABLY_NAME = {
   TRANSFER_RINGING: "TRANSFER_RINGING",
   TRANSFER_ANSWER: "TRANSFER_ANSWER",
   TRANSFER_ACCEPTED: "TRANSFER_ACCEPTED",
-  RECORDING: "RECORDING"
+  RECORDING: "RECORDING",
+  QUEUE: "QUEUE"
 };
 const MessengerForm = {
   AGENT: "AGENT",
@@ -33113,6 +33154,10 @@ const CONVERSATION_STATE = {
 const WRAP_UP_TIME = 30;
 const PROCESSING_END_CALL_TIME = 60;
 const ListCalls = [channelCall, internetCall];
+const LabelCallAssistant = {
+  1: "agent",
+  0: "customer"
+};
 const CLOSE_MODE = {
   MANUAL: "MANUAL"
 };
@@ -33150,7 +33195,10 @@ const Event_SDK = {
   CallEvent: "CallEvent",
   AgentStatusEvent: "AgentStatusEvent",
   InteractionEvent: "InteractionEvent",
-  GuestEvent: "GuestEvent"
+  GuestEvent: "GuestEvent",
+  AssistantEvent: "AssistantEvent",
+  MediPipeEvent: "MediPipeEvent",
+  QueueEvent: "QueueEvent"
 };
 ({
   CLOSE_CONVERSATION: InteractionEventType.CLOSE_CONVERSATION,
@@ -33254,7 +33302,7 @@ const SCREEN_RESOLUTION = /* @__PURE__ */ new Map([
       width: { ideal: 1920 },
       height: { ideal: 1080 },
       label: "Full HD",
-      frameRate: { ideal: 30 }
+      frameRate: { ideal: 60 }
     }
   ],
   [
@@ -33276,6 +33324,13 @@ const SCREEN_RESOLUTION = /* @__PURE__ */ new Map([
     }
   ]
 ]);
+const socket_rooms = {
+  agent_join_rooms: "agent_join_rooms"
+};
+const hardCodeLocalVideoId = "local";
+const QUEUE_EVENT = {
+  CHANGE_STATUS_QUEUE: "CHANGE_STATUS_QUEUE"
+};
 var define_process_env_default$c = {};
 function formatProdErrorMessage$1(code) {
   return `Minified Redux error #${code}; visit https://redux.js.org/Errors?code=${code} for the full message or use the non-minified dev environment for full errors. `;
@@ -35423,7 +35478,7 @@ var hasRequiredUseSyncExternalStoreWithSelector_production;
 function requireUseSyncExternalStoreWithSelector_production() {
   if (hasRequiredUseSyncExternalStoreWithSelector_production) return useSyncExternalStoreWithSelector_production;
   hasRequiredUseSyncExternalStoreWithSelector_production = 1;
-  var React2 = reactExports;
+  var React2 = requireReact();
   function is2(x, y) {
     return x === y && (0 !== x || 1 / x === 1 / y) || x !== x && y !== y;
   }
@@ -35501,7 +35556,7 @@ function requireUseSyncExternalStoreWithSelector_development() {
       return x === y && (0 !== x || 1 / x === 1 / y) || x !== x && y !== y;
     }
     "undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-    var React2 = reactExports, objectIs = "function" === typeof Object.is ? Object.is : is2, useSyncExternalStore = React2.useSyncExternalStore, useRef = React2.useRef, useEffect = React2.useEffect, useMemo = React2.useMemo, useDebugValue = React2.useDebugValue;
+    var React2 = requireReact(), objectIs = "function" === typeof Object.is ? Object.is : is2, useSyncExternalStore = React2.useSyncExternalStore, useRef = React2.useRef, useEffect = React2.useEffect, useMemo = React2.useMemo, useDebugValue = React2.useDebugValue;
     useSyncExternalStoreWithSelector_development.useSyncExternalStoreWithSelector = function(subscribe, getSnapshot, getServerSnapshot, selector, isEqual) {
       var instRef = useRef(null);
       if (null === instRef.current) {
@@ -47662,6 +47717,3307 @@ function regex_type_file(str = "", reg_exp = reg_exp_images) {
   const regex = new RegExp(reg_exp);
   return regex.test(str);
 }
+const PACKET_TYPES = /* @__PURE__ */ Object.create(null);
+PACKET_TYPES["open"] = "0";
+PACKET_TYPES["close"] = "1";
+PACKET_TYPES["ping"] = "2";
+PACKET_TYPES["pong"] = "3";
+PACKET_TYPES["message"] = "4";
+PACKET_TYPES["upgrade"] = "5";
+PACKET_TYPES["noop"] = "6";
+const PACKET_TYPES_REVERSE = /* @__PURE__ */ Object.create(null);
+Object.keys(PACKET_TYPES).forEach((key) => {
+  PACKET_TYPES_REVERSE[PACKET_TYPES[key]] = key;
+});
+const ERROR_PACKET = { type: "error", data: "parser error" };
+const withNativeBlob$1 = typeof Blob === "function" || typeof Blob !== "undefined" && Object.prototype.toString.call(Blob) === "[object BlobConstructor]";
+const withNativeArrayBuffer$2 = typeof ArrayBuffer === "function";
+const isView$1 = (obj) => {
+  return typeof ArrayBuffer.isView === "function" ? ArrayBuffer.isView(obj) : obj && obj.buffer instanceof ArrayBuffer;
+};
+const encodePacket = ({ type, data }, supportsBinary, callback) => {
+  if (withNativeBlob$1 && data instanceof Blob) {
+    if (supportsBinary) {
+      return callback(data);
+    } else {
+      return encodeBlobAsBase64(data, callback);
+    }
+  } else if (withNativeArrayBuffer$2 && (data instanceof ArrayBuffer || isView$1(data))) {
+    if (supportsBinary) {
+      return callback(data);
+    } else {
+      return encodeBlobAsBase64(new Blob([data]), callback);
+    }
+  }
+  return callback(PACKET_TYPES[type] + (data || ""));
+};
+const encodeBlobAsBase64 = (data, callback) => {
+  const fileReader = new FileReader();
+  fileReader.onload = function() {
+    const content2 = fileReader.result.split(",")[1];
+    callback("b" + (content2 || ""));
+  };
+  return fileReader.readAsDataURL(data);
+};
+function toArray(data) {
+  if (data instanceof Uint8Array) {
+    return data;
+  } else if (data instanceof ArrayBuffer) {
+    return new Uint8Array(data);
+  } else {
+    return new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
+  }
+}
+let TEXT_ENCODER;
+function encodePacketToBinary(packet, callback) {
+  if (withNativeBlob$1 && packet.data instanceof Blob) {
+    return packet.data.arrayBuffer().then(toArray).then(callback);
+  } else if (withNativeArrayBuffer$2 && (packet.data instanceof ArrayBuffer || isView$1(packet.data))) {
+    return callback(toArray(packet.data));
+  }
+  encodePacket(packet, false, (encoded) => {
+    if (!TEXT_ENCODER) {
+      TEXT_ENCODER = new TextEncoder();
+    }
+    callback(TEXT_ENCODER.encode(encoded));
+  });
+}
+const chars$1 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+const lookup$1 = typeof Uint8Array === "undefined" ? [] : new Uint8Array(256);
+for (let i2 = 0; i2 < chars$1.length; i2++) {
+  lookup$1[chars$1.charCodeAt(i2)] = i2;
+}
+const decode$1 = (base64) => {
+  let bufferLength = base64.length * 0.75, len = base64.length, i2, p2 = 0, encoded1, encoded2, encoded3, encoded4;
+  if (base64[base64.length - 1] === "=") {
+    bufferLength--;
+    if (base64[base64.length - 2] === "=") {
+      bufferLength--;
+    }
+  }
+  const arraybuffer = new ArrayBuffer(bufferLength), bytes = new Uint8Array(arraybuffer);
+  for (i2 = 0; i2 < len; i2 += 4) {
+    encoded1 = lookup$1[base64.charCodeAt(i2)];
+    encoded2 = lookup$1[base64.charCodeAt(i2 + 1)];
+    encoded3 = lookup$1[base64.charCodeAt(i2 + 2)];
+    encoded4 = lookup$1[base64.charCodeAt(i2 + 3)];
+    bytes[p2++] = encoded1 << 2 | encoded2 >> 4;
+    bytes[p2++] = (encoded2 & 15) << 4 | encoded3 >> 2;
+    bytes[p2++] = (encoded3 & 3) << 6 | encoded4 & 63;
+  }
+  return arraybuffer;
+};
+const withNativeArrayBuffer$1 = typeof ArrayBuffer === "function";
+const decodePacket = (encodedPacket, binaryType) => {
+  if (typeof encodedPacket !== "string") {
+    return {
+      type: "message",
+      data: mapBinary(encodedPacket, binaryType)
+    };
+  }
+  const type = encodedPacket.charAt(0);
+  if (type === "b") {
+    return {
+      type: "message",
+      data: decodeBase64Packet(encodedPacket.substring(1), binaryType)
+    };
+  }
+  const packetType = PACKET_TYPES_REVERSE[type];
+  if (!packetType) {
+    return ERROR_PACKET;
+  }
+  return encodedPacket.length > 1 ? {
+    type: PACKET_TYPES_REVERSE[type],
+    data: encodedPacket.substring(1)
+  } : {
+    type: PACKET_TYPES_REVERSE[type]
+  };
+};
+const decodeBase64Packet = (data, binaryType) => {
+  if (withNativeArrayBuffer$1) {
+    const decoded = decode$1(data);
+    return mapBinary(decoded, binaryType);
+  } else {
+    return { base64: true, data };
+  }
+};
+const mapBinary = (data, binaryType) => {
+  switch (binaryType) {
+    case "blob":
+      if (data instanceof Blob) {
+        return data;
+      } else {
+        return new Blob([data]);
+      }
+    case "arraybuffer":
+    default:
+      if (data instanceof ArrayBuffer) {
+        return data;
+      } else {
+        return data.buffer;
+      }
+  }
+};
+const SEPARATOR = String.fromCharCode(30);
+const encodePayload = (packets, callback) => {
+  const length = packets.length;
+  const encodedPackets = new Array(length);
+  let count = 0;
+  packets.forEach((packet, i2) => {
+    encodePacket(packet, false, (encodedPacket) => {
+      encodedPackets[i2] = encodedPacket;
+      if (++count === length) {
+        callback(encodedPackets.join(SEPARATOR));
+      }
+    });
+  });
+};
+const decodePayload = (encodedPayload, binaryType) => {
+  const encodedPackets = encodedPayload.split(SEPARATOR);
+  const packets = [];
+  for (let i2 = 0; i2 < encodedPackets.length; i2++) {
+    const decodedPacket = decodePacket(encodedPackets[i2], binaryType);
+    packets.push(decodedPacket);
+    if (decodedPacket.type === "error") {
+      break;
+    }
+  }
+  return packets;
+};
+function createPacketEncoderStream() {
+  return new TransformStream({
+    transform(packet, controller) {
+      encodePacketToBinary(packet, (encodedPacket) => {
+        const payloadLength = encodedPacket.length;
+        let header;
+        if (payloadLength < 126) {
+          header = new Uint8Array(1);
+          new DataView(header.buffer).setUint8(0, payloadLength);
+        } else if (payloadLength < 65536) {
+          header = new Uint8Array(3);
+          const view = new DataView(header.buffer);
+          view.setUint8(0, 126);
+          view.setUint16(1, payloadLength);
+        } else {
+          header = new Uint8Array(9);
+          const view = new DataView(header.buffer);
+          view.setUint8(0, 127);
+          view.setBigUint64(1, BigInt(payloadLength));
+        }
+        if (packet.data && typeof packet.data !== "string") {
+          header[0] |= 128;
+        }
+        controller.enqueue(header);
+        controller.enqueue(encodedPacket);
+      });
+    }
+  });
+}
+let TEXT_DECODER;
+function totalLength(chunks) {
+  return chunks.reduce((acc, chunk) => acc + chunk.length, 0);
+}
+function concatChunks(chunks, size) {
+  if (chunks[0].length === size) {
+    return chunks.shift();
+  }
+  const buffer = new Uint8Array(size);
+  let j = 0;
+  for (let i2 = 0; i2 < size; i2++) {
+    buffer[i2] = chunks[0][j++];
+    if (j === chunks[0].length) {
+      chunks.shift();
+      j = 0;
+    }
+  }
+  if (chunks.length && j < chunks[0].length) {
+    chunks[0] = chunks[0].slice(j);
+  }
+  return buffer;
+}
+function createPacketDecoderStream(maxPayload, binaryType) {
+  if (!TEXT_DECODER) {
+    TEXT_DECODER = new TextDecoder();
+  }
+  const chunks = [];
+  let state = 0;
+  let expectedLength = -1;
+  let isBinary2 = false;
+  return new TransformStream({
+    transform(chunk, controller) {
+      chunks.push(chunk);
+      while (true) {
+        if (state === 0) {
+          if (totalLength(chunks) < 1) {
+            break;
+          }
+          const header = concatChunks(chunks, 1);
+          isBinary2 = (header[0] & 128) === 128;
+          expectedLength = header[0] & 127;
+          if (expectedLength < 126) {
+            state = 3;
+          } else if (expectedLength === 126) {
+            state = 1;
+          } else {
+            state = 2;
+          }
+        } else if (state === 1) {
+          if (totalLength(chunks) < 2) {
+            break;
+          }
+          const headerArray = concatChunks(chunks, 2);
+          expectedLength = new DataView(headerArray.buffer, headerArray.byteOffset, headerArray.length).getUint16(0);
+          state = 3;
+        } else if (state === 2) {
+          if (totalLength(chunks) < 8) {
+            break;
+          }
+          const headerArray = concatChunks(chunks, 8);
+          const view = new DataView(headerArray.buffer, headerArray.byteOffset, headerArray.length);
+          const n2 = view.getUint32(0);
+          if (n2 > Math.pow(2, 53 - 32) - 1) {
+            controller.enqueue(ERROR_PACKET);
+            break;
+          }
+          expectedLength = n2 * Math.pow(2, 32) + view.getUint32(4);
+          state = 3;
+        } else {
+          if (totalLength(chunks) < expectedLength) {
+            break;
+          }
+          const data = concatChunks(chunks, expectedLength);
+          controller.enqueue(decodePacket(isBinary2 ? data : TEXT_DECODER.decode(data), binaryType));
+          state = 0;
+        }
+        if (expectedLength === 0 || expectedLength > maxPayload) {
+          controller.enqueue(ERROR_PACKET);
+          break;
+        }
+      }
+    }
+  });
+}
+const protocol$1 = 4;
+function Emitter(obj) {
+  if (obj) return mixin(obj);
+}
+function mixin(obj) {
+  for (var key in Emitter.prototype) {
+    obj[key] = Emitter.prototype[key];
+  }
+  return obj;
+}
+Emitter.prototype.on = Emitter.prototype.addEventListener = function(event, fn) {
+  this._callbacks = this._callbacks || {};
+  (this._callbacks["$" + event] = this._callbacks["$" + event] || []).push(fn);
+  return this;
+};
+Emitter.prototype.once = function(event, fn) {
+  function on2() {
+    this.off(event, on2);
+    fn.apply(this, arguments);
+  }
+  on2.fn = fn;
+  this.on(event, on2);
+  return this;
+};
+Emitter.prototype.off = Emitter.prototype.removeListener = Emitter.prototype.removeAllListeners = Emitter.prototype.removeEventListener = function(event, fn) {
+  this._callbacks = this._callbacks || {};
+  if (0 == arguments.length) {
+    this._callbacks = {};
+    return this;
+  }
+  var callbacks = this._callbacks["$" + event];
+  if (!callbacks) return this;
+  if (1 == arguments.length) {
+    delete this._callbacks["$" + event];
+    return this;
+  }
+  var cb;
+  for (var i2 = 0; i2 < callbacks.length; i2++) {
+    cb = callbacks[i2];
+    if (cb === fn || cb.fn === fn) {
+      callbacks.splice(i2, 1);
+      break;
+    }
+  }
+  if (callbacks.length === 0) {
+    delete this._callbacks["$" + event];
+  }
+  return this;
+};
+Emitter.prototype.emit = function(event) {
+  this._callbacks = this._callbacks || {};
+  var args = new Array(arguments.length - 1), callbacks = this._callbacks["$" + event];
+  for (var i2 = 1; i2 < arguments.length; i2++) {
+    args[i2 - 1] = arguments[i2];
+  }
+  if (callbacks) {
+    callbacks = callbacks.slice(0);
+    for (var i2 = 0, len = callbacks.length; i2 < len; ++i2) {
+      callbacks[i2].apply(this, args);
+    }
+  }
+  return this;
+};
+Emitter.prototype.emitReserved = Emitter.prototype.emit;
+Emitter.prototype.listeners = function(event) {
+  this._callbacks = this._callbacks || {};
+  return this._callbacks["$" + event] || [];
+};
+Emitter.prototype.hasListeners = function(event) {
+  return !!this.listeners(event).length;
+};
+const nextTick = (() => {
+  const isPromiseAvailable = typeof Promise === "function" && typeof Promise.resolve === "function";
+  if (isPromiseAvailable) {
+    return (cb) => Promise.resolve().then(cb);
+  } else {
+    return (cb, setTimeoutFn) => setTimeoutFn(cb, 0);
+  }
+})();
+const globalThisShim = (() => {
+  if (typeof self !== "undefined") {
+    return self;
+  } else if (typeof window !== "undefined") {
+    return window;
+  } else {
+    return Function("return this")();
+  }
+})();
+const defaultBinaryType = "arraybuffer";
+function createCookieJar() {
+}
+function pick(obj, ...attr) {
+  return attr.reduce((acc, k) => {
+    if (obj.hasOwnProperty(k)) {
+      acc[k] = obj[k];
+    }
+    return acc;
+  }, {});
+}
+const NATIVE_SET_TIMEOUT = globalThisShim.setTimeout;
+const NATIVE_CLEAR_TIMEOUT = globalThisShim.clearTimeout;
+function installTimerFunctions(obj, opts) {
+  if (opts.useNativeTimers) {
+    obj.setTimeoutFn = NATIVE_SET_TIMEOUT.bind(globalThisShim);
+    obj.clearTimeoutFn = NATIVE_CLEAR_TIMEOUT.bind(globalThisShim);
+  } else {
+    obj.setTimeoutFn = globalThisShim.setTimeout.bind(globalThisShim);
+    obj.clearTimeoutFn = globalThisShim.clearTimeout.bind(globalThisShim);
+  }
+}
+const BASE64_OVERHEAD = 1.33;
+function byteLength(obj) {
+  if (typeof obj === "string") {
+    return utf8Length$2(obj);
+  }
+  return Math.ceil((obj.byteLength || obj.size) * BASE64_OVERHEAD);
+}
+function utf8Length$2(str) {
+  let c2 = 0, length = 0;
+  for (let i2 = 0, l2 = str.length; i2 < l2; i2++) {
+    c2 = str.charCodeAt(i2);
+    if (c2 < 128) {
+      length += 1;
+    } else if (c2 < 2048) {
+      length += 2;
+    } else if (c2 < 55296 || c2 >= 57344) {
+      length += 3;
+    } else {
+      i2++;
+      length += 4;
+    }
+  }
+  return length;
+}
+function randomString() {
+  return Date.now().toString(36).substring(3) + Math.random().toString(36).substring(2, 5);
+}
+function encode(obj) {
+  let str = "";
+  for (let i2 in obj) {
+    if (obj.hasOwnProperty(i2)) {
+      if (str.length)
+        str += "&";
+      str += encodeURIComponent(i2) + "=" + encodeURIComponent(obj[i2]);
+    }
+  }
+  return str;
+}
+function decode(qs) {
+  let qry = {};
+  let pairs = qs.split("&");
+  for (let i2 = 0, l2 = pairs.length; i2 < l2; i2++) {
+    let pair = pairs[i2].split("=");
+    qry[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]);
+  }
+  return qry;
+}
+let TransportError$2 = class TransportError extends Error {
+  constructor(reason, description, context) {
+    super(reason);
+    this.description = description;
+    this.context = context;
+    this.type = "TransportError";
+  }
+};
+let Transport$2 = class Transport extends Emitter {
+  /**
+   * Transport abstract constructor.
+   *
+   * @param {Object} opts - options
+   * @protected
+   */
+  constructor(opts) {
+    super();
+    this.writable = false;
+    installTimerFunctions(this, opts);
+    this.opts = opts;
+    this.query = opts.query;
+    this.socket = opts.socket;
+    this.supportsBinary = !opts.forceBase64;
+  }
+  /**
+   * Emits an error.
+   *
+   * @param {String} reason
+   * @param description
+   * @param context - the error context
+   * @return {Transport} for chaining
+   * @protected
+   */
+  onError(reason, description, context) {
+    super.emitReserved("error", new TransportError$2(reason, description, context));
+    return this;
+  }
+  /**
+   * Opens the transport.
+   */
+  open() {
+    this.readyState = "opening";
+    this.doOpen();
+    return this;
+  }
+  /**
+   * Closes the transport.
+   */
+  close() {
+    if (this.readyState === "opening" || this.readyState === "open") {
+      this.doClose();
+      this.onClose();
+    }
+    return this;
+  }
+  /**
+   * Sends multiple packets.
+   *
+   * @param {Array} packets
+   */
+  send(packets) {
+    if (this.readyState === "open") {
+      this.write(packets);
+    }
+  }
+  /**
+   * Called upon open
+   *
+   * @protected
+   */
+  onOpen() {
+    this.readyState = "open";
+    this.writable = true;
+    super.emitReserved("open");
+  }
+  /**
+   * Called with data.
+   *
+   * @param {String} data
+   * @protected
+   */
+  onData(data) {
+    const packet = decodePacket(data, this.socket.binaryType);
+    this.onPacket(packet);
+  }
+  /**
+   * Called with a decoded packet.
+   *
+   * @protected
+   */
+  onPacket(packet) {
+    super.emitReserved("packet", packet);
+  }
+  /**
+   * Called upon close.
+   *
+   * @protected
+   */
+  onClose(details) {
+    this.readyState = "closed";
+    super.emitReserved("close", details);
+  }
+  /**
+   * Pauses the transport, in order not to lose packets during an upgrade.
+   *
+   * @param onPause
+   */
+  pause(onPause) {
+  }
+  createUri(schema, query = {}) {
+    return schema + "://" + this._hostname() + this._port() + this.opts.path + this._query(query);
+  }
+  _hostname() {
+    const hostname = this.opts.hostname;
+    return hostname.indexOf(":") === -1 ? hostname : "[" + hostname + "]";
+  }
+  _port() {
+    if (this.opts.port && (this.opts.secure && Number(this.opts.port !== 443) || !this.opts.secure && Number(this.opts.port) !== 80)) {
+      return ":" + this.opts.port;
+    } else {
+      return "";
+    }
+  }
+  _query(query) {
+    const encodedQuery = encode(query);
+    return encodedQuery.length ? "?" + encodedQuery : "";
+  }
+};
+class Polling extends Transport$2 {
+  constructor() {
+    super(...arguments);
+    this._polling = false;
+  }
+  get name() {
+    return "polling";
+  }
+  /**
+   * Opens the socket (triggers polling). We write a PING message to determine
+   * when the transport is open.
+   *
+   * @protected
+   */
+  doOpen() {
+    this._poll();
+  }
+  /**
+   * Pauses polling.
+   *
+   * @param {Function} onPause - callback upon buffers are flushed and transport is paused
+   * @package
+   */
+  pause(onPause) {
+    this.readyState = "pausing";
+    const pause = () => {
+      this.readyState = "paused";
+      onPause();
+    };
+    if (this._polling || !this.writable) {
+      let total = 0;
+      if (this._polling) {
+        total++;
+        this.once("pollComplete", function() {
+          --total || pause();
+        });
+      }
+      if (!this.writable) {
+        total++;
+        this.once("drain", function() {
+          --total || pause();
+        });
+      }
+    } else {
+      pause();
+    }
+  }
+  /**
+   * Starts polling cycle.
+   *
+   * @private
+   */
+  _poll() {
+    this._polling = true;
+    this.doPoll();
+    this.emitReserved("poll");
+  }
+  /**
+   * Overloads onData to detect payloads.
+   *
+   * @protected
+   */
+  onData(data) {
+    const callback = (packet) => {
+      if ("opening" === this.readyState && packet.type === "open") {
+        this.onOpen();
+      }
+      if ("close" === packet.type) {
+        this.onClose({ description: "transport closed by the server" });
+        return false;
+      }
+      this.onPacket(packet);
+    };
+    decodePayload(data, this.socket.binaryType).forEach(callback);
+    if ("closed" !== this.readyState) {
+      this._polling = false;
+      this.emitReserved("pollComplete");
+      if ("open" === this.readyState) {
+        this._poll();
+      }
+    }
+  }
+  /**
+   * For polling, send a close packet.
+   *
+   * @protected
+   */
+  doClose() {
+    const close2 = () => {
+      this.write([{ type: "close" }]);
+    };
+    if ("open" === this.readyState) {
+      close2();
+    } else {
+      this.once("open", close2);
+    }
+  }
+  /**
+   * Writes a packets payload.
+   *
+   * @param {Array} packets - data packets
+   * @protected
+   */
+  write(packets) {
+    this.writable = false;
+    encodePayload(packets, (data) => {
+      this.doWrite(data, () => {
+        this.writable = true;
+        this.emitReserved("drain");
+      });
+    });
+  }
+  /**
+   * Generates uri for connection.
+   *
+   * @private
+   */
+  uri() {
+    const schema = this.opts.secure ? "https" : "http";
+    const query = this.query || {};
+    if (false !== this.opts.timestampRequests) {
+      query[this.opts.timestampParam] = randomString();
+    }
+    if (!this.supportsBinary && !query.sid) {
+      query.b64 = 1;
+    }
+    return this.createUri(schema, query);
+  }
+}
+let value = false;
+try {
+  value = typeof XMLHttpRequest !== "undefined" && "withCredentials" in new XMLHttpRequest();
+} catch (err) {
+}
+const hasCORS = value;
+function empty$1() {
+}
+class BaseXHR extends Polling {
+  /**
+   * XHR Polling constructor.
+   *
+   * @param {Object} opts
+   * @package
+   */
+  constructor(opts) {
+    super(opts);
+    if (typeof location !== "undefined") {
+      const isSSL = "https:" === location.protocol;
+      let port = location.port;
+      if (!port) {
+        port = isSSL ? "443" : "80";
+      }
+      this.xd = typeof location !== "undefined" && opts.hostname !== location.hostname || port !== opts.port;
+    }
+  }
+  /**
+   * Sends data.
+   *
+   * @param {String} data to send.
+   * @param {Function} called upon flush.
+   * @private
+   */
+  doWrite(data, fn) {
+    const req = this.request({
+      method: "POST",
+      data
+    });
+    req.on("success", fn);
+    req.on("error", (xhrStatus, context) => {
+      this.onError("xhr post error", xhrStatus, context);
+    });
+  }
+  /**
+   * Starts a poll cycle.
+   *
+   * @private
+   */
+  doPoll() {
+    const req = this.request();
+    req.on("data", this.onData.bind(this));
+    req.on("error", (xhrStatus, context) => {
+      this.onError("xhr poll error", xhrStatus, context);
+    });
+    this.pollXhr = req;
+  }
+}
+let Request$1 = class Request2 extends Emitter {
+  /**
+   * Request constructor
+   *
+   * @param {Object} options
+   * @package
+   */
+  constructor(createRequest, uri, opts) {
+    super();
+    this.createRequest = createRequest;
+    installTimerFunctions(this, opts);
+    this._opts = opts;
+    this._method = opts.method || "GET";
+    this._uri = uri;
+    this._data = void 0 !== opts.data ? opts.data : null;
+    this._create();
+  }
+  /**
+   * Creates the XHR object and sends the request.
+   *
+   * @private
+   */
+  _create() {
+    var _a;
+    const opts = pick(this._opts, "agent", "pfx", "key", "passphrase", "cert", "ca", "ciphers", "rejectUnauthorized", "autoUnref");
+    opts.xdomain = !!this._opts.xd;
+    const xhr = this._xhr = this.createRequest(opts);
+    try {
+      xhr.open(this._method, this._uri, true);
+      try {
+        if (this._opts.extraHeaders) {
+          xhr.setDisableHeaderCheck && xhr.setDisableHeaderCheck(true);
+          for (let i2 in this._opts.extraHeaders) {
+            if (this._opts.extraHeaders.hasOwnProperty(i2)) {
+              xhr.setRequestHeader(i2, this._opts.extraHeaders[i2]);
+            }
+          }
+        }
+      } catch (e2) {
+      }
+      if ("POST" === this._method) {
+        try {
+          xhr.setRequestHeader("Content-type", "text/plain;charset=UTF-8");
+        } catch (e2) {
+        }
+      }
+      try {
+        xhr.setRequestHeader("Accept", "*/*");
+      } catch (e2) {
+      }
+      (_a = this._opts.cookieJar) === null || _a === void 0 ? void 0 : _a.addCookies(xhr);
+      if ("withCredentials" in xhr) {
+        xhr.withCredentials = this._opts.withCredentials;
+      }
+      if (this._opts.requestTimeout) {
+        xhr.timeout = this._opts.requestTimeout;
+      }
+      xhr.onreadystatechange = () => {
+        var _a2;
+        if (xhr.readyState === 3) {
+          (_a2 = this._opts.cookieJar) === null || _a2 === void 0 ? void 0 : _a2.parseCookies(
+            // @ts-ignore
+            xhr.getResponseHeader("set-cookie")
+          );
+        }
+        if (4 !== xhr.readyState)
+          return;
+        if (200 === xhr.status || 1223 === xhr.status) {
+          this._onLoad();
+        } else {
+          this.setTimeoutFn(() => {
+            this._onError(typeof xhr.status === "number" ? xhr.status : 0);
+          }, 0);
+        }
+      };
+      xhr.send(this._data);
+    } catch (e2) {
+      this.setTimeoutFn(() => {
+        this._onError(e2);
+      }, 0);
+      return;
+    }
+    if (typeof document !== "undefined") {
+      this._index = Request2.requestsCount++;
+      Request2.requests[this._index] = this;
+    }
+  }
+  /**
+   * Called upon error.
+   *
+   * @private
+   */
+  _onError(err) {
+    this.emitReserved("error", err, this._xhr);
+    this._cleanup(true);
+  }
+  /**
+   * Cleans up house.
+   *
+   * @private
+   */
+  _cleanup(fromError) {
+    if ("undefined" === typeof this._xhr || null === this._xhr) {
+      return;
+    }
+    this._xhr.onreadystatechange = empty$1;
+    if (fromError) {
+      try {
+        this._xhr.abort();
+      } catch (e2) {
+      }
+    }
+    if (typeof document !== "undefined") {
+      delete Request2.requests[this._index];
+    }
+    this._xhr = null;
+  }
+  /**
+   * Called upon load.
+   *
+   * @private
+   */
+  _onLoad() {
+    const data = this._xhr.responseText;
+    if (data !== null) {
+      this.emitReserved("data", data);
+      this.emitReserved("success");
+      this._cleanup();
+    }
+  }
+  /**
+   * Aborts the request.
+   *
+   * @package
+   */
+  abort() {
+    this._cleanup();
+  }
+};
+Request$1.requestsCount = 0;
+Request$1.requests = {};
+if (typeof document !== "undefined") {
+  if (typeof attachEvent === "function") {
+    attachEvent("onunload", unloadHandler);
+  } else if (typeof addEventListener === "function") {
+    const terminationEvent = "onpagehide" in globalThisShim ? "pagehide" : "unload";
+    addEventListener(terminationEvent, unloadHandler, false);
+  }
+}
+function unloadHandler() {
+  for (let i2 in Request$1.requests) {
+    if (Request$1.requests.hasOwnProperty(i2)) {
+      Request$1.requests[i2].abort();
+    }
+  }
+}
+const hasXHR2 = function() {
+  const xhr = newRequest({
+    xdomain: false
+  });
+  return xhr && xhr.responseType !== null;
+}();
+class XHR extends BaseXHR {
+  constructor(opts) {
+    super(opts);
+    const forceBase64 = opts && opts.forceBase64;
+    this.supportsBinary = hasXHR2 && !forceBase64;
+  }
+  request(opts = {}) {
+    Object.assign(opts, { xd: this.xd }, this.opts);
+    return new Request$1(newRequest, this.uri(), opts);
+  }
+}
+function newRequest(opts) {
+  const xdomain = opts.xdomain;
+  try {
+    if ("undefined" !== typeof XMLHttpRequest && (!xdomain || hasCORS)) {
+      return new XMLHttpRequest();
+    }
+  } catch (e2) {
+  }
+  if (!xdomain) {
+    try {
+      return new globalThisShim[["Active"].concat("Object").join("X")]("Microsoft.XMLHTTP");
+    } catch (e2) {
+    }
+  }
+}
+const isReactNative = typeof navigator !== "undefined" && typeof navigator.product === "string" && navigator.product.toLowerCase() === "reactnative";
+class BaseWS extends Transport$2 {
+  get name() {
+    return "websocket";
+  }
+  doOpen() {
+    const uri = this.uri();
+    const protocols = this.opts.protocols;
+    const opts = isReactNative ? {} : pick(this.opts, "agent", "perMessageDeflate", "pfx", "key", "passphrase", "cert", "ca", "ciphers", "rejectUnauthorized", "localAddress", "protocolVersion", "origin", "maxPayload", "family", "checkServerIdentity");
+    if (this.opts.extraHeaders) {
+      opts.headers = this.opts.extraHeaders;
+    }
+    try {
+      this.ws = this.createSocket(uri, protocols, opts);
+    } catch (err) {
+      return this.emitReserved("error", err);
+    }
+    this.ws.binaryType = this.socket.binaryType;
+    this.addEventListeners();
+  }
+  /**
+   * Adds event listeners to the socket
+   *
+   * @private
+   */
+  addEventListeners() {
+    this.ws.onopen = () => {
+      if (this.opts.autoUnref) {
+        this.ws._socket.unref();
+      }
+      this.onOpen();
+    };
+    this.ws.onclose = (closeEvent) => this.onClose({
+      description: "websocket connection closed",
+      context: closeEvent
+    });
+    this.ws.onmessage = (ev) => this.onData(ev.data);
+    this.ws.onerror = (e2) => this.onError("websocket error", e2);
+  }
+  write(packets) {
+    this.writable = false;
+    for (let i2 = 0; i2 < packets.length; i2++) {
+      const packet = packets[i2];
+      const lastPacket = i2 === packets.length - 1;
+      encodePacket(packet, this.supportsBinary, (data) => {
+        try {
+          this.doWrite(packet, data);
+        } catch (e2) {
+        }
+        if (lastPacket) {
+          nextTick(() => {
+            this.writable = true;
+            this.emitReserved("drain");
+          }, this.setTimeoutFn);
+        }
+      });
+    }
+  }
+  doClose() {
+    if (typeof this.ws !== "undefined") {
+      this.ws.onerror = () => {
+      };
+      this.ws.close();
+      this.ws = null;
+    }
+  }
+  /**
+   * Generates uri for connection.
+   *
+   * @private
+   */
+  uri() {
+    const schema = this.opts.secure ? "wss" : "ws";
+    const query = this.query || {};
+    if (this.opts.timestampRequests) {
+      query[this.opts.timestampParam] = randomString();
+    }
+    if (!this.supportsBinary) {
+      query.b64 = 1;
+    }
+    return this.createUri(schema, query);
+  }
+}
+const WebSocketCtor = globalThisShim.WebSocket || globalThisShim.MozWebSocket;
+class WS extends BaseWS {
+  createSocket(uri, protocols, opts) {
+    return !isReactNative ? protocols ? new WebSocketCtor(uri, protocols) : new WebSocketCtor(uri) : new WebSocketCtor(uri, protocols, opts);
+  }
+  doWrite(_packet, data) {
+    this.ws.send(data);
+  }
+}
+class WT extends Transport$2 {
+  get name() {
+    return "webtransport";
+  }
+  doOpen() {
+    try {
+      this._transport = new WebTransport(this.createUri("https"), this.opts.transportOptions[this.name]);
+    } catch (err) {
+      return this.emitReserved("error", err);
+    }
+    this._transport.closed.then(() => {
+      this.onClose();
+    }).catch((err) => {
+      this.onError("webtransport error", err);
+    });
+    this._transport.ready.then(() => {
+      this._transport.createBidirectionalStream().then((stream) => {
+        const decoderStream = createPacketDecoderStream(Number.MAX_SAFE_INTEGER, this.socket.binaryType);
+        const reader = stream.readable.pipeThrough(decoderStream).getReader();
+        const encoderStream = createPacketEncoderStream();
+        encoderStream.readable.pipeTo(stream.writable);
+        this._writer = encoderStream.writable.getWriter();
+        const read = () => {
+          reader.read().then(({ done: done2, value: value2 }) => {
+            if (done2) {
+              return;
+            }
+            this.onPacket(value2);
+            read();
+          }).catch((err) => {
+          });
+        };
+        read();
+        const packet = { type: "open" };
+        if (this.query.sid) {
+          packet.data = `{"sid":"${this.query.sid}"}`;
+        }
+        this._writer.write(packet).then(() => this.onOpen());
+      });
+    });
+  }
+  write(packets) {
+    this.writable = false;
+    for (let i2 = 0; i2 < packets.length; i2++) {
+      const packet = packets[i2];
+      const lastPacket = i2 === packets.length - 1;
+      this._writer.write(packet).then(() => {
+        if (lastPacket) {
+          nextTick(() => {
+            this.writable = true;
+            this.emitReserved("drain");
+          }, this.setTimeoutFn);
+        }
+      });
+    }
+  }
+  doClose() {
+    var _a;
+    (_a = this._transport) === null || _a === void 0 ? void 0 : _a.close();
+  }
+}
+const transports = {
+  websocket: WS,
+  webtransport: WT,
+  polling: XHR
+};
+const re = /^(?:(?![^:@\/?#]+:[^:@\/]*@)(http|https|ws|wss):\/\/)?((?:(([^:@\/?#]*)(?::([^:@\/?#]*))?)?@)?((?:[a-f0-9]{0,4}:){2,7}[a-f0-9]{0,4}|[^:\/?#]*)(?::(\d*))?)(((\/(?:[^?#](?![^?#\/]*\.[^?#\/.]+(?:[?#]|$)))*\/?)?([^?#\/]*))(?:\?([^#]*))?(?:#(.*))?)/;
+const parts = [
+  "source",
+  "protocol",
+  "authority",
+  "userInfo",
+  "user",
+  "password",
+  "host",
+  "port",
+  "relative",
+  "path",
+  "directory",
+  "file",
+  "query",
+  "anchor"
+];
+function parse$3(str) {
+  if (str.length > 8e3) {
+    throw "URI too long";
+  }
+  const src = str, b = str.indexOf("["), e2 = str.indexOf("]");
+  if (b != -1 && e2 != -1) {
+    str = str.substring(0, b) + str.substring(b, e2).replace(/:/g, ";") + str.substring(e2, str.length);
+  }
+  let m2 = re.exec(str || ""), uri = {}, i2 = 14;
+  while (i2--) {
+    uri[parts[i2]] = m2[i2] || "";
+  }
+  if (b != -1 && e2 != -1) {
+    uri.source = src;
+    uri.host = uri.host.substring(1, uri.host.length - 1).replace(/;/g, ":");
+    uri.authority = uri.authority.replace("[", "").replace("]", "").replace(/;/g, ":");
+    uri.ipv6uri = true;
+  }
+  uri.pathNames = pathNames(uri, uri["path"]);
+  uri.queryKey = queryKey(uri, uri["query"]);
+  return uri;
+}
+function pathNames(obj, path) {
+  const regx = /\/{2,9}/g, names2 = path.replace(regx, "/").split("/");
+  if (path.slice(0, 1) == "/" || path.length === 0) {
+    names2.splice(0, 1);
+  }
+  if (path.slice(-1) == "/") {
+    names2.splice(names2.length - 1, 1);
+  }
+  return names2;
+}
+function queryKey(uri, query) {
+  const data = {};
+  query.replace(/(?:^|&)([^&=]*)=?([^&]*)/g, function($0, $1, $2) {
+    if ($1) {
+      data[$1] = $2;
+    }
+  });
+  return data;
+}
+const withEventListeners = typeof addEventListener === "function" && typeof removeEventListener === "function";
+const OFFLINE_EVENT_LISTENERS = [];
+if (withEventListeners) {
+  addEventListener("offline", () => {
+    OFFLINE_EVENT_LISTENERS.forEach((listener) => listener());
+  }, false);
+}
+class SocketWithoutUpgrade extends Emitter {
+  /**
+   * Socket constructor.
+   *
+   * @param {String|Object} uri - uri or options
+   * @param {Object} opts - options
+   */
+  constructor(uri, opts) {
+    super();
+    this.binaryType = defaultBinaryType;
+    this.writeBuffer = [];
+    this._prevBufferLen = 0;
+    this._pingInterval = -1;
+    this._pingTimeout = -1;
+    this._maxPayload = -1;
+    this._pingTimeoutTime = Infinity;
+    if (uri && "object" === typeof uri) {
+      opts = uri;
+      uri = null;
+    }
+    if (uri) {
+      const parsedUri = parse$3(uri);
+      opts.hostname = parsedUri.host;
+      opts.secure = parsedUri.protocol === "https" || parsedUri.protocol === "wss";
+      opts.port = parsedUri.port;
+      if (parsedUri.query)
+        opts.query = parsedUri.query;
+    } else if (opts.host) {
+      opts.hostname = parse$3(opts.host).host;
+    }
+    installTimerFunctions(this, opts);
+    this.secure = null != opts.secure ? opts.secure : typeof location !== "undefined" && "https:" === location.protocol;
+    if (opts.hostname && !opts.port) {
+      opts.port = this.secure ? "443" : "80";
+    }
+    this.hostname = opts.hostname || (typeof location !== "undefined" ? location.hostname : "localhost");
+    this.port = opts.port || (typeof location !== "undefined" && location.port ? location.port : this.secure ? "443" : "80");
+    this.transports = [];
+    this._transportsByName = {};
+    opts.transports.forEach((t2) => {
+      const transportName = t2.prototype.name;
+      this.transports.push(transportName);
+      this._transportsByName[transportName] = t2;
+    });
+    this.opts = Object.assign({
+      path: "/engine.io",
+      agent: false,
+      withCredentials: false,
+      upgrade: true,
+      timestampParam: "t",
+      rememberUpgrade: false,
+      addTrailingSlash: true,
+      rejectUnauthorized: true,
+      perMessageDeflate: {
+        threshold: 1024
+      },
+      transportOptions: {},
+      closeOnBeforeunload: false
+    }, opts);
+    this.opts.path = this.opts.path.replace(/\/$/, "") + (this.opts.addTrailingSlash ? "/" : "");
+    if (typeof this.opts.query === "string") {
+      this.opts.query = decode(this.opts.query);
+    }
+    if (withEventListeners) {
+      if (this.opts.closeOnBeforeunload) {
+        this._beforeunloadEventListener = () => {
+          if (this.transport) {
+            this.transport.removeAllListeners();
+            this.transport.close();
+          }
+        };
+        addEventListener("beforeunload", this._beforeunloadEventListener, false);
+      }
+      if (this.hostname !== "localhost") {
+        this._offlineEventListener = () => {
+          this._onClose("transport close", {
+            description: "network connection lost"
+          });
+        };
+        OFFLINE_EVENT_LISTENERS.push(this._offlineEventListener);
+      }
+    }
+    if (this.opts.withCredentials) {
+      this._cookieJar = createCookieJar();
+    }
+    this._open();
+  }
+  /**
+   * Creates transport of the given type.
+   *
+   * @param {String} name - transport name
+   * @return {Transport}
+   * @private
+   */
+  createTransport(name2) {
+    const query = Object.assign({}, this.opts.query);
+    query.EIO = protocol$1;
+    query.transport = name2;
+    if (this.id)
+      query.sid = this.id;
+    const opts = Object.assign({}, this.opts, {
+      query,
+      socket: this,
+      hostname: this.hostname,
+      secure: this.secure,
+      port: this.port
+    }, this.opts.transportOptions[name2]);
+    return new this._transportsByName[name2](opts);
+  }
+  /**
+   * Initializes transport to use and starts probe.
+   *
+   * @private
+   */
+  _open() {
+    if (this.transports.length === 0) {
+      this.setTimeoutFn(() => {
+        this.emitReserved("error", "No transports available");
+      }, 0);
+      return;
+    }
+    const transportName = this.opts.rememberUpgrade && SocketWithoutUpgrade.priorWebsocketSuccess && this.transports.indexOf("websocket") !== -1 ? "websocket" : this.transports[0];
+    this.readyState = "opening";
+    const transport = this.createTransport(transportName);
+    transport.open();
+    this.setTransport(transport);
+  }
+  /**
+   * Sets the current transport. Disables the existing one (if any).
+   *
+   * @private
+   */
+  setTransport(transport) {
+    if (this.transport) {
+      this.transport.removeAllListeners();
+    }
+    this.transport = transport;
+    transport.on("drain", this._onDrain.bind(this)).on("packet", this._onPacket.bind(this)).on("error", this._onError.bind(this)).on("close", (reason) => this._onClose("transport close", reason));
+  }
+  /**
+   * Called when connection is deemed open.
+   *
+   * @private
+   */
+  onOpen() {
+    this.readyState = "open";
+    SocketWithoutUpgrade.priorWebsocketSuccess = "websocket" === this.transport.name;
+    this.emitReserved("open");
+    this.flush();
+  }
+  /**
+   * Handles a packet.
+   *
+   * @private
+   */
+  _onPacket(packet) {
+    if ("opening" === this.readyState || "open" === this.readyState || "closing" === this.readyState) {
+      this.emitReserved("packet", packet);
+      this.emitReserved("heartbeat");
+      switch (packet.type) {
+        case "open":
+          this.onHandshake(JSON.parse(packet.data));
+          break;
+        case "ping":
+          this._sendPacket("pong");
+          this.emitReserved("ping");
+          this.emitReserved("pong");
+          this._resetPingTimeout();
+          break;
+        case "error":
+          const err = new Error("server error");
+          err.code = packet.data;
+          this._onError(err);
+          break;
+        case "message":
+          this.emitReserved("data", packet.data);
+          this.emitReserved("message", packet.data);
+          break;
+      }
+    }
+  }
+  /**
+   * Called upon handshake completion.
+   *
+   * @param {Object} data - handshake obj
+   * @private
+   */
+  onHandshake(data) {
+    this.emitReserved("handshake", data);
+    this.id = data.sid;
+    this.transport.query.sid = data.sid;
+    this._pingInterval = data.pingInterval;
+    this._pingTimeout = data.pingTimeout;
+    this._maxPayload = data.maxPayload;
+    this.onOpen();
+    if ("closed" === this.readyState)
+      return;
+    this._resetPingTimeout();
+  }
+  /**
+   * Sets and resets ping timeout timer based on server pings.
+   *
+   * @private
+   */
+  _resetPingTimeout() {
+    this.clearTimeoutFn(this._pingTimeoutTimer);
+    const delay = this._pingInterval + this._pingTimeout;
+    this._pingTimeoutTime = Date.now() + delay;
+    this._pingTimeoutTimer = this.setTimeoutFn(() => {
+      this._onClose("ping timeout");
+    }, delay);
+    if (this.opts.autoUnref) {
+      this._pingTimeoutTimer.unref();
+    }
+  }
+  /**
+   * Called on `drain` event
+   *
+   * @private
+   */
+  _onDrain() {
+    this.writeBuffer.splice(0, this._prevBufferLen);
+    this._prevBufferLen = 0;
+    if (0 === this.writeBuffer.length) {
+      this.emitReserved("drain");
+    } else {
+      this.flush();
+    }
+  }
+  /**
+   * Flush write buffers.
+   *
+   * @private
+   */
+  flush() {
+    if ("closed" !== this.readyState && this.transport.writable && !this.upgrading && this.writeBuffer.length) {
+      const packets = this._getWritablePackets();
+      this.transport.send(packets);
+      this._prevBufferLen = packets.length;
+      this.emitReserved("flush");
+    }
+  }
+  /**
+   * Ensure the encoded size of the writeBuffer is below the maxPayload value sent by the server (only for HTTP
+   * long-polling)
+   *
+   * @private
+   */
+  _getWritablePackets() {
+    const shouldCheckPayloadSize = this._maxPayload && this.transport.name === "polling" && this.writeBuffer.length > 1;
+    if (!shouldCheckPayloadSize) {
+      return this.writeBuffer;
+    }
+    let payloadSize = 1;
+    for (let i2 = 0; i2 < this.writeBuffer.length; i2++) {
+      const data = this.writeBuffer[i2].data;
+      if (data) {
+        payloadSize += byteLength(data);
+      }
+      if (i2 > 0 && payloadSize > this._maxPayload) {
+        return this.writeBuffer.slice(0, i2);
+      }
+      payloadSize += 2;
+    }
+    return this.writeBuffer;
+  }
+  /**
+   * Checks whether the heartbeat timer has expired but the socket has not yet been notified.
+   *
+   * Note: this method is private for now because it does not really fit the WebSocket API, but if we put it in the
+   * `write()` method then the message would not be buffered by the Socket.IO client.
+   *
+   * @return {boolean}
+   * @private
+   */
+  /* private */
+  _hasPingExpired() {
+    if (!this._pingTimeoutTime)
+      return true;
+    const hasExpired = Date.now() > this._pingTimeoutTime;
+    if (hasExpired) {
+      this._pingTimeoutTime = 0;
+      nextTick(() => {
+        this._onClose("ping timeout");
+      }, this.setTimeoutFn);
+    }
+    return hasExpired;
+  }
+  /**
+   * Sends a message.
+   *
+   * @param {String} msg - message.
+   * @param {Object} options.
+   * @param {Function} fn - callback function.
+   * @return {Socket} for chaining.
+   */
+  write(msg, options, fn) {
+    this._sendPacket("message", msg, options, fn);
+    return this;
+  }
+  /**
+   * Sends a message. Alias of {@link Socket#write}.
+   *
+   * @param {String} msg - message.
+   * @param {Object} options.
+   * @param {Function} fn - callback function.
+   * @return {Socket} for chaining.
+   */
+  send(msg, options, fn) {
+    this._sendPacket("message", msg, options, fn);
+    return this;
+  }
+  /**
+   * Sends a packet.
+   *
+   * @param {String} type: packet type.
+   * @param {String} data.
+   * @param {Object} options.
+   * @param {Function} fn - callback function.
+   * @private
+   */
+  _sendPacket(type, data, options, fn) {
+    if ("function" === typeof data) {
+      fn = data;
+      data = void 0;
+    }
+    if ("function" === typeof options) {
+      fn = options;
+      options = null;
+    }
+    if ("closing" === this.readyState || "closed" === this.readyState) {
+      return;
+    }
+    options = options || {};
+    options.compress = false !== options.compress;
+    const packet = {
+      type,
+      data,
+      options
+    };
+    this.emitReserved("packetCreate", packet);
+    this.writeBuffer.push(packet);
+    if (fn)
+      this.once("flush", fn);
+    this.flush();
+  }
+  /**
+   * Closes the connection.
+   */
+  close() {
+    const close2 = () => {
+      this._onClose("forced close");
+      this.transport.close();
+    };
+    const cleanupAndClose = () => {
+      this.off("upgrade", cleanupAndClose);
+      this.off("upgradeError", cleanupAndClose);
+      close2();
+    };
+    const waitForUpgrade = () => {
+      this.once("upgrade", cleanupAndClose);
+      this.once("upgradeError", cleanupAndClose);
+    };
+    if ("opening" === this.readyState || "open" === this.readyState) {
+      this.readyState = "closing";
+      if (this.writeBuffer.length) {
+        this.once("drain", () => {
+          if (this.upgrading) {
+            waitForUpgrade();
+          } else {
+            close2();
+          }
+        });
+      } else if (this.upgrading) {
+        waitForUpgrade();
+      } else {
+        close2();
+      }
+    }
+    return this;
+  }
+  /**
+   * Called upon transport error
+   *
+   * @private
+   */
+  _onError(err) {
+    SocketWithoutUpgrade.priorWebsocketSuccess = false;
+    if (this.opts.tryAllTransports && this.transports.length > 1 && this.readyState === "opening") {
+      this.transports.shift();
+      return this._open();
+    }
+    this.emitReserved("error", err);
+    this._onClose("transport error", err);
+  }
+  /**
+   * Called upon transport close.
+   *
+   * @private
+   */
+  _onClose(reason, description) {
+    if ("opening" === this.readyState || "open" === this.readyState || "closing" === this.readyState) {
+      this.clearTimeoutFn(this._pingTimeoutTimer);
+      this.transport.removeAllListeners("close");
+      this.transport.close();
+      this.transport.removeAllListeners();
+      if (withEventListeners) {
+        if (this._beforeunloadEventListener) {
+          removeEventListener("beforeunload", this._beforeunloadEventListener, false);
+        }
+        if (this._offlineEventListener) {
+          const i2 = OFFLINE_EVENT_LISTENERS.indexOf(this._offlineEventListener);
+          if (i2 !== -1) {
+            OFFLINE_EVENT_LISTENERS.splice(i2, 1);
+          }
+        }
+      }
+      this.readyState = "closed";
+      this.id = null;
+      this.emitReserved("close", reason, description);
+      this.writeBuffer = [];
+      this._prevBufferLen = 0;
+    }
+  }
+}
+SocketWithoutUpgrade.protocol = protocol$1;
+class SocketWithUpgrade extends SocketWithoutUpgrade {
+  constructor() {
+    super(...arguments);
+    this._upgrades = [];
+  }
+  onOpen() {
+    super.onOpen();
+    if ("open" === this.readyState && this.opts.upgrade) {
+      for (let i2 = 0; i2 < this._upgrades.length; i2++) {
+        this._probe(this._upgrades[i2]);
+      }
+    }
+  }
+  /**
+   * Probes a transport.
+   *
+   * @param {String} name - transport name
+   * @private
+   */
+  _probe(name2) {
+    let transport = this.createTransport(name2);
+    let failed = false;
+    SocketWithoutUpgrade.priorWebsocketSuccess = false;
+    const onTransportOpen = () => {
+      if (failed)
+        return;
+      transport.send([{ type: "ping", data: "probe" }]);
+      transport.once("packet", (msg) => {
+        if (failed)
+          return;
+        if ("pong" === msg.type && "probe" === msg.data) {
+          this.upgrading = true;
+          this.emitReserved("upgrading", transport);
+          if (!transport)
+            return;
+          SocketWithoutUpgrade.priorWebsocketSuccess = "websocket" === transport.name;
+          this.transport.pause(() => {
+            if (failed)
+              return;
+            if ("closed" === this.readyState)
+              return;
+            cleanup();
+            this.setTransport(transport);
+            transport.send([{ type: "upgrade" }]);
+            this.emitReserved("upgrade", transport);
+            transport = null;
+            this.upgrading = false;
+            this.flush();
+          });
+        } else {
+          const err = new Error("probe error");
+          err.transport = transport.name;
+          this.emitReserved("upgradeError", err);
+        }
+      });
+    };
+    function freezeTransport() {
+      if (failed)
+        return;
+      failed = true;
+      cleanup();
+      transport.close();
+      transport = null;
+    }
+    const onerror = (err) => {
+      const error = new Error("probe error: " + err);
+      error.transport = transport.name;
+      freezeTransport();
+      this.emitReserved("upgradeError", error);
+    };
+    function onTransportClose() {
+      onerror("transport closed");
+    }
+    function onclose() {
+      onerror("socket closed");
+    }
+    function onupgrade(to) {
+      if (transport && to.name !== transport.name) {
+        freezeTransport();
+      }
+    }
+    const cleanup = () => {
+      transport.removeListener("open", onTransportOpen);
+      transport.removeListener("error", onerror);
+      transport.removeListener("close", onTransportClose);
+      this.off("close", onclose);
+      this.off("upgrading", onupgrade);
+    };
+    transport.once("open", onTransportOpen);
+    transport.once("error", onerror);
+    transport.once("close", onTransportClose);
+    this.once("close", onclose);
+    this.once("upgrading", onupgrade);
+    if (this._upgrades.indexOf("webtransport") !== -1 && name2 !== "webtransport") {
+      this.setTimeoutFn(() => {
+        if (!failed) {
+          transport.open();
+        }
+      }, 200);
+    } else {
+      transport.open();
+    }
+  }
+  onHandshake(data) {
+    this._upgrades = this._filterUpgrades(data.upgrades);
+    super.onHandshake(data);
+  }
+  /**
+   * Filters upgrades, returning only those matching client transports.
+   *
+   * @param {Array} upgrades - server upgrades
+   * @private
+   */
+  _filterUpgrades(upgrades) {
+    const filteredUpgrades = [];
+    for (let i2 = 0; i2 < upgrades.length; i2++) {
+      if (~this.transports.indexOf(upgrades[i2]))
+        filteredUpgrades.push(upgrades[i2]);
+    }
+    return filteredUpgrades;
+  }
+}
+let Socket$1 = class Socket extends SocketWithUpgrade {
+  constructor(uri, opts = {}) {
+    const o2 = typeof uri === "object" ? uri : opts;
+    if (!o2.transports || o2.transports && typeof o2.transports[0] === "string") {
+      o2.transports = (o2.transports || ["polling", "websocket", "webtransport"]).map((transportName) => transports[transportName]).filter((t2) => !!t2);
+    }
+    super(uri, o2);
+  }
+};
+function url(uri, path = "", loc) {
+  let obj = uri;
+  loc = loc || typeof location !== "undefined" && location;
+  if (null == uri)
+    uri = loc.protocol + "//" + loc.host;
+  if (typeof uri === "string") {
+    if ("/" === uri.charAt(0)) {
+      if ("/" === uri.charAt(1)) {
+        uri = loc.protocol + uri;
+      } else {
+        uri = loc.host + uri;
+      }
+    }
+    if (!/^(https?|wss?):\/\//.test(uri)) {
+      if ("undefined" !== typeof loc) {
+        uri = loc.protocol + "//" + uri;
+      } else {
+        uri = "https://" + uri;
+      }
+    }
+    obj = parse$3(uri);
+  }
+  if (!obj.port) {
+    if (/^(http|ws)$/.test(obj.protocol)) {
+      obj.port = "80";
+    } else if (/^(http|ws)s$/.test(obj.protocol)) {
+      obj.port = "443";
+    }
+  }
+  obj.path = obj.path || "/";
+  const ipv6 = obj.host.indexOf(":") !== -1;
+  const host = ipv6 ? "[" + obj.host + "]" : obj.host;
+  obj.id = obj.protocol + "://" + host + ":" + obj.port + path;
+  obj.href = obj.protocol + "://" + host + (loc && loc.port === obj.port ? "" : ":" + obj.port);
+  return obj;
+}
+const withNativeArrayBuffer = typeof ArrayBuffer === "function";
+const isView = (obj) => {
+  return typeof ArrayBuffer.isView === "function" ? ArrayBuffer.isView(obj) : obj.buffer instanceof ArrayBuffer;
+};
+const toString2 = Object.prototype.toString;
+const withNativeBlob = typeof Blob === "function" || typeof Blob !== "undefined" && toString2.call(Blob) === "[object BlobConstructor]";
+const withNativeFile = typeof File === "function" || typeof File !== "undefined" && toString2.call(File) === "[object FileConstructor]";
+function isBinary(obj) {
+  return withNativeArrayBuffer && (obj instanceof ArrayBuffer || isView(obj)) || withNativeBlob && obj instanceof Blob || withNativeFile && obj instanceof File;
+}
+function hasBinary(obj, toJSON2) {
+  if (!obj || typeof obj !== "object") {
+    return false;
+  }
+  if (Array.isArray(obj)) {
+    for (let i2 = 0, l2 = obj.length; i2 < l2; i2++) {
+      if (hasBinary(obj[i2])) {
+        return true;
+      }
+    }
+    return false;
+  }
+  if (isBinary(obj)) {
+    return true;
+  }
+  if (obj.toJSON && typeof obj.toJSON === "function" && arguments.length === 1) {
+    return hasBinary(obj.toJSON(), true);
+  }
+  for (const key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key) && hasBinary(obj[key])) {
+      return true;
+    }
+  }
+  return false;
+}
+function deconstructPacket(packet) {
+  const buffers = [];
+  const packetData = packet.data;
+  const pack = packet;
+  pack.data = _deconstructPacket(packetData, buffers);
+  pack.attachments = buffers.length;
+  return { packet: pack, buffers };
+}
+function _deconstructPacket(data, buffers) {
+  if (!data)
+    return data;
+  if (isBinary(data)) {
+    const placeholder = { _placeholder: true, num: buffers.length };
+    buffers.push(data);
+    return placeholder;
+  } else if (Array.isArray(data)) {
+    const newData = new Array(data.length);
+    for (let i2 = 0; i2 < data.length; i2++) {
+      newData[i2] = _deconstructPacket(data[i2], buffers);
+    }
+    return newData;
+  } else if (typeof data === "object" && !(data instanceof Date)) {
+    const newData = {};
+    for (const key in data) {
+      if (Object.prototype.hasOwnProperty.call(data, key)) {
+        newData[key] = _deconstructPacket(data[key], buffers);
+      }
+    }
+    return newData;
+  }
+  return data;
+}
+function reconstructPacket(packet, buffers) {
+  packet.data = _reconstructPacket(packet.data, buffers);
+  delete packet.attachments;
+  return packet;
+}
+function _reconstructPacket(data, buffers) {
+  if (!data)
+    return data;
+  if (data && data._placeholder === true) {
+    const isIndexValid = typeof data.num === "number" && data.num >= 0 && data.num < buffers.length;
+    if (isIndexValid) {
+      return buffers[data.num];
+    } else {
+      throw new Error("illegal attachments");
+    }
+  } else if (Array.isArray(data)) {
+    for (let i2 = 0; i2 < data.length; i2++) {
+      data[i2] = _reconstructPacket(data[i2], buffers);
+    }
+  } else if (typeof data === "object") {
+    for (const key in data) {
+      if (Object.prototype.hasOwnProperty.call(data, key)) {
+        data[key] = _reconstructPacket(data[key], buffers);
+      }
+    }
+  }
+  return data;
+}
+const RESERVED_EVENTS$1 = [
+  "connect",
+  "connect_error",
+  "disconnect",
+  "disconnecting",
+  "newListener",
+  "removeListener"
+  // used by the Node.js EventEmitter
+];
+const protocol = 5;
+var PacketType;
+(function(PacketType2) {
+  PacketType2[PacketType2["CONNECT"] = 0] = "CONNECT";
+  PacketType2[PacketType2["DISCONNECT"] = 1] = "DISCONNECT";
+  PacketType2[PacketType2["EVENT"] = 2] = "EVENT";
+  PacketType2[PacketType2["ACK"] = 3] = "ACK";
+  PacketType2[PacketType2["CONNECT_ERROR"] = 4] = "CONNECT_ERROR";
+  PacketType2[PacketType2["BINARY_EVENT"] = 5] = "BINARY_EVENT";
+  PacketType2[PacketType2["BINARY_ACK"] = 6] = "BINARY_ACK";
+})(PacketType || (PacketType = {}));
+class Encoder {
+  /**
+   * Encoder constructor
+   *
+   * @param {function} replacer - custom replacer to pass down to JSON.parse
+   */
+  constructor(replacer) {
+    this.replacer = replacer;
+  }
+  /**
+   * Encode a packet as a single string if non-binary, or as a
+   * buffer sequence, depending on packet type.
+   *
+   * @param {Object} obj - packet object
+   */
+  encode(obj) {
+    if (obj.type === PacketType.EVENT || obj.type === PacketType.ACK) {
+      if (hasBinary(obj)) {
+        return this.encodeAsBinary({
+          type: obj.type === PacketType.EVENT ? PacketType.BINARY_EVENT : PacketType.BINARY_ACK,
+          nsp: obj.nsp,
+          data: obj.data,
+          id: obj.id
+        });
+      }
+    }
+    return [this.encodeAsString(obj)];
+  }
+  /**
+   * Encode packet as string.
+   */
+  encodeAsString(obj) {
+    let str = "" + obj.type;
+    if (obj.type === PacketType.BINARY_EVENT || obj.type === PacketType.BINARY_ACK) {
+      str += obj.attachments + "-";
+    }
+    if (obj.nsp && "/" !== obj.nsp) {
+      str += obj.nsp + ",";
+    }
+    if (null != obj.id) {
+      str += obj.id;
+    }
+    if (null != obj.data) {
+      str += JSON.stringify(obj.data, this.replacer);
+    }
+    return str;
+  }
+  /**
+   * Encode packet as 'buffer sequence' by removing blobs, and
+   * deconstructing packet into object with placeholders and
+   * a list of buffers.
+   */
+  encodeAsBinary(obj) {
+    const deconstruction = deconstructPacket(obj);
+    const pack = this.encodeAsString(deconstruction.packet);
+    const buffers = deconstruction.buffers;
+    buffers.unshift(pack);
+    return buffers;
+  }
+}
+function isObject(value2) {
+  return Object.prototype.toString.call(value2) === "[object Object]";
+}
+class Decoder extends Emitter {
+  /**
+   * Decoder constructor
+   *
+   * @param {function} reviver - custom reviver to pass down to JSON.stringify
+   */
+  constructor(reviver) {
+    super();
+    this.reviver = reviver;
+  }
+  /**
+   * Decodes an encoded packet string into packet JSON.
+   *
+   * @param {String} obj - encoded packet
+   */
+  add(obj) {
+    let packet;
+    if (typeof obj === "string") {
+      if (this.reconstructor) {
+        throw new Error("got plaintext data when reconstructing a packet");
+      }
+      packet = this.decodeString(obj);
+      const isBinaryEvent = packet.type === PacketType.BINARY_EVENT;
+      if (isBinaryEvent || packet.type === PacketType.BINARY_ACK) {
+        packet.type = isBinaryEvent ? PacketType.EVENT : PacketType.ACK;
+        this.reconstructor = new BinaryReconstructor(packet);
+        if (packet.attachments === 0) {
+          super.emitReserved("decoded", packet);
+        }
+      } else {
+        super.emitReserved("decoded", packet);
+      }
+    } else if (isBinary(obj) || obj.base64) {
+      if (!this.reconstructor) {
+        throw new Error("got binary data when not reconstructing a packet");
+      } else {
+        packet = this.reconstructor.takeBinaryData(obj);
+        if (packet) {
+          this.reconstructor = null;
+          super.emitReserved("decoded", packet);
+        }
+      }
+    } else {
+      throw new Error("Unknown type: " + obj);
+    }
+  }
+  /**
+   * Decode a packet String (JSON data)
+   *
+   * @param {String} str
+   * @return {Object} packet
+   */
+  decodeString(str) {
+    let i2 = 0;
+    const p2 = {
+      type: Number(str.charAt(0))
+    };
+    if (PacketType[p2.type] === void 0) {
+      throw new Error("unknown packet type " + p2.type);
+    }
+    if (p2.type === PacketType.BINARY_EVENT || p2.type === PacketType.BINARY_ACK) {
+      const start = i2 + 1;
+      while (str.charAt(++i2) !== "-" && i2 != str.length) {
+      }
+      const buf = str.substring(start, i2);
+      if (buf != Number(buf) || str.charAt(i2) !== "-") {
+        throw new Error("Illegal attachments");
+      }
+      p2.attachments = Number(buf);
+    }
+    if ("/" === str.charAt(i2 + 1)) {
+      const start = i2 + 1;
+      while (++i2) {
+        const c2 = str.charAt(i2);
+        if ("," === c2)
+          break;
+        if (i2 === str.length)
+          break;
+      }
+      p2.nsp = str.substring(start, i2);
+    } else {
+      p2.nsp = "/";
+    }
+    const next = str.charAt(i2 + 1);
+    if ("" !== next && Number(next) == next) {
+      const start = i2 + 1;
+      while (++i2) {
+        const c2 = str.charAt(i2);
+        if (null == c2 || Number(c2) != c2) {
+          --i2;
+          break;
+        }
+        if (i2 === str.length)
+          break;
+      }
+      p2.id = Number(str.substring(start, i2 + 1));
+    }
+    if (str.charAt(++i2)) {
+      const payload = this.tryParse(str.substr(i2));
+      if (Decoder.isPayloadValid(p2.type, payload)) {
+        p2.data = payload;
+      } else {
+        throw new Error("invalid payload");
+      }
+    }
+    return p2;
+  }
+  tryParse(str) {
+    try {
+      return JSON.parse(str, this.reviver);
+    } catch (e2) {
+      return false;
+    }
+  }
+  static isPayloadValid(type, payload) {
+    switch (type) {
+      case PacketType.CONNECT:
+        return isObject(payload);
+      case PacketType.DISCONNECT:
+        return payload === void 0;
+      case PacketType.CONNECT_ERROR:
+        return typeof payload === "string" || isObject(payload);
+      case PacketType.EVENT:
+      case PacketType.BINARY_EVENT:
+        return Array.isArray(payload) && (typeof payload[0] === "number" || typeof payload[0] === "string" && RESERVED_EVENTS$1.indexOf(payload[0]) === -1);
+      case PacketType.ACK:
+      case PacketType.BINARY_ACK:
+        return Array.isArray(payload);
+    }
+  }
+  /**
+   * Deallocates a parser's resources
+   */
+  destroy() {
+    if (this.reconstructor) {
+      this.reconstructor.finishedReconstruction();
+      this.reconstructor = null;
+    }
+  }
+}
+class BinaryReconstructor {
+  constructor(packet) {
+    this.packet = packet;
+    this.buffers = [];
+    this.reconPack = packet;
+  }
+  /**
+   * Method to be called when binary data received from connection
+   * after a BINARY_EVENT packet.
+   *
+   * @param {Buffer | ArrayBuffer} binData - the raw binary data received
+   * @return {null | Object} returns null if more binary data is expected or
+   *   a reconstructed packet object if all buffers have been received.
+   */
+  takeBinaryData(binData) {
+    this.buffers.push(binData);
+    if (this.buffers.length === this.reconPack.attachments) {
+      const packet = reconstructPacket(this.reconPack, this.buffers);
+      this.finishedReconstruction();
+      return packet;
+    }
+    return null;
+  }
+  /**
+   * Cleans up binary packet reconstruction variables.
+   */
+  finishedReconstruction() {
+    this.reconPack = null;
+    this.buffers = [];
+  }
+}
+const parser = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  Decoder,
+  Encoder,
+  get PacketType() {
+    return PacketType;
+  },
+  protocol
+}, Symbol.toStringTag, { value: "Module" }));
+function on(obj, ev, fn) {
+  obj.on(ev, fn);
+  return function subDestroy() {
+    obj.off(ev, fn);
+  };
+}
+const RESERVED_EVENTS = Object.freeze({
+  connect: 1,
+  connect_error: 1,
+  disconnect: 1,
+  disconnecting: 1,
+  // EventEmitter reserved events: https://nodejs.org/api/events.html#events_event_newlistener
+  newListener: 1,
+  removeListener: 1
+});
+class Socket2 extends Emitter {
+  /**
+   * `Socket` constructor.
+   */
+  constructor(io, nsp, opts) {
+    super();
+    this.connected = false;
+    this.recovered = false;
+    this.receiveBuffer = [];
+    this.sendBuffer = [];
+    this._queue = [];
+    this._queueSeq = 0;
+    this.ids = 0;
+    this.acks = {};
+    this.flags = {};
+    this.io = io;
+    this.nsp = nsp;
+    if (opts && opts.auth) {
+      this.auth = opts.auth;
+    }
+    this._opts = Object.assign({}, opts);
+    if (this.io._autoConnect)
+      this.open();
+  }
+  /**
+   * Whether the socket is currently disconnected
+   *
+   * @example
+   * const socket = io();
+   *
+   * socket.on("connect", () => {
+   *   console.log(socket.disconnected); // false
+   * });
+   *
+   * socket.on("disconnect", () => {
+   *   console.log(socket.disconnected); // true
+   * });
+   */
+  get disconnected() {
+    return !this.connected;
+  }
+  /**
+   * Subscribe to open, close and packet events
+   *
+   * @private
+   */
+  subEvents() {
+    if (this.subs)
+      return;
+    const io = this.io;
+    this.subs = [
+      on(io, "open", this.onopen.bind(this)),
+      on(io, "packet", this.onpacket.bind(this)),
+      on(io, "error", this.onerror.bind(this)),
+      on(io, "close", this.onclose.bind(this))
+    ];
+  }
+  /**
+   * Whether the Socket will try to reconnect when its Manager connects or reconnects.
+   *
+   * @example
+   * const socket = io();
+   *
+   * console.log(socket.active); // true
+   *
+   * socket.on("disconnect", (reason) => {
+   *   if (reason === "io server disconnect") {
+   *     // the disconnection was initiated by the server, you need to manually reconnect
+   *     console.log(socket.active); // false
+   *   }
+   *   // else the socket will automatically try to reconnect
+   *   console.log(socket.active); // true
+   * });
+   */
+  get active() {
+    return !!this.subs;
+  }
+  /**
+   * "Opens" the socket.
+   *
+   * @example
+   * const socket = io({
+   *   autoConnect: false
+   * });
+   *
+   * socket.connect();
+   */
+  connect() {
+    if (this.connected)
+      return this;
+    this.subEvents();
+    if (!this.io["_reconnecting"])
+      this.io.open();
+    if ("open" === this.io._readyState)
+      this.onopen();
+    return this;
+  }
+  /**
+   * Alias for {@link connect()}.
+   */
+  open() {
+    return this.connect();
+  }
+  /**
+   * Sends a `message` event.
+   *
+   * This method mimics the WebSocket.send() method.
+   *
+   * @see https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/send
+   *
+   * @example
+   * socket.send("hello");
+   *
+   * // this is equivalent to
+   * socket.emit("message", "hello");
+   *
+   * @return self
+   */
+  send(...args) {
+    args.unshift("message");
+    this.emit.apply(this, args);
+    return this;
+  }
+  /**
+   * Override `emit`.
+   * If the event is in `events`, it's emitted normally.
+   *
+   * @example
+   * socket.emit("hello", "world");
+   *
+   * // all serializable datastructures are supported (no need to call JSON.stringify)
+   * socket.emit("hello", 1, "2", { 3: ["4"], 5: Uint8Array.from([6]) });
+   *
+   * // with an acknowledgement from the server
+   * socket.emit("hello", "world", (val) => {
+   *   // ...
+   * });
+   *
+   * @return self
+   */
+  emit(ev, ...args) {
+    var _a, _b, _c;
+    if (RESERVED_EVENTS.hasOwnProperty(ev)) {
+      throw new Error('"' + ev.toString() + '" is a reserved event name');
+    }
+    args.unshift(ev);
+    if (this._opts.retries && !this.flags.fromQueue && !this.flags.volatile) {
+      this._addToQueue(args);
+      return this;
+    }
+    const packet = {
+      type: PacketType.EVENT,
+      data: args
+    };
+    packet.options = {};
+    packet.options.compress = this.flags.compress !== false;
+    if ("function" === typeof args[args.length - 1]) {
+      const id = this.ids++;
+      const ack = args.pop();
+      this._registerAckCallback(id, ack);
+      packet.id = id;
+    }
+    const isTransportWritable = (_b = (_a = this.io.engine) === null || _a === void 0 ? void 0 : _a.transport) === null || _b === void 0 ? void 0 : _b.writable;
+    const isConnected = this.connected && !((_c = this.io.engine) === null || _c === void 0 ? void 0 : _c._hasPingExpired());
+    const discardPacket = this.flags.volatile && !isTransportWritable;
+    if (discardPacket) ;
+    else if (isConnected) {
+      this.notifyOutgoingListeners(packet);
+      this.packet(packet);
+    } else {
+      this.sendBuffer.push(packet);
+    }
+    this.flags = {};
+    return this;
+  }
+  /**
+   * @private
+   */
+  _registerAckCallback(id, ack) {
+    var _a;
+    const timeout2 = (_a = this.flags.timeout) !== null && _a !== void 0 ? _a : this._opts.ackTimeout;
+    if (timeout2 === void 0) {
+      this.acks[id] = ack;
+      return;
+    }
+    const timer = this.io.setTimeoutFn(() => {
+      delete this.acks[id];
+      for (let i2 = 0; i2 < this.sendBuffer.length; i2++) {
+        if (this.sendBuffer[i2].id === id) {
+          this.sendBuffer.splice(i2, 1);
+        }
+      }
+      ack.call(this, new Error("operation has timed out"));
+    }, timeout2);
+    const fn = (...args) => {
+      this.io.clearTimeoutFn(timer);
+      ack.apply(this, args);
+    };
+    fn.withError = true;
+    this.acks[id] = fn;
+  }
+  /**
+   * Emits an event and waits for an acknowledgement
+   *
+   * @example
+   * // without timeout
+   * const response = await socket.emitWithAck("hello", "world");
+   *
+   * // with a specific timeout
+   * try {
+   *   const response = await socket.timeout(1000).emitWithAck("hello", "world");
+   * } catch (err) {
+   *   // the server did not acknowledge the event in the given delay
+   * }
+   *
+   * @return a Promise that will be fulfilled when the server acknowledges the event
+   */
+  emitWithAck(ev, ...args) {
+    return new Promise((resolve, reject) => {
+      const fn = (arg1, arg2) => {
+        return arg1 ? reject(arg1) : resolve(arg2);
+      };
+      fn.withError = true;
+      args.push(fn);
+      this.emit(ev, ...args);
+    });
+  }
+  /**
+   * Add the packet to the queue.
+   * @param args
+   * @private
+   */
+  _addToQueue(args) {
+    let ack;
+    if (typeof args[args.length - 1] === "function") {
+      ack = args.pop();
+    }
+    const packet = {
+      id: this._queueSeq++,
+      tryCount: 0,
+      pending: false,
+      args,
+      flags: Object.assign({ fromQueue: true }, this.flags)
+    };
+    args.push((err, ...responseArgs) => {
+      if (packet !== this._queue[0]) {
+        return;
+      }
+      const hasError = err !== null;
+      if (hasError) {
+        if (packet.tryCount > this._opts.retries) {
+          this._queue.shift();
+          if (ack) {
+            ack(err);
+          }
+        }
+      } else {
+        this._queue.shift();
+        if (ack) {
+          ack(null, ...responseArgs);
+        }
+      }
+      packet.pending = false;
+      return this._drainQueue();
+    });
+    this._queue.push(packet);
+    this._drainQueue();
+  }
+  /**
+   * Send the first packet of the queue, and wait for an acknowledgement from the server.
+   * @param force - whether to resend a packet that has not been acknowledged yet
+   *
+   * @private
+   */
+  _drainQueue(force = false) {
+    if (!this.connected || this._queue.length === 0) {
+      return;
+    }
+    const packet = this._queue[0];
+    if (packet.pending && !force) {
+      return;
+    }
+    packet.pending = true;
+    packet.tryCount++;
+    this.flags = packet.flags;
+    this.emit.apply(this, packet.args);
+  }
+  /**
+   * Sends a packet.
+   *
+   * @param packet
+   * @private
+   */
+  packet(packet) {
+    packet.nsp = this.nsp;
+    this.io._packet(packet);
+  }
+  /**
+   * Called upon engine `open`.
+   *
+   * @private
+   */
+  onopen() {
+    if (typeof this.auth == "function") {
+      this.auth((data) => {
+        this._sendConnectPacket(data);
+      });
+    } else {
+      this._sendConnectPacket(this.auth);
+    }
+  }
+  /**
+   * Sends a CONNECT packet to initiate the Socket.IO session.
+   *
+   * @param data
+   * @private
+   */
+  _sendConnectPacket(data) {
+    this.packet({
+      type: PacketType.CONNECT,
+      data: this._pid ? Object.assign({ pid: this._pid, offset: this._lastOffset }, data) : data
+    });
+  }
+  /**
+   * Called upon engine or manager `error`.
+   *
+   * @param err
+   * @private
+   */
+  onerror(err) {
+    if (!this.connected) {
+      this.emitReserved("connect_error", err);
+    }
+  }
+  /**
+   * Called upon engine `close`.
+   *
+   * @param reason
+   * @param description
+   * @private
+   */
+  onclose(reason, description) {
+    this.connected = false;
+    delete this.id;
+    this.emitReserved("disconnect", reason, description);
+    this._clearAcks();
+  }
+  /**
+   * Clears the acknowledgement handlers upon disconnection, since the client will never receive an acknowledgement from
+   * the server.
+   *
+   * @private
+   */
+  _clearAcks() {
+    Object.keys(this.acks).forEach((id) => {
+      const isBuffered = this.sendBuffer.some((packet) => String(packet.id) === id);
+      if (!isBuffered) {
+        const ack = this.acks[id];
+        delete this.acks[id];
+        if (ack.withError) {
+          ack.call(this, new Error("socket has been disconnected"));
+        }
+      }
+    });
+  }
+  /**
+   * Called with socket packet.
+   *
+   * @param packet
+   * @private
+   */
+  onpacket(packet) {
+    const sameNamespace = packet.nsp === this.nsp;
+    if (!sameNamespace)
+      return;
+    switch (packet.type) {
+      case PacketType.CONNECT:
+        if (packet.data && packet.data.sid) {
+          this.onconnect(packet.data.sid, packet.data.pid);
+        } else {
+          this.emitReserved("connect_error", new Error("It seems you are trying to reach a Socket.IO server in v2.x with a v3.x client, but they are not compatible (more information here: https://socket.io/docs/v3/migrating-from-2-x-to-3-0/)"));
+        }
+        break;
+      case PacketType.EVENT:
+      case PacketType.BINARY_EVENT:
+        this.onevent(packet);
+        break;
+      case PacketType.ACK:
+      case PacketType.BINARY_ACK:
+        this.onack(packet);
+        break;
+      case PacketType.DISCONNECT:
+        this.ondisconnect();
+        break;
+      case PacketType.CONNECT_ERROR:
+        this.destroy();
+        const err = new Error(packet.data.message);
+        err.data = packet.data.data;
+        this.emitReserved("connect_error", err);
+        break;
+    }
+  }
+  /**
+   * Called upon a server event.
+   *
+   * @param packet
+   * @private
+   */
+  onevent(packet) {
+    const args = packet.data || [];
+    if (null != packet.id) {
+      args.push(this.ack(packet.id));
+    }
+    if (this.connected) {
+      this.emitEvent(args);
+    } else {
+      this.receiveBuffer.push(Object.freeze(args));
+    }
+  }
+  emitEvent(args) {
+    if (this._anyListeners && this._anyListeners.length) {
+      const listeners = this._anyListeners.slice();
+      for (const listener of listeners) {
+        listener.apply(this, args);
+      }
+    }
+    super.emit.apply(this, args);
+    if (this._pid && args.length && typeof args[args.length - 1] === "string") {
+      this._lastOffset = args[args.length - 1];
+    }
+  }
+  /**
+   * Produces an ack callback to emit with an event.
+   *
+   * @private
+   */
+  ack(id) {
+    const self2 = this;
+    let sent = false;
+    return function(...args) {
+      if (sent)
+        return;
+      sent = true;
+      self2.packet({
+        type: PacketType.ACK,
+        id,
+        data: args
+      });
+    };
+  }
+  /**
+   * Called upon a server acknowledgement.
+   *
+   * @param packet
+   * @private
+   */
+  onack(packet) {
+    const ack = this.acks[packet.id];
+    if (typeof ack !== "function") {
+      return;
+    }
+    delete this.acks[packet.id];
+    if (ack.withError) {
+      packet.data.unshift(null);
+    }
+    ack.apply(this, packet.data);
+  }
+  /**
+   * Called upon server connect.
+   *
+   * @private
+   */
+  onconnect(id, pid) {
+    this.id = id;
+    this.recovered = pid && this._pid === pid;
+    this._pid = pid;
+    this.connected = true;
+    this.emitBuffered();
+    this.emitReserved("connect");
+    this._drainQueue(true);
+  }
+  /**
+   * Emit buffered events (received and emitted).
+   *
+   * @private
+   */
+  emitBuffered() {
+    this.receiveBuffer.forEach((args) => this.emitEvent(args));
+    this.receiveBuffer = [];
+    this.sendBuffer.forEach((packet) => {
+      this.notifyOutgoingListeners(packet);
+      this.packet(packet);
+    });
+    this.sendBuffer = [];
+  }
+  /**
+   * Called upon server disconnect.
+   *
+   * @private
+   */
+  ondisconnect() {
+    this.destroy();
+    this.onclose("io server disconnect");
+  }
+  /**
+   * Called upon forced client/server side disconnections,
+   * this method ensures the manager stops tracking us and
+   * that reconnections don't get triggered for this.
+   *
+   * @private
+   */
+  destroy() {
+    if (this.subs) {
+      this.subs.forEach((subDestroy) => subDestroy());
+      this.subs = void 0;
+    }
+    this.io["_destroy"](this);
+  }
+  /**
+   * Disconnects the socket manually. In that case, the socket will not try to reconnect.
+   *
+   * If this is the last active Socket instance of the {@link Manager}, the low-level connection will be closed.
+   *
+   * @example
+   * const socket = io();
+   *
+   * socket.on("disconnect", (reason) => {
+   *   // console.log(reason); prints "io client disconnect"
+   * });
+   *
+   * socket.disconnect();
+   *
+   * @return self
+   */
+  disconnect() {
+    if (this.connected) {
+      this.packet({ type: PacketType.DISCONNECT });
+    }
+    this.destroy();
+    if (this.connected) {
+      this.onclose("io client disconnect");
+    }
+    return this;
+  }
+  /**
+   * Alias for {@link disconnect()}.
+   *
+   * @return self
+   */
+  close() {
+    return this.disconnect();
+  }
+  /**
+   * Sets the compress flag.
+   *
+   * @example
+   * socket.compress(false).emit("hello");
+   *
+   * @param compress - if `true`, compresses the sending data
+   * @return self
+   */
+  compress(compress) {
+    this.flags.compress = compress;
+    return this;
+  }
+  /**
+   * Sets a modifier for a subsequent event emission that the event message will be dropped when this socket is not
+   * ready to send messages.
+   *
+   * @example
+   * socket.volatile.emit("hello"); // the server may or may not receive it
+   *
+   * @returns self
+   */
+  get volatile() {
+    this.flags.volatile = true;
+    return this;
+  }
+  /**
+   * Sets a modifier for a subsequent event emission that the callback will be called with an error when the
+   * given number of milliseconds have elapsed without an acknowledgement from the server:
+   *
+   * @example
+   * socket.timeout(5000).emit("my-event", (err) => {
+   *   if (err) {
+   *     // the server did not acknowledge the event in the given delay
+   *   }
+   * });
+   *
+   * @returns self
+   */
+  timeout(timeout2) {
+    this.flags.timeout = timeout2;
+    return this;
+  }
+  /**
+   * Adds a listener that will be fired when any event is emitted. The event name is passed as the first argument to the
+   * callback.
+   *
+   * @example
+   * socket.onAny((event, ...args) => {
+   *   console.log(`got ${event}`);
+   * });
+   *
+   * @param listener
+   */
+  onAny(listener) {
+    this._anyListeners = this._anyListeners || [];
+    this._anyListeners.push(listener);
+    return this;
+  }
+  /**
+   * Adds a listener that will be fired when any event is emitted. The event name is passed as the first argument to the
+   * callback. The listener is added to the beginning of the listeners array.
+   *
+   * @example
+   * socket.prependAny((event, ...args) => {
+   *   console.log(`got event ${event}`);
+   * });
+   *
+   * @param listener
+   */
+  prependAny(listener) {
+    this._anyListeners = this._anyListeners || [];
+    this._anyListeners.unshift(listener);
+    return this;
+  }
+  /**
+   * Removes the listener that will be fired when any event is emitted.
+   *
+   * @example
+   * const catchAllListener = (event, ...args) => {
+   *   console.log(`got event ${event}`);
+   * }
+   *
+   * socket.onAny(catchAllListener);
+   *
+   * // remove a specific listener
+   * socket.offAny(catchAllListener);
+   *
+   * // or remove all listeners
+   * socket.offAny();
+   *
+   * @param listener
+   */
+  offAny(listener) {
+    if (!this._anyListeners) {
+      return this;
+    }
+    if (listener) {
+      const listeners = this._anyListeners;
+      for (let i2 = 0; i2 < listeners.length; i2++) {
+        if (listener === listeners[i2]) {
+          listeners.splice(i2, 1);
+          return this;
+        }
+      }
+    } else {
+      this._anyListeners = [];
+    }
+    return this;
+  }
+  /**
+   * Returns an array of listeners that are listening for any event that is specified. This array can be manipulated,
+   * e.g. to remove listeners.
+   */
+  listenersAny() {
+    return this._anyListeners || [];
+  }
+  /**
+   * Adds a listener that will be fired when any event is emitted. The event name is passed as the first argument to the
+   * callback.
+   *
+   * Note: acknowledgements sent to the server are not included.
+   *
+   * @example
+   * socket.onAnyOutgoing((event, ...args) => {
+   *   console.log(`sent event ${event}`);
+   * });
+   *
+   * @param listener
+   */
+  onAnyOutgoing(listener) {
+    this._anyOutgoingListeners = this._anyOutgoingListeners || [];
+    this._anyOutgoingListeners.push(listener);
+    return this;
+  }
+  /**
+   * Adds a listener that will be fired when any event is emitted. The event name is passed as the first argument to the
+   * callback. The listener is added to the beginning of the listeners array.
+   *
+   * Note: acknowledgements sent to the server are not included.
+   *
+   * @example
+   * socket.prependAnyOutgoing((event, ...args) => {
+   *   console.log(`sent event ${event}`);
+   * });
+   *
+   * @param listener
+   */
+  prependAnyOutgoing(listener) {
+    this._anyOutgoingListeners = this._anyOutgoingListeners || [];
+    this._anyOutgoingListeners.unshift(listener);
+    return this;
+  }
+  /**
+   * Removes the listener that will be fired when any event is emitted.
+   *
+   * @example
+   * const catchAllListener = (event, ...args) => {
+   *   console.log(`sent event ${event}`);
+   * }
+   *
+   * socket.onAnyOutgoing(catchAllListener);
+   *
+   * // remove a specific listener
+   * socket.offAnyOutgoing(catchAllListener);
+   *
+   * // or remove all listeners
+   * socket.offAnyOutgoing();
+   *
+   * @param [listener] - the catch-all listener (optional)
+   */
+  offAnyOutgoing(listener) {
+    if (!this._anyOutgoingListeners) {
+      return this;
+    }
+    if (listener) {
+      const listeners = this._anyOutgoingListeners;
+      for (let i2 = 0; i2 < listeners.length; i2++) {
+        if (listener === listeners[i2]) {
+          listeners.splice(i2, 1);
+          return this;
+        }
+      }
+    } else {
+      this._anyOutgoingListeners = [];
+    }
+    return this;
+  }
+  /**
+   * Returns an array of listeners that are listening for any event that is specified. This array can be manipulated,
+   * e.g. to remove listeners.
+   */
+  listenersAnyOutgoing() {
+    return this._anyOutgoingListeners || [];
+  }
+  /**
+   * Notify the listeners for each packet sent
+   *
+   * @param packet
+   *
+   * @private
+   */
+  notifyOutgoingListeners(packet) {
+    if (this._anyOutgoingListeners && this._anyOutgoingListeners.length) {
+      const listeners = this._anyOutgoingListeners.slice();
+      for (const listener of listeners) {
+        listener.apply(this, packet.data);
+      }
+    }
+  }
+}
+function Backoff(opts) {
+  opts = opts || {};
+  this.ms = opts.min || 100;
+  this.max = opts.max || 1e4;
+  this.factor = opts.factor || 2;
+  this.jitter = opts.jitter > 0 && opts.jitter <= 1 ? opts.jitter : 0;
+  this.attempts = 0;
+}
+Backoff.prototype.duration = function() {
+  var ms = this.ms * Math.pow(this.factor, this.attempts++);
+  if (this.jitter) {
+    var rand = Math.random();
+    var deviation = Math.floor(rand * this.jitter * ms);
+    ms = (Math.floor(rand * 10) & 1) == 0 ? ms - deviation : ms + deviation;
+  }
+  return Math.min(ms, this.max) | 0;
+};
+Backoff.prototype.reset = function() {
+  this.attempts = 0;
+};
+Backoff.prototype.setMin = function(min) {
+  this.ms = min;
+};
+Backoff.prototype.setMax = function(max) {
+  this.max = max;
+};
+Backoff.prototype.setJitter = function(jitter) {
+  this.jitter = jitter;
+};
+class Manager extends Emitter {
+  constructor(uri, opts) {
+    var _a;
+    super();
+    this.nsps = {};
+    this.subs = [];
+    if (uri && "object" === typeof uri) {
+      opts = uri;
+      uri = void 0;
+    }
+    opts = opts || {};
+    opts.path = opts.path || "/socket.io";
+    this.opts = opts;
+    installTimerFunctions(this, opts);
+    this.reconnection(opts.reconnection !== false);
+    this.reconnectionAttempts(opts.reconnectionAttempts || Infinity);
+    this.reconnectionDelay(opts.reconnectionDelay || 1e3);
+    this.reconnectionDelayMax(opts.reconnectionDelayMax || 5e3);
+    this.randomizationFactor((_a = opts.randomizationFactor) !== null && _a !== void 0 ? _a : 0.5);
+    this.backoff = new Backoff({
+      min: this.reconnectionDelay(),
+      max: this.reconnectionDelayMax(),
+      jitter: this.randomizationFactor()
+    });
+    this.timeout(null == opts.timeout ? 2e4 : opts.timeout);
+    this._readyState = "closed";
+    this.uri = uri;
+    const _parser = opts.parser || parser;
+    this.encoder = new _parser.Encoder();
+    this.decoder = new _parser.Decoder();
+    this._autoConnect = opts.autoConnect !== false;
+    if (this._autoConnect)
+      this.open();
+  }
+  reconnection(v) {
+    if (!arguments.length)
+      return this._reconnection;
+    this._reconnection = !!v;
+    if (!v) {
+      this.skipReconnect = true;
+    }
+    return this;
+  }
+  reconnectionAttempts(v) {
+    if (v === void 0)
+      return this._reconnectionAttempts;
+    this._reconnectionAttempts = v;
+    return this;
+  }
+  reconnectionDelay(v) {
+    var _a;
+    if (v === void 0)
+      return this._reconnectionDelay;
+    this._reconnectionDelay = v;
+    (_a = this.backoff) === null || _a === void 0 ? void 0 : _a.setMin(v);
+    return this;
+  }
+  randomizationFactor(v) {
+    var _a;
+    if (v === void 0)
+      return this._randomizationFactor;
+    this._randomizationFactor = v;
+    (_a = this.backoff) === null || _a === void 0 ? void 0 : _a.setJitter(v);
+    return this;
+  }
+  reconnectionDelayMax(v) {
+    var _a;
+    if (v === void 0)
+      return this._reconnectionDelayMax;
+    this._reconnectionDelayMax = v;
+    (_a = this.backoff) === null || _a === void 0 ? void 0 : _a.setMax(v);
+    return this;
+  }
+  timeout(v) {
+    if (!arguments.length)
+      return this._timeout;
+    this._timeout = v;
+    return this;
+  }
+  /**
+   * Starts trying to reconnect if reconnection is enabled and we have not
+   * started reconnecting yet
+   *
+   * @private
+   */
+  maybeReconnectOnOpen() {
+    if (!this._reconnecting && this._reconnection && this.backoff.attempts === 0) {
+      this.reconnect();
+    }
+  }
+  /**
+   * Sets the current transport `socket`.
+   *
+   * @param {Function} fn - optional, callback
+   * @return self
+   * @public
+   */
+  open(fn) {
+    if (~this._readyState.indexOf("open"))
+      return this;
+    this.engine = new Socket$1(this.uri, this.opts);
+    const socket = this.engine;
+    const self2 = this;
+    this._readyState = "opening";
+    this.skipReconnect = false;
+    const openSubDestroy = on(socket, "open", function() {
+      self2.onopen();
+      fn && fn();
+    });
+    const onError = (err) => {
+      this.cleanup();
+      this._readyState = "closed";
+      this.emitReserved("error", err);
+      if (fn) {
+        fn(err);
+      } else {
+        this.maybeReconnectOnOpen();
+      }
+    };
+    const errorSub = on(socket, "error", onError);
+    if (false !== this._timeout) {
+      const timeout2 = this._timeout;
+      const timer = this.setTimeoutFn(() => {
+        openSubDestroy();
+        onError(new Error("timeout"));
+        socket.close();
+      }, timeout2);
+      if (this.opts.autoUnref) {
+        timer.unref();
+      }
+      this.subs.push(() => {
+        this.clearTimeoutFn(timer);
+      });
+    }
+    this.subs.push(openSubDestroy);
+    this.subs.push(errorSub);
+    return this;
+  }
+  /**
+   * Alias for open()
+   *
+   * @return self
+   * @public
+   */
+  connect(fn) {
+    return this.open(fn);
+  }
+  /**
+   * Called upon transport open.
+   *
+   * @private
+   */
+  onopen() {
+    this.cleanup();
+    this._readyState = "open";
+    this.emitReserved("open");
+    const socket = this.engine;
+    this.subs.push(
+      on(socket, "ping", this.onping.bind(this)),
+      on(socket, "data", this.ondata.bind(this)),
+      on(socket, "error", this.onerror.bind(this)),
+      on(socket, "close", this.onclose.bind(this)),
+      // @ts-ignore
+      on(this.decoder, "decoded", this.ondecoded.bind(this))
+    );
+  }
+  /**
+   * Called upon a ping.
+   *
+   * @private
+   */
+  onping() {
+    this.emitReserved("ping");
+  }
+  /**
+   * Called with data.
+   *
+   * @private
+   */
+  ondata(data) {
+    try {
+      this.decoder.add(data);
+    } catch (e2) {
+      this.onclose("parse error", e2);
+    }
+  }
+  /**
+   * Called when parser fully decodes a packet.
+   *
+   * @private
+   */
+  ondecoded(packet) {
+    nextTick(() => {
+      this.emitReserved("packet", packet);
+    }, this.setTimeoutFn);
+  }
+  /**
+   * Called upon socket error.
+   *
+   * @private
+   */
+  onerror(err) {
+    this.emitReserved("error", err);
+  }
+  /**
+   * Creates a new socket for the given `nsp`.
+   *
+   * @return {Socket}
+   * @public
+   */
+  socket(nsp, opts) {
+    let socket = this.nsps[nsp];
+    if (!socket) {
+      socket = new Socket2(this, nsp, opts);
+      this.nsps[nsp] = socket;
+    } else if (this._autoConnect && !socket.active) {
+      socket.connect();
+    }
+    return socket;
+  }
+  /**
+   * Called upon a socket close.
+   *
+   * @param socket
+   * @private
+   */
+  _destroy(socket) {
+    const nsps = Object.keys(this.nsps);
+    for (const nsp of nsps) {
+      const socket2 = this.nsps[nsp];
+      if (socket2.active) {
+        return;
+      }
+    }
+    this._close();
+  }
+  /**
+   * Writes a packet.
+   *
+   * @param packet
+   * @private
+   */
+  _packet(packet) {
+    const encodedPackets = this.encoder.encode(packet);
+    for (let i2 = 0; i2 < encodedPackets.length; i2++) {
+      this.engine.write(encodedPackets[i2], packet.options);
+    }
+  }
+  /**
+   * Clean up transport subscriptions and packet buffer.
+   *
+   * @private
+   */
+  cleanup() {
+    this.subs.forEach((subDestroy) => subDestroy());
+    this.subs.length = 0;
+    this.decoder.destroy();
+  }
+  /**
+   * Close the current socket.
+   *
+   * @private
+   */
+  _close() {
+    this.skipReconnect = true;
+    this._reconnecting = false;
+    this.onclose("forced close");
+  }
+  /**
+   * Alias for close()
+   *
+   * @private
+   */
+  disconnect() {
+    return this._close();
+  }
+  /**
+   * Called when:
+   *
+   * - the low-level engine is closed
+   * - the parser encountered a badly formatted packet
+   * - all sockets are disconnected
+   *
+   * @private
+   */
+  onclose(reason, description) {
+    var _a;
+    this.cleanup();
+    (_a = this.engine) === null || _a === void 0 ? void 0 : _a.close();
+    this.backoff.reset();
+    this._readyState = "closed";
+    this.emitReserved("close", reason, description);
+    if (this._reconnection && !this.skipReconnect) {
+      this.reconnect();
+    }
+  }
+  /**
+   * Attempt a reconnection.
+   *
+   * @private
+   */
+  reconnect() {
+    if (this._reconnecting || this.skipReconnect)
+      return this;
+    const self2 = this;
+    if (this.backoff.attempts >= this._reconnectionAttempts) {
+      this.backoff.reset();
+      this.emitReserved("reconnect_failed");
+      this._reconnecting = false;
+    } else {
+      const delay = this.backoff.duration();
+      this._reconnecting = true;
+      const timer = this.setTimeoutFn(() => {
+        if (self2.skipReconnect)
+          return;
+        this.emitReserved("reconnect_attempt", self2.backoff.attempts);
+        if (self2.skipReconnect)
+          return;
+        self2.open((err) => {
+          if (err) {
+            self2._reconnecting = false;
+            self2.reconnect();
+            this.emitReserved("reconnect_error", err);
+          } else {
+            self2.onreconnect();
+          }
+        });
+      }, delay);
+      if (this.opts.autoUnref) {
+        timer.unref();
+      }
+      this.subs.push(() => {
+        this.clearTimeoutFn(timer);
+      });
+    }
+  }
+  /**
+   * Called upon successful reconnect.
+   *
+   * @private
+   */
+  onreconnect() {
+    const attempt = this.backoff.attempts;
+    this._reconnecting = false;
+    this.backoff.reset();
+    this.emitReserved("reconnect", attempt);
+  }
+}
+const cache = {};
+function lookup(uri, opts) {
+  if (typeof uri === "object") {
+    opts = uri;
+    uri = void 0;
+  }
+  opts = opts || {};
+  const parsed = url(uri, opts.path || "/socket.io");
+  const source = parsed.source;
+  const id = parsed.id;
+  const path = parsed.path;
+  const sameNamespace = cache[id] && path in cache[id]["nsps"];
+  const newConnection = opts.forceNew || opts["force new connection"] || false === opts.multiplex || sameNamespace;
+  let io;
+  if (newConnection) {
+    io = new Manager(source, opts);
+  } else {
+    if (!cache[id]) {
+      cache[id] = new Manager(source, opts);
+    }
+    io = cache[id];
+  }
+  if (parsed.query && !opts.query) {
+    opts.query = parsed.queryKey;
+  }
+  return io.socket(parsed.path, opts);
+}
+Object.assign(lookup, {
+  Manager,
+  Socket: Socket2,
+  io: lookup,
+  connect: lookup
+});
 function getStorage(key, defaultValue, parseJson = true) {
   try {
     const item = localStorage.getItem(key);
@@ -48840,6 +52196,9 @@ const stackViewRecentList = (entries, item, isAdd = false) => {
   }
   return stackViewRecently(entries);
 };
+const getChannelNameAiAsstant = (id) => {
+  return `ai_assistant_${id}`;
+};
 const pushEventCurrentStatus = async (params) => {
   var _a, _b, _c, _d, _e, _f, _g;
   try {
@@ -48910,6 +52269,25 @@ const debounce = (func, delay) => {
   };
 };
 const existChannelCall = (call = "") => ListCalls.some((i2) => i2 === call);
+const typeWriterSystem = ({
+  cb,
+  text = "",
+  ms = 100,
+  endWrite
+}) => {
+  let i2 = 0;
+  const array = text.split(" ");
+  const typeWriter = () => {
+    if (i2 < array.length) {
+      cb(array[i2] + " ");
+      i2++;
+      setTimeout(typeWriter, ms);
+    } else {
+      endWrite && endWrite();
+    }
+  };
+  typeWriter();
+};
 function config_key_redux(params) {
   return {
     key: params,
@@ -49094,6 +52472,27 @@ const convertBufferToBase64 = (buffer, type) => {
     binary += String.fromCharCode(byte);
   });
   return `data:${type};base64,${window.btoa(binary)}`;
+};
+const connnectTranscript = (agentId, tenantId) => {
+  const socket = lookup(config_url.base_url ?? "", {
+    path: "/asr",
+    auth: {
+      token: ""
+    },
+    query: {
+      type: "asr",
+      agentId,
+      tenantId
+    },
+    transports: ["websocket", "polling"],
+    reconnectionAttempts: 5,
+    reconnectionDelay: 1e3,
+    timeout: 5e3,
+    closeOnBeforeunload: true,
+    forceNew: true
+  });
+  socket.connect();
+  return { socket };
 };
 const defaultInfo = {
   tenant: {
@@ -49819,7 +53218,7 @@ const createStore = (reducer, initialState2) => {
   };
 };
 const local = typeof window === "undefined" ? JSON.stringify(Agents_Status[3]) : localStorage == null ? void 0 : localStorage.getItem("savedStatus");
-const parse$3 = !local ? Agents_Status[3] : JSON.parse(local);
+const parse$2 = !local ? Agents_Status[3] : JSON.parse(local);
 const agentStatusStore = createStore(
   (state, action) => {
     var _a;
@@ -49832,7 +53231,7 @@ const agentStatusStore = createStore(
     }
     return state;
   },
-  { ...parse$3, changeTime: "0" }
+  { ...parse$2, changeTime: "0" }
 );
 function LoginPage() {
   const dispatch = useAppDispatch();
@@ -50641,12 +54040,12 @@ class RegExpCache {
     return regExpNew;
   }
 }
-const chars$1 = [" ", ",", "?", "!", ";"];
+const chars = [" ", ",", "?", "!", ";"];
 const looksLikeObjectPathRegExpCache = new RegExpCache(20);
 const looksLikeObjectPath = (key, nsSeparator, keySeparator) => {
   nsSeparator = nsSeparator || "";
   keySeparator = keySeparator || "";
-  const possibleChars = chars$1.filter((c2) => nsSeparator.indexOf(c2) < 0 && keySeparator.indexOf(c2) < 0);
+  const possibleChars = chars.filter((c2) => nsSeparator.indexOf(c2) < 0 && keySeparator.indexOf(c2) < 0);
   if (possibleChars.length === 0) return true;
   const r2 = looksLikeObjectPathRegExpCache.getRegExp(`(${possibleChars.map((c2) => c2 === "?" ? "\\?" : c2).join("|")})`);
   let matched = !r2.test(key);
@@ -52845,7 +56244,7 @@ const selectBusinessSuccess = "Chọn kết quả nghiệp vụ thành công!";
 const youHaveNotSelectedBusinessResultYet = "Bạn chưa chọn kết quả nghiệp vụ!";
 const resultBusiness = "Kết quả nghiệp vụ: {{value}}";
 const notResultSearch = "Không có kết quả tìm kiếm!";
-const empty$1 = "Trống";
+const empty = "Trống";
 const goBack = "Quay lại";
 const completionDeadline = "Hạn hoàn thành";
 const peopleHandler = "Người xử lý";
@@ -53038,7 +56437,7 @@ const vi = {
   youHaveNotSelectedBusinessResultYet,
   resultBusiness,
   notResultSearch,
-  empty: empty$1,
+  empty,
   goBack,
   completionDeadline,
   peopleHandler,
@@ -53296,7 +56695,7 @@ tinycolor.prototype = {
     }
     return "progid:DXImageTransform.Microsoft.gradient(" + gradientType + "startColorstr=" + hex8String + ",endColorstr=" + secondHex8String + ")";
   },
-  toString: function toString2(format) {
+  toString: function toString3(format) {
     var formatSet = !!format;
     format = format || this._format;
     var formattedString = false;
@@ -57235,13 +60634,13 @@ function peg$parse$1(input, options) {
     throw peg$buildStructuredError(peg$maxFailExpected, peg$maxFailPos < input.length ? input.charAt(peg$maxFailPos) : null, peg$maxFailPos < input.length ? peg$computeLocation(peg$maxFailPos, peg$maxFailPos + 1) : peg$computeLocation(peg$maxFailPos, peg$maxFailPos));
   }
 }
-const parse$2 = peg$parse$1;
+const parse$1 = peg$parse$1;
 var Grammar$1;
 (function(Grammar2) {
   function parse2(input, startRule) {
     const options = { startRule };
     try {
-      parse$2(input, options);
+      parse$1(input, options);
     } catch (e2) {
       options.data = -1;
     }
@@ -57369,7 +60768,7 @@ function headerize$1(str) {
   }
   return hname;
 }
-function utf8Length$2(str) {
+function utf8Length$1(str) {
   return encodeURIComponent(str).replace(/%[A-F\d]{2}/g, "U").length;
 }
 let IncomingMessage$1 = class IncomingMessage {
@@ -57676,12 +61075,12 @@ let OutgoingRequestMessage$1 = class OutgoingRequestMessage {
     msg += "User-Agent: " + this.options.userAgentString + "\r\n";
     if (this.body) {
       if (typeof this.body === "string") {
-        msg += "Content-Length: " + utf8Length$2(this.body) + "\r\n\r\n";
+        msg += "Content-Length: " + utf8Length$1(this.body) + "\r\n\r\n";
         msg += this.body;
       } else {
         if (this.body.body && this.body.contentType) {
           msg += "Content-Type: " + this.body.contentType + "\r\n";
-          msg += "Content-Length: " + utf8Length$2(this.body.body) + "\r\n\r\n";
+          msg += "Content-Length: " + utf8Length$1(this.body.body) + "\r\n\r\n";
           msg += this.body.body;
         } else {
           msg += "Content-Length: 0\r\n\r\n";
@@ -61789,14 +65188,14 @@ function constructOutgoingResponse$1(message2, options) {
   response += extensionHeaders;
   if (options.body) {
     response += "Content-Type: " + options.body.contentType + CRLF;
-    response += "Content-Length: " + utf8Length$2(options.body.content) + CRLF + CRLF;
+    response += "Content-Length: " + utf8Length$1(options.body.content) + CRLF + CRLF;
     response += options.body.content;
   } else {
     response += "Content-Length: 0" + CRLF + CRLF;
   }
   return { message: response };
 }
-let TransportError$2 = class TransportError extends Exception$1 {
+let TransportError$1 = class TransportError2 extends Exception$1 {
   constructor(message2) {
     super(message2 ? message2 : "Unspecified transport error.");
   }
@@ -61881,15 +65280,15 @@ let Transaction$1 = class Transaction {
    */
   send(message2) {
     return this.transport.send(message2).catch((error) => {
-      if (error instanceof TransportError$2) {
+      if (error instanceof TransportError$1) {
         this.onTransportError(error);
         throw error;
       }
       let transportError;
       if (error && typeof error.message === "string") {
-        transportError = new TransportError$2(error.message);
+        transportError = new TransportError$1(error.message);
       } else {
-        transportError = new TransportError$2();
+        transportError = new TransportError$1();
       }
       this.onTransportError(transportError);
       throw transportError;
@@ -65824,7 +69223,7 @@ var TransportState$1;
   TransportState2["Disconnecting"] = "Disconnecting";
   TransportState2["Disconnected"] = "Disconnected";
 })(TransportState$1 = TransportState$1 || (TransportState$1 = {}));
-let Transport$2 = class Transport {
+let Transport$1 = class Transport2 {
   constructor(logger, options) {
     this._state = TransportState$1.Disconnected;
     this.transitioningState = false;
@@ -65851,7 +69250,7 @@ let Transport$2 = class Transport {
         }
       }
     }
-    this.configuration = Object.assign(Object.assign({}, Transport.defaultOptions), options);
+    this.configuration = Object.assign(Object.assign({}, Transport2.defaultOptions), options);
     const url2 = this.configuration.server;
     const parsed = Grammar$1.parse(url2, "absoluteURI");
     if (parsed === -1) {
@@ -66373,7 +69772,7 @@ let Transport$2 = class Transport {
     this.keepAliveDebounceTimeout = void 0;
   }
 };
-Transport$2.defaultOptions = {
+Transport$1.defaultOptions = {
   server: "",
   connectionTimeout: 5,
   keepAliveInterval: 0,
@@ -66536,7 +69935,7 @@ let UserAgent$1 = class UserAgent {
       sipExtensionReplaces: SIPExtension$1.Unsupported,
       sipExtensionExtraSupported: [],
       sipjsId: "",
-      transportConstructor: Transport$2,
+      transportConstructor: Transport$1,
       transportOptions: {},
       uri: new URI$1("sip", "anonymous", "anonymous.invalid"),
       userAgentString: "SIP.js/" + LIBRARY_VERSION$1,
@@ -67039,7 +70438,7 @@ let UserAgent$1 = class UserAgent {
         this.userAgentCore.replyStateless(message2, { statusCode: 482 });
         return;
       }
-      const len = utf8Length$2(message2.body);
+      const len = utf8Length$1(message2.body);
       const contentLength = message2.getHeader("content-length");
       if (contentLength && len < Number(contentLength)) {
         this.userAgentCore.replyStateless(message2, { statusCode: 400 });
@@ -67059,7 +70458,7 @@ let UserAgent$1 = class UserAgent {
         this.logger.warn("Via sent-by in the response does not match UA Via host value. Dropping.");
         return;
       }
-      const len = utf8Length$2(message2.body);
+      const len = utf8Length$1(message2.body);
       const contentLength = message2.getHeader("content-length");
       if (contentLength && len < Number(contentLength)) {
         this.logger.warn("Message body length is lower than the value in Content-Length header field. Dropping.");
@@ -67139,7 +70538,7 @@ class SessionManager {
     }, SessionManager.stripUndefinedProperties(options));
     const userAgentOptions = Object.assign({}, options.userAgentOptions);
     if (!userAgentOptions.transportConstructor) {
-      userAgentOptions.transportConstructor = Transport$2;
+      userAgentOptions.transportConstructor = Transport$1;
     }
     if (!userAgentOptions.transportOptions) {
       userAgentOptions.transportOptions = {
@@ -70846,19 +74245,19 @@ function peg$parse(input, options) {
     throw peg$buildStructuredError(peg$maxFailExpected, peg$maxFailPos < input.length ? input.charAt(peg$maxFailPos) : null, peg$maxFailPos < input.length ? peg$computeLocation(peg$maxFailPos, peg$maxFailPos + 1) : peg$computeLocation(peg$maxFailPos, peg$maxFailPos));
   }
 }
-const parse$1 = peg$parse;
+const parse = peg$parse;
 var Grammar;
 (function(Grammar2) {
-  function parse2(input, startRule) {
+  function parse$12(input, startRule) {
     const options = { startRule };
     try {
-      parse$1(input, options);
+      parse(input, options);
     } catch (e2) {
       options.data = -1;
     }
     return options.data;
   }
-  Grammar2.parse = parse2;
+  Grammar2.parse = parse$12;
   function nameAddrHeaderParse(nameAddrHeader) {
     const parsedNameAddrHeader = Grammar2.parse(nameAddrHeader, "Name_Addr_Header");
     return parsedNameAddrHeader !== -1 ? parsedNameAddrHeader : void 0;
@@ -70997,7 +74396,7 @@ function headerize(str) {
   }
   return hname;
 }
-function utf8Length$1(str) {
+function utf8Length(str) {
   return encodeURIComponent(str).replace(/%[A-F\d]{2}/g, "U").length;
 }
 class IncomingMessage2 {
@@ -71304,12 +74703,12 @@ class OutgoingRequestMessage2 {
     msg += "User-Agent: " + this.options.userAgentString + "\r\n";
     if (this.body) {
       if (typeof this.body === "string") {
-        msg += "Content-Length: " + utf8Length$1(this.body) + "\r\n\r\n";
+        msg += "Content-Length: " + utf8Length(this.body) + "\r\n\r\n";
         msg += this.body;
       } else {
         if (this.body.body && this.body.contentType) {
           msg += "Content-Type: " + this.body.contentType + "\r\n";
-          msg += "Content-Length: " + utf8Length$1(this.body.body) + "\r\n\r\n";
+          msg += "Content-Length: " + utf8Length(this.body.body) + "\r\n\r\n";
           msg += this.body.body;
         } else {
           msg += "Content-Length: 0\r\n\r\n";
@@ -71896,7 +75295,7 @@ function constructOutgoingResponse(message2, options) {
   response += extensionHeaders;
   if (options.body) {
     response += "Content-Type: " + options.body.contentType + CRLF;
-    response += "Content-Length: " + utf8Length$1(options.body.content) + CRLF + CRLF;
+    response += "Content-Length: " + utf8Length(options.body.content) + CRLF + CRLF;
     response += options.body.content;
   } else {
     response += "Content-Length: 0" + CRLF + CRLF;
@@ -72465,11 +75864,11 @@ class TransactionStateError2 extends Exception2 {
     super(message2 ? message2 : "Transaction state error.");
   }
 }
-let TransportError$1 = class TransportError2 extends Exception2 {
+class TransportError3 extends Exception2 {
   constructor(message2) {
     super(message2 ? message2 : "Unspecified transport error.");
   }
-};
+}
 class Transaction2 {
   constructor(_transport, _user, _id, _state, loggerCategory) {
     this._transport = _transport;
@@ -72550,15 +75949,15 @@ class Transaction2 {
    */
   send(message2) {
     return this.transport.send(message2).catch((error) => {
-      if (error instanceof TransportError$1) {
+      if (error instanceof TransportError3) {
         this.onTransportError(error);
         throw error;
       }
       let transportError;
       if (error && typeof error.message === "string") {
-        transportError = new TransportError$1(error.message);
+        transportError = new TransportError3(error.message);
       } else {
-        transportError = new TransportError$1();
+        transportError = new TransportError3();
       }
       this.onTransportError(transportError);
       throw transportError;
@@ -80971,7 +84370,7 @@ function defaultSessionDescriptionHandlerFactory(mediaStreamFactory) {
     return new SessionDescriptionHandler2(logger, mediaStreamFactory, sessionDescriptionHandlerConfiguration);
   };
 }
-let Transport$1 = class Transport2 {
+class Transport3 {
   constructor(logger, options) {
     this._state = TransportState.Disconnected;
     this.transitioningState = false;
@@ -80998,7 +84397,7 @@ let Transport$1 = class Transport2 {
         }
       }
     }
-    this.configuration = Object.assign(Object.assign({}, Transport2.defaultOptions), options);
+    this.configuration = Object.assign(Object.assign({}, Transport3.defaultOptions), options);
     const url2 = this.configuration.server;
     const parsed = Grammar.parse(url2, "absoluteURI");
     if (parsed === -1) {
@@ -81519,8 +84918,8 @@ let Transport$1 = class Transport2 {
     this.keepAliveInterval = void 0;
     this.keepAliveDebounceTimeout = void 0;
   }
-};
-Transport$1.defaultOptions = {
+}
+Transport3.defaultOptions = {
   server: "",
   connectionTimeout: 5,
   keepAliveInterval: 0,
@@ -81672,7 +85071,7 @@ class UserAgent2 {
       sipExtensionReplaces: SIPExtension.Unsupported,
       sipExtensionExtraSupported: [],
       sipjsId: "",
-      transportConstructor: Transport$1,
+      transportConstructor: Transport3,
       transportOptions: {},
       uri: new URI2("sip", "anonymous", "anonymous.invalid"),
       userAgentString: "SIP.js/" + LIBRARY_VERSION,
@@ -82147,7 +85546,7 @@ class UserAgent2 {
         this.userAgentCore.replyStateless(message2, { statusCode: 482 });
         return;
       }
-      const len = utf8Length$1(message2.body);
+      const len = utf8Length(message2.body);
       const contentLength = message2.getHeader("content-length");
       if (contentLength && len < Number(contentLength)) {
         this.userAgentCore.replyStateless(message2, { statusCode: 400 });
@@ -82167,7 +85566,7 @@ class UserAgent2 {
         this.logger.warn("Via sent-by in the response does not match UA Via host value. Dropping.");
         return;
       }
-      const len = utf8Length$1(message2.body);
+      const len = utf8Length(message2.body);
       const contentLength = message2.getHeader("content-length");
       if (contentLength && len < Number(contentLength)) {
         this.logger.warn("Message body length is lower than the value in Content-Length header field. Dropping.");
@@ -83746,6 +87145,3075 @@ _PortSipSdk_username = /* @__PURE__ */ new WeakMap(), _PortSipSdk_registererOpti
     }
   }
 };
+class TranscriptIntegration {
+  constructor(info) {
+    __publicField(this, "localAudioCaptureHandles", /* @__PURE__ */ new Map());
+    __publicField(this, "remoteAudioCaptureHandles", /* @__PURE__ */ new Map());
+    __publicField(this, "localAudioSendEnabled", /* @__PURE__ */ new Map());
+    __publicField(this, "socket", null);
+    __publicField(this, "remoteMediaRecorders", /* @__PURE__ */ new Map());
+    this.info = info;
+  }
+  destroy() {
+    var _a;
+    (_a = this.socket) == null ? void 0 : _a.disconnect();
+    this.socket = null;
+    for (const [sessionId, handle] of this.localAudioCaptureHandles) {
+      handle.stop().catch((err) => {
+        console.error(
+          `[ASR Local] Cleanup error for session ${sessionId}:`,
+          err
+        );
+      });
+      this.stopTranscriptionWithAudioCapture(sessionId);
+    }
+    this.localAudioCaptureHandles.clear();
+    for (const [sessionId, handle] of this.remoteAudioCaptureHandles) {
+      handle.stop().catch((err) => {
+        console.error(
+          `[ASR Remote] Cleanup error for session ${sessionId}:`,
+          err
+        );
+      });
+      this.stopRemoteMediaRecorder(sessionId);
+    }
+    this.remoteAudioCaptureHandles.clear();
+    this.localAudioSendEnabled.clear();
+  }
+  /**
+   * Start ASR transcription with audio capture (all-in-one helper).
+   * This connects to ASR socket, sends start signal, and begins dual audio capture.
+   *
+   * @param sessionId - session ID for the call
+   * @param onTranscriptResponse - optional callback for transcript results
+   */
+  async startTranscriptionWithAudioCapture(sessionId, onTranscriptResponse, callId, sessionManager) {
+    var _a, _b;
+    try {
+      const { socket } = connnectTranscript(
+        ((_a = this.info) == null ? void 0 : _a.agentId) ?? 0,
+        ((_b = this.info) == null ? void 0 : _b.tenantId) ?? 0
+      );
+      socket.on("connect", () => {
+        console.log("[ASR] Socket connected");
+        socket.emit(
+          "agent_join_rooms",
+          { rooms: [`transcript_${sessionId}`] },
+          (response) => {
+            console.log("[ASR] Joined room:", response);
+          }
+        );
+        socket.emit("start-transcript", {
+          callId: sessionId,
+          numChannel: 2
+        });
+        console.log("[ASR] Start signal sent");
+        setTimeout(() => {
+          console.log("[ASR] Starting audio capture after delay...");
+          this.startAudioCaptureForASR(
+            sessionId,
+            socket,
+            callId,
+            sessionManager
+          );
+        }, 1e3);
+      });
+      socket.on("disconnect", () => {
+        console.log("[ASR] Socket disconnected");
+      });
+      socket.on("transcript_response", (response) => {
+        console.log("[ASR] Transcript response:", response);
+        onTranscriptResponse == null ? void 0 : onTranscriptResponse(response);
+      });
+      this._asrSockets = this._asrSockets || /* @__PURE__ */ new Map();
+      this._asrSockets.set(sessionId, socket);
+      console.log("[ASR] Transcription started for session:", sessionId);
+    } catch (error) {
+      console.error("[ASR] Failed to start transcription:", error);
+    }
+  }
+  /**
+   * Start BOTH local + remote audio capture (wrapper)
+   */
+  async startAudioCaptureForASR(sessionId, socket, callId, sessionManager) {
+    try {
+      const localHandle = await this.startLocalAudioCaptureForASR(
+        sessionId,
+        socket
+      );
+      if (localHandle) {
+        this.localAudioCaptureHandles.set(sessionId, localHandle);
+      }
+      const startRemoteWithRetry = async (retryCount = 0) => {
+        const remoteHandle = await this.startRemoteAudioCaptureForASR(
+          sessionId,
+          socket,
+          callId ?? 0,
+          sessionManager ?? {}
+          // Pass actual SDK instance if needed
+        );
+        if (remoteHandle) {
+          this.remoteAudioCaptureHandles.set(sessionId, remoteHandle);
+          console.log("[ASR] ✅ Remote audio capture started successfully");
+        } else if (retryCount < 2) {
+          console.warn(
+            `[ASR] Remote capture failed, retrying in 1s (attempt ${retryCount + 1}/2)...`
+          );
+          setTimeout(() => {
+            startRemoteWithRetry(retryCount + 1);
+          }, 1e3);
+        } else {
+          console.error(
+            "[ASR] ❌ Failed to start remote capture after retries"
+          );
+        }
+        return remoteHandle;
+      };
+      await startRemoteWithRetry();
+    } catch (error) {
+      console.error("[ASR] Failed to start dual audio capture:", error);
+    }
+  }
+  /**
+   * Start LOCAL mic capture (Agent - Channel 1)
+   */
+  async startLocalAudioCaptureForASR(sessionId, socket) {
+    try {
+      const targetSampleRate = 16e3;
+      const bufferSize = 4096;
+      const micStream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          sampleRate: 16e3,
+          channelCount: 1,
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true
+        }
+      });
+      const localAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+      if (localAudioContext.state === "suspended") {
+        await localAudioContext.resume();
+      }
+      const localSourceNode = localAudioContext.createMediaStreamSource(micStream);
+      const localProcessor = localAudioContext.createScriptProcessor(
+        bufferSize,
+        1,
+        1
+      );
+      localSourceNode.connect(localProcessor);
+      localProcessor.connect(localAudioContext.destination);
+      this.setLocalAudioSendEnabled(sessionId, true, "start-local-capture");
+      localProcessor.onaudioprocess = (event) => {
+        if (!socket || !socket.connected) return;
+        if (!this.isLocalAudioSendEnabled(sessionId)) return;
+        const inputData = event.inputBuffer.getChannelData(0);
+        const sampleRate = localAudioContext.sampleRate;
+        let audioData = inputData;
+        if (sampleRate !== targetSampleRate) {
+          const ratio = targetSampleRate / sampleRate;
+          const newLength = Math.round(inputData.length * ratio);
+          audioData = new Float32Array(newLength);
+          for (let i2 = 0; i2 < newLength; i2++) {
+            const index = i2 / ratio;
+            const i0 = Math.floor(index);
+            const i1 = Math.min(i0 + 1, inputData.length - 1);
+            const frac = index - i0;
+            audioData[i2] = inputData[i0] * (1 - frac) + inputData[i1] * frac;
+          }
+        }
+        const int16Data = new Int16Array(audioData.length);
+        for (let i2 = 0; i2 < audioData.length; i2++) {
+          const s2 = Math.max(-1, Math.min(1, audioData[i2]));
+          int16Data[i2] = s2 < 0 ? s2 * 32768 : s2 * 32767;
+        }
+        try {
+          const audioBuffer = new Uint8Array(int16Data.buffer);
+          socket.emit("transcript", {
+            callId: sessionId,
+            channel: 1,
+            data: audioBuffer.buffer
+          });
+        } catch (err) {
+          console.error("[ASR Local] Error sending audio:", err);
+        }
+      };
+      console.log("[ASR Local] Mic capture started for session:", sessionId);
+      return {
+        audioContext: localAudioContext,
+        stop: async () => {
+          try {
+            if (localProcessor) localProcessor.disconnect();
+            if (localSourceNode) localSourceNode.disconnect();
+            if (micStream)
+              micStream.getTracks().forEach((track) => track.stop());
+            if (localAudioContext) await localAudioContext.close();
+          } catch (err) {
+            console.error("[ASR Local] Cleanup error:", err);
+          }
+        }
+      };
+    } catch (error) {
+      console.error("[ASR Local] Failed to start mic capture:", error);
+      return null;
+    }
+  }
+  /**
+   * Start REMOTE audio capture (Customer - Channel 0)
+   */
+  async startRemoteAudioCaptureForASR(sessionId, socket, callId, sesssionManager) {
+    try {
+      const targetSampleRate = 16e3;
+      const bufferSize = 4096;
+      if (!callId) {
+        console.error(
+          "[ASR Remote] ❌ No callId found for session:",
+          sessionId
+        );
+        return null;
+      }
+      const waitForRemoteStream = async (maxRetries = 30, intervalMs = 200) => {
+        return new Promise((resolve) => {
+          var _a;
+          let retries = 0;
+          let resolved = false;
+          const session2 = (_a = sesssionManager == null ? void 0 : sesssionManager.sessions.get(callId)) == null ? void 0 : _a.session;
+          const sdh = session2 == null ? void 0 : session2.sessionDescriptionHandler;
+          console.log("[ASR Remote] Session info:", {
+            hasSession: !!session2,
+            hasSDH: !!sdh,
+            hasPeerConnection: !!(sdh == null ? void 0 : sdh.peerConnection),
+            sessionState: session2 == null ? void 0 : session2.state
+          });
+          if (sdh && sdh.peerConnection) {
+            const pc = sdh.peerConnection;
+            console.log(
+              "[ASR Remote] Setting up track listener on RTCPeerConnection",
+              {
+                connectionState: pc.connectionState,
+                iceConnectionState: pc.iceConnectionState,
+                signalingState: pc.signalingState
+              }
+            );
+            pc.addEventListener(
+              "track",
+              (event) => {
+                if (!resolved && event.track.kind === "audio") {
+                  console.log("[ASR Remote] ✅ Track event received:", {
+                    kind: event.track.kind,
+                    readyState: event.track.readyState,
+                    streams: event.streams.length
+                  });
+                  setTimeout(() => {
+                    if (!resolved) {
+                      const stream = event.streams[0] || sdh.remoteMediaStream;
+                      if (stream && stream.getAudioTracks().length > 0) {
+                        resolved = true;
+                        resolve(stream);
+                      }
+                    }
+                  }, 100);
+                }
+              },
+              { once: true }
+            );
+          }
+          const checkStream = () => {
+            var _a2, _b, _c, _d;
+            if (resolved) return;
+            const session22 = (_a2 = sesssionManager == null ? void 0 : sesssionManager.sessions.get(callId)) == null ? void 0 : _a2.session;
+            const stream = (_b = session22 == null ? void 0 : session22.sessionDescriptionHandler) == null ? void 0 : _b.remoteMediaStream;
+            const audioTracks = (stream == null ? void 0 : stream.getAudioTracks()) || [];
+            console.log(
+              `[ASR Remote] Checking remote stream #${retries + 1}:`,
+              {
+                hasStream: !!stream,
+                audioTracksCount: audioTracks.length,
+                trackReady: ((_c = audioTracks[0]) == null ? void 0 : _c.readyState) === "live"
+              }
+            );
+            if (stream && audioTracks.length > 0 && ((_d = audioTracks[0]) == null ? void 0 : _d.readyState) === "live") {
+              console.log("[ASR Remote] ✅ Remote stream ready via polling!");
+              resolved = true;
+              resolve(stream);
+              return;
+            }
+            retries++;
+            if (retries >= maxRetries) {
+              if (!resolved) {
+                console.warn(
+                  "[ASR Remote] ❌ Timeout waiting for remote stream"
+                );
+                resolved = true;
+                resolve(null);
+              }
+              return;
+            }
+            setTimeout(checkStream, intervalMs);
+          };
+          checkStream();
+        });
+      };
+      const remoteStream = await waitForRemoteStream();
+      if (!remoteStream || remoteStream.getAudioTracks().length === 0) {
+        console.warn("[ASR Remote] No remote audio stream available");
+        return null;
+      }
+      let keepAliveAudio = null;
+      try {
+        keepAliveAudio = document.createElement("audio");
+        keepAliveAudio.srcObject = remoteStream;
+        keepAliveAudio.muted = true;
+        keepAliveAudio.play().catch(() => {
+        });
+      } catch (err) {
+        console.warn("[ASR Remote] Keep-alive audio failed:", err);
+      }
+      const remoteTracks = remoteStream.getAudioTracks();
+      console.log("[ASR Remote] Remote stream tracks:", {
+        count: remoteTracks.length,
+        tracks: remoteTracks.map((t2) => ({
+          id: t2.id,
+          label: t2.label,
+          muted: t2.muted,
+          enabled: t2.enabled,
+          readyState: t2.readyState
+        }))
+      });
+      const remoteAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+      if (remoteAudioContext.state === "suspended") {
+        try {
+          await remoteAudioContext.resume();
+        } catch (err) {
+          console.warn("[ASR Remote] AudioContext resume failed:", err);
+        }
+      }
+      console.log("[ASR Remote] AudioContext state:", {
+        state: remoteAudioContext.state,
+        sampleRate: remoteAudioContext.sampleRate
+      });
+      const remoteSourceNode = remoteAudioContext.createMediaStreamSource(remoteStream);
+      const remoteProcessor = remoteAudioContext.createScriptProcessor(
+        bufferSize,
+        1,
+        1
+      );
+      remoteSourceNode.connect(remoteProcessor);
+      remoteProcessor.connect(remoteAudioContext.destination);
+      remoteProcessor.onaudioprocess = (event) => {
+        if (!socket || !socket.connected) return;
+        const inputData = event.inputBuffer.getChannelData(0);
+        const hasAudio = inputData.some((sample) => Math.abs(sample) > 1e-4);
+        if (!hasAudio) return;
+        const sampleRate = remoteAudioContext.sampleRate;
+        let audioData = inputData;
+        if (sampleRate !== targetSampleRate) {
+          const ratio = targetSampleRate / sampleRate;
+          const newLength = Math.round(inputData.length * ratio);
+          audioData = new Float32Array(newLength);
+          for (let i2 = 0; i2 < newLength; i2++) {
+            const index = i2 / ratio;
+            const i0 = Math.floor(index);
+            const i1 = Math.min(i0 + 1, inputData.length - 1);
+            const frac = index - i0;
+            audioData[i2] = inputData[i0] * (1 - frac) + inputData[i1] * frac;
+          }
+        }
+        const int16Data = new Int16Array(audioData.length);
+        for (let i2 = 0; i2 < audioData.length; i2++) {
+          const s2 = Math.max(-1, Math.min(1, audioData[i2]));
+          int16Data[i2] = s2 < 0 ? s2 * 32768 : s2 * 32767;
+        }
+        try {
+          const audioBuffer = new Uint8Array(int16Data.buffer);
+          socket.emit("transcript", {
+            callId: sessionId,
+            channel: 0,
+            data: audioBuffer.buffer
+          });
+        } catch (err) {
+          console.error("[ASR Remote] Error sending audio:", err);
+        }
+      };
+      console.log(
+        "[ASR Remote] Remote audio capture started for session:",
+        sessionId
+      );
+      return {
+        audioContext: remoteAudioContext,
+        stop: async () => {
+          try {
+            if (remoteProcessor) remoteProcessor.disconnect();
+            if (remoteSourceNode) remoteSourceNode.disconnect();
+            if (remoteAudioContext) await remoteAudioContext.close();
+            console.log(
+              "[ASR Remote] Remote audio capture stopped for session:",
+              sessionId
+            );
+          } catch (err) {
+            console.error("[ASR Remote] Cleanup error:", err);
+          }
+        }
+      };
+    } catch (error) {
+      console.error(
+        "[ASR Remote] Failed to start remote audio capture:",
+        error
+      );
+      return null;
+    }
+  }
+  setLocalAudioSendEnabled(sessionId, enabled, reason) {
+    this.localAudioSendEnabled.set(sessionId, enabled);
+    console.log("[ASR Local] Send state changed:", {
+      sessionId,
+      enabled,
+      reason
+    });
+  }
+  isLocalAudioSendEnabled(sessionId) {
+    return this.localAudioSendEnabled.get(sessionId) !== false;
+  }
+  stopRemoteMediaRecorder(sessionId) {
+    var _a;
+    try {
+      if (!sessionId) throw Error("sessionId not found");
+      const rec = this.remoteMediaRecorders.get(sessionId);
+      if (((_a = rec == null ? void 0 : rec.recorder) == null ? void 0 : _a.state) && rec.recorder.state !== "inactive") {
+        rec.recorder.stop();
+      }
+      if (rec == null ? void 0 : rec.pullTimer) clearInterval(rec.pullTimer);
+    } catch (error) {
+      console.log("error stopRemoteMediaRecorder", error);
+    }
+    this.remoteMediaRecorders.delete(sessionId);
+  }
+  /**
+   * Stop ASR transcription and audio capture
+   */
+  async stopTranscriptionWithAudioCapture(sessionId) {
+    try {
+      console.log("[ASR] Stopping transcription for session:", sessionId);
+      if (!sessionId) throw Error("session not found");
+      await this.stopAudioCaptureForASR(sessionId);
+      const asrSockets = this._asrSockets;
+      if (asrSockets) {
+        const socket = asrSockets.get(sessionId);
+        if (socket) {
+          socket.removeAllListeners();
+          if (socket.connected) {
+            try {
+              socket.emit("stop-transcript", { callId: sessionId });
+            } catch (err) {
+              console.warn("[ASR] Error sending stop signal:", err);
+            }
+          }
+          try {
+            socket.disconnect();
+          } catch (err) {
+            console.warn("[ASR] Error disconnecting socket:", err);
+          }
+          asrSockets.delete(sessionId);
+        }
+      }
+      console.log("[ASR] ✅ Transcription stopped for session:", sessionId);
+    } catch (error) {
+      console.error("[ASR] Failed to stop transcription:", error);
+    }
+  }
+  /**
+   * Stop audio capture for a session (both local + remote)
+   */
+  async stopAudioCaptureForASR(sessionId) {
+    try {
+      console.log("[ASR] Stopping audio capture for session:", sessionId, {
+        hasLocal: this.localAudioCaptureHandles.has(sessionId),
+        hasRemote: this.remoteAudioCaptureHandles.has(sessionId)
+      });
+      const localHandle = this.localAudioCaptureHandles.get(sessionId);
+      if (localHandle) {
+        console.log("[ASR] Stopping local mic capture...");
+        await localHandle.stop();
+        this.localAudioCaptureHandles.delete(sessionId);
+        this.localAudioSendEnabled.delete(sessionId);
+        console.log("[ASR] ✅ Local mic capture stopped");
+      }
+      const remoteHandle = this.remoteAudioCaptureHandles.get(sessionId);
+      if (remoteHandle) {
+        console.log("[ASR] Stopping remote audio capture...");
+        await remoteHandle.stop();
+        this.remoteAudioCaptureHandles.delete(sessionId);
+        console.log("[ASR] ✅ Remote audio capture stopped");
+      }
+      console.log("[ASR] ✅ All audio capture stopped for session:", sessionId);
+    } catch (error) {
+      console.error("[ASR] Failed to stop audio capture:", error);
+    }
+  }
+  getRemoteMediaStream(sessionId, callId, sessionManager) {
+    var _a, _b, _c;
+    const session2 = (_a = sessionManager == null ? void 0 : sessionManager.sessions.get(callId)) == null ? void 0 : _a.session;
+    try {
+      const remoteStream = (_b = session2.sessionDescriptionHandler) == null ? void 0 : _b.remoteMediaStream;
+      if (!remoteStream) return;
+      const existed = this.remoteMediaRecorders.get(sessionId);
+      if (((_c = existed == null ? void 0 : existed.recorder) == null ? void 0 : _c.state) && existed.recorder.state !== "inactive") {
+        return remoteStream;
+      }
+      const tracks = remoteStream.getAudioTracks();
+      if (tracks.length === 0) return remoteStream;
+      const mediaStream = new MediaStream(
+        tracks.map((t2) => typeof t2.clone === "function" ? t2.clone() : t2)
+      );
+      const preferredTypes = [
+        "audio/webm;codecs=opus",
+        "audio/webm",
+        "audio/mp4"
+      ];
+      const mimeType = preferredTypes.find(
+        (t2) => MediaRecorder.isTypeSupported ? MediaRecorder.isTypeSupported(t2) : true
+      ) || "";
+      const recorder = new MediaRecorder(mediaStream, { mimeType });
+      let pullTimer = null;
+      recorder.ondataavailable = (event) => {
+        if (event.data && event.data.size > 0) {
+          console.log("[RemoteRecorder] ondataavailable", {
+            sessionId,
+            size: event.data.size,
+            type: event.data.type,
+            state: recorder.state
+          });
+        }
+      };
+      recorder.onerror = (e2) => {
+        console.error("[RemoteRecorder] error", { sessionId, e: e2 });
+      };
+      recorder.onstop = () => {
+        try {
+          if (pullTimer) clearInterval(pullTimer);
+        } catch {
+        }
+        this.remoteMediaRecorders.delete(sessionId);
+      };
+      try {
+        recorder.start(250);
+      } catch (err) {
+        recorder.start();
+        pullTimer = setInterval(() => {
+          if (recorder.state === "recording") recorder.requestData();
+        }, 250);
+      }
+      this.remoteMediaRecorders.set(sessionId, { recorder, pullTimer });
+      return remoteStream;
+    } catch (error) {
+    }
+  }
+}
+var selfie_segmentation = {};
+(function() {
+  var x;
+  function aa(a2) {
+    var b = 0;
+    return function() {
+      return b < a2.length ? { done: false, value: a2[b++] } : { done: true };
+    };
+  }
+  var ba = "function" == typeof Object.defineProperties ? Object.defineProperty : function(a2, b, c2) {
+    if (a2 == Array.prototype || a2 == Object.prototype) return a2;
+    a2[b] = c2.value;
+    return a2;
+  };
+  function ca(a2) {
+    a2 = ["object" == typeof globalThis && globalThis, a2, "object" == typeof window && window, "object" == typeof self && self, "object" == typeof commonjsGlobal && commonjsGlobal];
+    for (var b = 0; b < a2.length; ++b) {
+      var c2 = a2[b];
+      if (c2 && c2.Math == Math) return c2;
+    }
+    throw Error("Cannot find global object");
+  }
+  var y = ca(this);
+  function z(a2, b) {
+    if (b) a: {
+      var c2 = y;
+      a2 = a2.split(".");
+      for (var d = 0; d < a2.length - 1; d++) {
+        var e2 = a2[d];
+        if (!(e2 in c2)) break a;
+        c2 = c2[e2];
+      }
+      a2 = a2[a2.length - 1];
+      d = c2[a2];
+      b = b(d);
+      b != d && null != b && ba(c2, a2, { configurable: true, writable: true, value: b });
+    }
+  }
+  z("Symbol", function(a2) {
+    function b(g) {
+      if (this instanceof b) throw new TypeError("Symbol is not a constructor");
+      return new c2(d + (g || "") + "_" + e2++, g);
+    }
+    function c2(g, f) {
+      this.h = g;
+      ba(this, "description", { configurable: true, writable: true, value: f });
+    }
+    if (a2) return a2;
+    c2.prototype.toString = function() {
+      return this.h;
+    };
+    var d = "jscomp_symbol_" + (1e9 * Math.random() >>> 0) + "_", e2 = 0;
+    return b;
+  });
+  z("Symbol.iterator", function(a2) {
+    if (a2) return a2;
+    a2 = Symbol("Symbol.iterator");
+    for (var b = "Array Int8Array Uint8Array Uint8ClampedArray Int16Array Uint16Array Int32Array Uint32Array Float32Array Float64Array".split(" "), c2 = 0; c2 < b.length; c2++) {
+      var d = y[b[c2]];
+      "function" === typeof d && "function" != typeof d.prototype[a2] && ba(d.prototype, a2, { configurable: true, writable: true, value: function() {
+        return da(aa(this));
+      } });
+    }
+    return a2;
+  });
+  function da(a2) {
+    a2 = { next: a2 };
+    a2[Symbol.iterator] = function() {
+      return this;
+    };
+    return a2;
+  }
+  function A(a2) {
+    var b = "undefined" != typeof Symbol && Symbol.iterator && a2[Symbol.iterator];
+    return b ? b.call(a2) : { next: aa(a2) };
+  }
+  function ea(a2) {
+    if (!(a2 instanceof Array)) {
+      a2 = A(a2);
+      for (var b, c2 = []; !(b = a2.next()).done; ) c2.push(b.value);
+      a2 = c2;
+    }
+    return a2;
+  }
+  var fa = "function" == typeof Object.assign ? Object.assign : function(a2, b) {
+    for (var c2 = 1; c2 < arguments.length; c2++) {
+      var d = arguments[c2];
+      if (d) for (var e2 in d) Object.prototype.hasOwnProperty.call(d, e2) && (a2[e2] = d[e2]);
+    }
+    return a2;
+  };
+  z("Object.assign", function(a2) {
+    return a2 || fa;
+  });
+  var ha = "function" == typeof Object.create ? Object.create : function(a2) {
+    function b() {
+    }
+    b.prototype = a2;
+    return new b();
+  }, ia;
+  if ("function" == typeof Object.setPrototypeOf) ia = Object.setPrototypeOf;
+  else {
+    var ja;
+    a: {
+      var ka = { a: true }, la = {};
+      try {
+        la.__proto__ = ka;
+        ja = la.a;
+        break a;
+      } catch (a2) {
+      }
+      ja = false;
+    }
+    ia = ja ? function(a2, b) {
+      a2.__proto__ = b;
+      if (a2.__proto__ !== b) throw new TypeError(a2 + " is not extensible");
+      return a2;
+    } : null;
+  }
+  var ma = ia;
+  function na(a2, b) {
+    a2.prototype = ha(b.prototype);
+    a2.prototype.constructor = a2;
+    if (ma) ma(a2, b);
+    else for (var c2 in b) if ("prototype" != c2) if (Object.defineProperties) {
+      var d = Object.getOwnPropertyDescriptor(b, c2);
+      d && Object.defineProperty(a2, c2, d);
+    } else a2[c2] = b[c2];
+    a2.za = b.prototype;
+  }
+  function oa() {
+    this.m = false;
+    this.j = null;
+    this.i = void 0;
+    this.h = 1;
+    this.v = this.s = 0;
+    this.l = null;
+  }
+  function pa(a2) {
+    if (a2.m) throw new TypeError("Generator is already running");
+    a2.m = true;
+  }
+  oa.prototype.u = function(a2) {
+    this.i = a2;
+  };
+  function qa(a2, b) {
+    a2.l = { ma: b, na: true };
+    a2.h = a2.s || a2.v;
+  }
+  oa.prototype.return = function(a2) {
+    this.l = { return: a2 };
+    this.h = this.v;
+  };
+  function D(a2, b, c2) {
+    a2.h = c2;
+    return { value: b };
+  }
+  function ra(a2) {
+    this.h = new oa();
+    this.i = a2;
+  }
+  function sa(a2, b) {
+    pa(a2.h);
+    var c2 = a2.h.j;
+    if (c2) return ta(a2, "return" in c2 ? c2["return"] : function(d) {
+      return { value: d, done: true };
+    }, b, a2.h.return);
+    a2.h.return(b);
+    return ua2(a2);
+  }
+  function ta(a2, b, c2, d) {
+    try {
+      var e2 = b.call(a2.h.j, c2);
+      if (!(e2 instanceof Object)) throw new TypeError("Iterator result " + e2 + " is not an object");
+      if (!e2.done) return a2.h.m = false, e2;
+      var g = e2.value;
+    } catch (f) {
+      return a2.h.j = null, qa(a2.h, f), ua2(a2);
+    }
+    a2.h.j = null;
+    d.call(a2.h, g);
+    return ua2(a2);
+  }
+  function ua2(a2) {
+    for (; a2.h.h; ) try {
+      var b = a2.i(a2.h);
+      if (b) return a2.h.m = false, { value: b.value, done: false };
+    } catch (c2) {
+      a2.h.i = void 0, qa(a2.h, c2);
+    }
+    a2.h.m = false;
+    if (a2.h.l) {
+      b = a2.h.l;
+      a2.h.l = null;
+      if (b.na) throw b.ma;
+      return { value: b.return, done: true };
+    }
+    return { value: void 0, done: true };
+  }
+  function va(a2) {
+    this.next = function(b) {
+      pa(a2.h);
+      a2.h.j ? b = ta(a2, a2.h.j.next, b, a2.h.u) : (a2.h.u(b), b = ua2(a2));
+      return b;
+    };
+    this.throw = function(b) {
+      pa(a2.h);
+      a2.h.j ? b = ta(a2, a2.h.j["throw"], b, a2.h.u) : (qa(a2.h, b), b = ua2(a2));
+      return b;
+    };
+    this.return = function(b) {
+      return sa(a2, b);
+    };
+    this[Symbol.iterator] = function() {
+      return this;
+    };
+  }
+  function wa(a2) {
+    function b(d) {
+      return a2.next(d);
+    }
+    function c2(d) {
+      return a2.throw(d);
+    }
+    return new Promise(function(d, e2) {
+      function g(f) {
+        f.done ? d(f.value) : Promise.resolve(f.value).then(b, c2).then(g, e2);
+      }
+      g(a2.next());
+    });
+  }
+  function E(a2) {
+    return wa(new va(new ra(a2)));
+  }
+  z("Promise", function(a2) {
+    function b(f) {
+      this.i = 0;
+      this.j = void 0;
+      this.h = [];
+      this.u = false;
+      var h = this.l();
+      try {
+        f(h.resolve, h.reject);
+      } catch (k) {
+        h.reject(k);
+      }
+    }
+    function c2() {
+      this.h = null;
+    }
+    function d(f) {
+      return f instanceof b ? f : new b(function(h) {
+        h(f);
+      });
+    }
+    if (a2) return a2;
+    c2.prototype.i = function(f) {
+      if (null == this.h) {
+        this.h = [];
+        var h = this;
+        this.j(function() {
+          h.m();
+        });
+      }
+      this.h.push(f);
+    };
+    var e2 = y.setTimeout;
+    c2.prototype.j = function(f) {
+      e2(f, 0);
+    };
+    c2.prototype.m = function() {
+      for (; this.h && this.h.length; ) {
+        var f = this.h;
+        this.h = [];
+        for (var h = 0; h < f.length; ++h) {
+          var k = f[h];
+          f[h] = null;
+          try {
+            k();
+          } catch (l2) {
+            this.l(l2);
+          }
+        }
+      }
+      this.h = null;
+    };
+    c2.prototype.l = function(f) {
+      this.j(function() {
+        throw f;
+      });
+    };
+    b.prototype.l = function() {
+      function f(l2) {
+        return function(m2) {
+          k || (k = true, l2.call(h, m2));
+        };
+      }
+      var h = this, k = false;
+      return { resolve: f(this.I), reject: f(this.m) };
+    };
+    b.prototype.I = function(f) {
+      if (f === this) this.m(new TypeError("A Promise cannot resolve to itself"));
+      else if (f instanceof b) this.L(f);
+      else {
+        a: switch (typeof f) {
+          case "object":
+            var h = null != f;
+            break a;
+          case "function":
+            h = true;
+            break a;
+          default:
+            h = false;
+        }
+        h ? this.F(f) : this.s(f);
+      }
+    };
+    b.prototype.F = function(f) {
+      var h = void 0;
+      try {
+        h = f.then;
+      } catch (k) {
+        this.m(k);
+        return;
+      }
+      "function" == typeof h ? this.M(h, f) : this.s(f);
+    };
+    b.prototype.m = function(f) {
+      this.v(2, f);
+    };
+    b.prototype.s = function(f) {
+      this.v(1, f);
+    };
+    b.prototype.v = function(f, h) {
+      if (0 != this.i) throw Error("Cannot settle(" + f + ", " + h + "): Promise already settled in state" + this.i);
+      this.i = f;
+      this.j = h;
+      2 === this.i && this.K();
+      this.H();
+    };
+    b.prototype.K = function() {
+      var f = this;
+      e2(function() {
+        if (f.D()) {
+          var h = y.console;
+          "undefined" !== typeof h && h.error(f.j);
+        }
+      }, 1);
+    };
+    b.prototype.D = function() {
+      if (this.u) return false;
+      var f = y.CustomEvent, h = y.Event, k = y.dispatchEvent;
+      if ("undefined" === typeof k) return true;
+      "function" === typeof f ? f = new f("unhandledrejection", { cancelable: true }) : "function" === typeof h ? f = new h("unhandledrejection", { cancelable: true }) : (f = y.document.createEvent("CustomEvent"), f.initCustomEvent("unhandledrejection", false, true, f));
+      f.promise = this;
+      f.reason = this.j;
+      return k(f);
+    };
+    b.prototype.H = function() {
+      if (null != this.h) {
+        for (var f = 0; f < this.h.length; ++f) g.i(this.h[f]);
+        this.h = null;
+      }
+    };
+    var g = new c2();
+    b.prototype.L = function(f) {
+      var h = this.l();
+      f.T(h.resolve, h.reject);
+    };
+    b.prototype.M = function(f, h) {
+      var k = this.l();
+      try {
+        f.call(h, k.resolve, k.reject);
+      } catch (l2) {
+        k.reject(l2);
+      }
+    };
+    b.prototype.then = function(f, h) {
+      function k(p2, n2) {
+        return "function" == typeof p2 ? function(q) {
+          try {
+            l2(p2(q));
+          } catch (t2) {
+            m2(t2);
+          }
+        } : n2;
+      }
+      var l2, m2, r2 = new b(function(p2, n2) {
+        l2 = p2;
+        m2 = n2;
+      });
+      this.T(k(f, l2), k(h, m2));
+      return r2;
+    };
+    b.prototype.catch = function(f) {
+      return this.then(void 0, f);
+    };
+    b.prototype.T = function(f, h) {
+      function k() {
+        switch (l2.i) {
+          case 1:
+            f(l2.j);
+            break;
+          case 2:
+            h(l2.j);
+            break;
+          default:
+            throw Error("Unexpected state: " + l2.i);
+        }
+      }
+      var l2 = this;
+      null == this.h ? g.i(k) : this.h.push(k);
+      this.u = true;
+    };
+    b.resolve = d;
+    b.reject = function(f) {
+      return new b(function(h, k) {
+        k(f);
+      });
+    };
+    b.race = function(f) {
+      return new b(function(h, k) {
+        for (var l2 = A(f), m2 = l2.next(); !m2.done; m2 = l2.next()) d(m2.value).T(h, k);
+      });
+    };
+    b.all = function(f) {
+      var h = A(f), k = h.next();
+      return k.done ? d([]) : new b(function(l2, m2) {
+        function r2(q) {
+          return function(t2) {
+            p2[q] = t2;
+            n2--;
+            0 == n2 && l2(p2);
+          };
+        }
+        var p2 = [], n2 = 0;
+        do
+          p2.push(void 0), n2++, d(k.value).T(r2(p2.length - 1), m2), k = h.next();
+        while (!k.done);
+      });
+    };
+    return b;
+  });
+  function xa(a2, b) {
+    a2 instanceof String && (a2 += "");
+    var c2 = 0, d = false, e2 = { next: function() {
+      if (!d && c2 < a2.length) {
+        var g = c2++;
+        return { value: b(g, a2[g]), done: false };
+      }
+      d = true;
+      return { done: true, value: void 0 };
+    } };
+    e2[Symbol.iterator] = function() {
+      return e2;
+    };
+    return e2;
+  }
+  z("Array.prototype.keys", function(a2) {
+    return a2 ? a2 : function() {
+      return xa(this, function(b) {
+        return b;
+      });
+    };
+  });
+  z("Array.prototype.fill", function(a2) {
+    return a2 ? a2 : function(b, c2, d) {
+      var e2 = this.length || 0;
+      0 > c2 && (c2 = Math.max(0, e2 + c2));
+      if (null == d || d > e2) d = e2;
+      d = Number(d);
+      0 > d && (d = Math.max(0, e2 + d));
+      for (c2 = Number(c2 || 0); c2 < d; c2++) this[c2] = b;
+      return this;
+    };
+  });
+  function F(a2) {
+    return a2 ? a2 : Array.prototype.fill;
+  }
+  z("Int8Array.prototype.fill", F);
+  z("Uint8Array.prototype.fill", F);
+  z("Uint8ClampedArray.prototype.fill", F);
+  z("Int16Array.prototype.fill", F);
+  z("Uint16Array.prototype.fill", F);
+  z("Int32Array.prototype.fill", F);
+  z("Uint32Array.prototype.fill", F);
+  z("Float32Array.prototype.fill", F);
+  z("Float64Array.prototype.fill", F);
+  z("Object.is", function(a2) {
+    return a2 ? a2 : function(b, c2) {
+      return b === c2 ? 0 !== b || 1 / b === 1 / c2 : b !== b && c2 !== c2;
+    };
+  });
+  z("Array.prototype.includes", function(a2) {
+    return a2 ? a2 : function(b, c2) {
+      var d = this;
+      d instanceof String && (d = String(d));
+      var e2 = d.length;
+      c2 = c2 || 0;
+      for (0 > c2 && (c2 = Math.max(c2 + e2, 0)); c2 < e2; c2++) {
+        var g = d[c2];
+        if (g === b || Object.is(g, b)) return true;
+      }
+      return false;
+    };
+  });
+  z("String.prototype.includes", function(a2) {
+    return a2 ? a2 : function(b, c2) {
+      if (null == this) throw new TypeError("The 'this' value for String.prototype.includes must not be null or undefined");
+      if (b instanceof RegExp) throw new TypeError("First argument to String.prototype.includes must not be a regular expression");
+      return -1 !== this.indexOf(b, c2 || 0);
+    };
+  });
+  var ya = this || self;
+  function Aa(a2, b) {
+    a2 = a2.split(".");
+    var c2 = ya;
+    a2[0] in c2 || "undefined" == typeof c2.execScript || c2.execScript("var " + a2[0]);
+    for (var d; a2.length && (d = a2.shift()); ) a2.length || void 0 === b ? c2[d] && c2[d] !== Object.prototype[d] ? c2 = c2[d] : c2 = c2[d] = {} : c2[d] = b;
+  }
+  function Ba(a2) {
+    var b;
+    a: {
+      if (b = ya.navigator) {
+        if (b = b.userAgent) break a;
+      }
+      b = "";
+    }
+    return -1 != b.indexOf(a2);
+  }
+  var Ca = Array.prototype.map ? function(a2, b) {
+    return Array.prototype.map.call(a2, b, void 0);
+  } : function(a2, b) {
+    for (var c2 = a2.length, d = Array(c2), e2 = "string" === typeof a2 ? a2.split("") : a2, g = 0; g < c2; g++) g in e2 && (d[g] = b.call(void 0, e2[g], g, a2));
+    return d;
+  };
+  var Da = {}, Ea = null;
+  function Fa(a2) {
+    var b = a2.length, c2 = 3 * b / 4;
+    c2 % 3 ? c2 = Math.floor(c2) : -1 != "=.".indexOf(a2[b - 1]) && (c2 = -1 != "=.".indexOf(a2[b - 2]) ? c2 - 2 : c2 - 1);
+    var d = new Uint8Array(c2), e2 = 0;
+    Ga(a2, function(g) {
+      d[e2++] = g;
+    });
+    return e2 !== c2 ? d.subarray(0, e2) : d;
+  }
+  function Ga(a2, b) {
+    function c2(k) {
+      for (; d < a2.length; ) {
+        var l2 = a2.charAt(d++), m2 = Ea[l2];
+        if (null != m2) return m2;
+        if (!/^[\s\xa0]*$/.test(l2)) throw Error("Unknown base64 encoding at char: " + l2);
+      }
+      return k;
+    }
+    Ha();
+    for (var d = 0; ; ) {
+      var e2 = c2(-1), g = c2(0), f = c2(64), h = c2(64);
+      if (64 === h && -1 === e2) break;
+      b(e2 << 2 | g >> 4);
+      64 != f && (b(g << 4 & 240 | f >> 2), 64 != h && b(f << 6 & 192 | h));
+    }
+  }
+  function Ha() {
+    if (!Ea) {
+      Ea = {};
+      for (var a2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".split(""), b = ["+/=", "+/", "-_=", "-_.", "-_"], c2 = 0; 5 > c2; c2++) {
+        var d = a2.concat(b[c2].split(""));
+        Da[c2] = d;
+        for (var e2 = 0; e2 < d.length; e2++) {
+          var g = d[e2];
+          void 0 === Ea[g] && (Ea[g] = e2);
+        }
+      }
+    }
+  }
+  var Ia = "undefined" !== typeof Uint8Array, Ja = !(Ba("Trident") || Ba("MSIE")) && "function" === typeof ya.btoa;
+  function Ka(a2) {
+    if (!Ja) {
+      var b;
+      void 0 === b && (b = 0);
+      Ha();
+      b = Da[b];
+      for (var c2 = Array(Math.floor(a2.length / 3)), d = b[64] || "", e2 = 0, g = 0; e2 < a2.length - 2; e2 += 3) {
+        var f = a2[e2], h = a2[e2 + 1], k = a2[e2 + 2], l2 = b[f >> 2];
+        f = b[(f & 3) << 4 | h >> 4];
+        h = b[(h & 15) << 2 | k >> 6];
+        k = b[k & 63];
+        c2[g++] = l2 + f + h + k;
+      }
+      l2 = 0;
+      k = d;
+      switch (a2.length - e2) {
+        case 2:
+          l2 = a2[e2 + 1], k = b[(l2 & 15) << 2] || d;
+        case 1:
+          a2 = a2[e2], c2[g] = b[a2 >> 2] + b[(a2 & 3) << 4 | l2 >> 4] + k + d;
+      }
+      return c2.join("");
+    }
+    for (b = ""; 10240 < a2.length; ) b += String.fromCharCode.apply(null, a2.subarray(0, 10240)), a2 = a2.subarray(10240);
+    b += String.fromCharCode.apply(
+      null,
+      a2
+    );
+    return btoa(b);
+  }
+  var La = RegExp("[-_.]", "g");
+  function Ma(a2) {
+    switch (a2) {
+      case "-":
+        return "+";
+      case "_":
+        return "/";
+      case ".":
+        return "=";
+      default:
+        return "";
+    }
+  }
+  function Na(a2) {
+    if (!Ja) return Fa(a2);
+    La.test(a2) && (a2 = a2.replace(La, Ma));
+    a2 = atob(a2);
+    for (var b = new Uint8Array(a2.length), c2 = 0; c2 < a2.length; c2++) b[c2] = a2.charCodeAt(c2);
+    return b;
+  }
+  var Oa;
+  function Pa() {
+    return Oa || (Oa = new Uint8Array(0));
+  }
+  var Qa = {};
+  var Ra = "function" === typeof Uint8Array.prototype.slice, G = 0, H = 0;
+  function Sa(a2) {
+    var b = 0 > a2;
+    a2 = Math.abs(a2);
+    var c2 = a2 >>> 0;
+    a2 = Math.floor((a2 - c2) / 4294967296);
+    b && (c2 = A(Ta(c2, a2)), b = c2.next().value, a2 = c2.next().value, c2 = b);
+    G = c2 >>> 0;
+    H = a2 >>> 0;
+  }
+  var Ua = "function" === typeof BigInt;
+  function Ta(a2, b) {
+    b = ~b;
+    a2 ? a2 = ~a2 + 1 : b += 1;
+    return [a2, b];
+  }
+  function Va(a2, b) {
+    this.i = a2 >>> 0;
+    this.h = b >>> 0;
+  }
+  function Wa(a2) {
+    if (!a2) return Xa || (Xa = new Va(0, 0));
+    if (!/^-?\d+$/.test(a2)) return null;
+    if (16 > a2.length) Sa(Number(a2));
+    else if (Ua) a2 = BigInt(a2), G = Number(a2 & BigInt(4294967295)) >>> 0, H = Number(a2 >> BigInt(32) & BigInt(4294967295));
+    else {
+      var b = +("-" === a2[0]);
+      H = G = 0;
+      for (var c2 = a2.length, d = b, e2 = (c2 - b) % 6 + b; e2 <= c2; d = e2, e2 += 6) d = Number(a2.slice(d, e2)), H *= 1e6, G = 1e6 * G + d, 4294967296 <= G && (H += G / 4294967296 | 0, G %= 4294967296);
+      b && (b = A(Ta(G, H)), a2 = b.next().value, b = b.next().value, G = a2, H = b);
+    }
+    return new Va(G, H);
+  }
+  var Xa;
+  function Ya(a2, b) {
+    return Error("Invalid wire type: " + a2 + " (at position " + b + ")");
+  }
+  function Za() {
+    return Error("Failed to read varint, encoding is invalid.");
+  }
+  function $a(a2, b) {
+    return Error("Tried to read past the end of the data " + b + " > " + a2);
+  }
+  function K() {
+    throw Error("Invalid UTF8");
+  }
+  function ab(a2, b) {
+    b = String.fromCharCode.apply(null, b);
+    return null == a2 ? b : a2 + b;
+  }
+  var bb = void 0, cb, db = "undefined" !== typeof TextDecoder, eb, fb = "undefined" !== typeof TextEncoder;
+  var gb;
+  function hb(a2) {
+    if (a2 !== Qa) throw Error("illegal external caller");
+  }
+  function ib(a2, b) {
+    hb(b);
+    this.V = a2;
+    if (null != a2 && 0 === a2.length) throw Error("ByteString should be constructed with non-empty values");
+  }
+  function jb() {
+    return gb || (gb = new ib(null, Qa));
+  }
+  function kb(a2) {
+    hb(Qa);
+    var b = a2.V;
+    b = null == b || Ia && null != b && b instanceof Uint8Array ? b : "string" === typeof b ? Na(b) : null;
+    return null == b ? b : a2.V = b;
+  }
+  function lb(a2) {
+    if ("string" === typeof a2) return { buffer: Na(a2), C: false };
+    if (Array.isArray(a2)) return { buffer: new Uint8Array(a2), C: false };
+    if (a2.constructor === Uint8Array) return { buffer: a2, C: false };
+    if (a2.constructor === ArrayBuffer) return { buffer: new Uint8Array(a2), C: false };
+    if (a2.constructor === ib) return { buffer: kb(a2) || Pa(), C: true };
+    if (a2 instanceof Uint8Array) return { buffer: new Uint8Array(a2.buffer, a2.byteOffset, a2.byteLength), C: false };
+    throw Error("Type not convertible to a Uint8Array, expected a Uint8Array, an ArrayBuffer, a base64 encoded string, a ByteString or an Array of numbers");
+  }
+  function mb(a2, b) {
+    this.i = null;
+    this.m = false;
+    this.h = this.j = this.l = 0;
+    nb(this, a2, b);
+  }
+  function nb(a2, b, c2) {
+    c2 = void 0 === c2 ? {} : c2;
+    a2.S = void 0 === c2.S ? false : c2.S;
+    b && (b = lb(b), a2.i = b.buffer, a2.m = b.C, a2.l = 0, a2.j = a2.i.length, a2.h = a2.l);
+  }
+  mb.prototype.reset = function() {
+    this.h = this.l;
+  };
+  function L(a2, b) {
+    a2.h = b;
+    if (b > a2.j) throw $a(a2.j, b);
+  }
+  function ob(a2) {
+    var b = a2.i, c2 = a2.h, d = b[c2++], e2 = d & 127;
+    if (d & 128 && (d = b[c2++], e2 |= (d & 127) << 7, d & 128 && (d = b[c2++], e2 |= (d & 127) << 14, d & 128 && (d = b[c2++], e2 |= (d & 127) << 21, d & 128 && (d = b[c2++], e2 |= d << 28, d & 128 && b[c2++] & 128 && b[c2++] & 128 && b[c2++] & 128 && b[c2++] & 128 && b[c2++] & 128))))) throw Za();
+    L(a2, c2);
+    return e2;
+  }
+  function pb(a2, b) {
+    if (0 > b) throw Error("Tried to read a negative byte length: " + b);
+    var c2 = a2.h, d = c2 + b;
+    if (d > a2.j) throw $a(b, a2.j - c2);
+    a2.h = d;
+    return c2;
+  }
+  var qb = [];
+  function rb() {
+    this.h = [];
+  }
+  rb.prototype.length = function() {
+    return this.h.length;
+  };
+  rb.prototype.end = function() {
+    var a2 = this.h;
+    this.h = [];
+    return a2;
+  };
+  function sb(a2, b, c2) {
+    for (; 0 < c2 || 127 < b; ) a2.h.push(b & 127 | 128), b = (b >>> 7 | c2 << 25) >>> 0, c2 >>>= 7;
+    a2.h.push(b);
+  }
+  function M(a2, b) {
+    for (; 127 < b; ) a2.h.push(b & 127 | 128), b >>>= 7;
+    a2.h.push(b);
+  }
+  function tb(a2, b) {
+    if (qb.length) {
+      var c2 = qb.pop();
+      nb(c2, a2, b);
+      a2 = c2;
+    } else a2 = new mb(a2, b);
+    this.h = a2;
+    this.j = this.h.h;
+    this.i = this.l = -1;
+    this.setOptions(b);
+  }
+  tb.prototype.setOptions = function(a2) {
+    a2 = void 0 === a2 ? {} : a2;
+    this.ca = void 0 === a2.ca ? false : a2.ca;
+  };
+  tb.prototype.reset = function() {
+    this.h.reset();
+    this.j = this.h.h;
+    this.i = this.l = -1;
+  };
+  function ub(a2) {
+    var b = a2.h;
+    if (b.h == b.j) return false;
+    a2.j = a2.h.h;
+    var c2 = ob(a2.h) >>> 0;
+    b = c2 >>> 3;
+    c2 &= 7;
+    if (!(0 <= c2 && 5 >= c2)) throw Ya(c2, a2.j);
+    if (1 > b) throw Error("Invalid field number: " + b + " (at position " + a2.j + ")");
+    a2.l = b;
+    a2.i = c2;
+    return true;
+  }
+  function vb(a2) {
+    switch (a2.i) {
+      case 0:
+        if (0 != a2.i) vb(a2);
+        else a: {
+          a2 = a2.h;
+          for (var b = a2.h, c2 = b + 10, d = a2.i; b < c2; ) if (0 === (d[b++] & 128)) {
+            L(a2, b);
+            break a;
+          }
+          throw Za();
+        }
+        break;
+      case 1:
+        a2 = a2.h;
+        L(a2, a2.h + 8);
+        break;
+      case 2:
+        2 != a2.i ? vb(a2) : (b = ob(a2.h) >>> 0, a2 = a2.h, L(a2, a2.h + b));
+        break;
+      case 5:
+        a2 = a2.h;
+        L(a2, a2.h + 4);
+        break;
+      case 3:
+        b = a2.l;
+        do {
+          if (!ub(a2)) throw Error("Unmatched start-group tag: stream EOF");
+          if (4 == a2.i) {
+            if (a2.l != b) throw Error("Unmatched end-group tag");
+            break;
+          }
+          vb(a2);
+        } while (1);
+        break;
+      default:
+        throw Ya(a2.i, a2.j);
+    }
+  }
+  var wb = [];
+  function xb() {
+    this.j = [];
+    this.i = 0;
+    this.h = new rb();
+  }
+  function N(a2, b) {
+    0 !== b.length && (a2.j.push(b), a2.i += b.length);
+  }
+  function yb(a2, b) {
+    if (b = b.R) {
+      N(a2, a2.h.end());
+      for (var c2 = 0; c2 < b.length; c2++) N(a2, kb(b[c2]) || Pa());
+    }
+  }
+  var O = "function" === typeof Symbol && "symbol" === typeof Symbol() ? Symbol() : void 0;
+  function P(a2, b) {
+    if (O) return a2[O] |= b;
+    if (void 0 !== a2.A) return a2.A |= b;
+    Object.defineProperties(a2, { A: { value: b, configurable: true, writable: true, enumerable: false } });
+    return b;
+  }
+  function zb(a2, b) {
+    O ? a2[O] && (a2[O] &= ~b) : void 0 !== a2.A && (a2.A &= ~b);
+  }
+  function Q(a2) {
+    var b;
+    O ? b = a2[O] : b = a2.A;
+    return null == b ? 0 : b;
+  }
+  function R(a2, b) {
+    O ? a2[O] = b : void 0 !== a2.A ? a2.A = b : Object.defineProperties(a2, { A: { value: b, configurable: true, writable: true, enumerable: false } });
+  }
+  function Ab(a2) {
+    P(a2, 1);
+    return a2;
+  }
+  function Bb(a2, b) {
+    R(b, (a2 | 0) & -51);
+  }
+  function Cb(a2, b) {
+    R(b, (a2 | 18) & -41);
+  }
+  var Db = {};
+  function Eb(a2) {
+    return null !== a2 && "object" === typeof a2 && !Array.isArray(a2) && a2.constructor === Object;
+  }
+  var Fb, Gb = [];
+  R(Gb, 23);
+  Fb = Object.freeze(Gb);
+  function Hb(a2) {
+    if (Q(a2.o) & 2) throw Error("Cannot mutate an immutable Message");
+  }
+  function Ib(a2) {
+    var b = a2.length;
+    (b = b ? a2[b - 1] : void 0) && Eb(b) ? b.g = 1 : (b = {}, a2.push((b.g = 1, b)));
+  }
+  function Jb(a2) {
+    var b = a2.i + a2.G;
+    return a2.B || (a2.B = a2.o[b] = {});
+  }
+  function S(a2, b) {
+    return -1 === b ? null : b >= a2.i ? a2.B ? a2.B[b] : void 0 : a2.o[b + a2.G];
+  }
+  function U(a2, b, c2, d) {
+    Hb(a2);
+    Kb(a2, b, c2, d);
+  }
+  function Kb(a2, b, c2, d) {
+    a2.j && (a2.j = void 0);
+    b >= a2.i || d ? Jb(a2)[b] = c2 : (a2.o[b + a2.G] = c2, (a2 = a2.B) && b in a2 && delete a2[b]);
+  }
+  function Lb(a2, b, c2, d) {
+    var e2 = S(a2, b);
+    Array.isArray(e2) || (e2 = Fb);
+    var g = Q(e2);
+    g & 1 || Ab(e2);
+    if (d) g & 2 || P(e2, 2), c2 & 1 || Object.freeze(e2);
+    else {
+      d = !(c2 & 2);
+      var f = g & 2;
+      c2 & 1 || !f ? d && g & 16 && !f && zb(e2, 16) : (e2 = Ab(Array.prototype.slice.call(e2)), Kb(a2, b, e2));
+    }
+    return e2;
+  }
+  function Mb(a2, b) {
+    var c2 = S(a2, b);
+    var d = null == c2 ? c2 : "number" === typeof c2 || "NaN" === c2 || "Infinity" === c2 || "-Infinity" === c2 ? Number(c2) : void 0;
+    null != d && d !== c2 && Kb(a2, b, d);
+    return d;
+  }
+  function Nb(a2, b, c2, d, e2) {
+    a2.h || (a2.h = {});
+    var g = a2.h[c2], f = Lb(a2, c2, 3, e2);
+    if (!g) {
+      var h = f;
+      g = [];
+      var k = !!(Q(a2.o) & 16);
+      f = !!(Q(h) & 2);
+      var l2 = h;
+      !e2 && f && (h = Array.prototype.slice.call(h));
+      for (var m2 = f, r2 = 0; r2 < h.length; r2++) {
+        var p2 = h[r2];
+        var n2 = b, q = false;
+        q = void 0 === q ? false : q;
+        p2 = Array.isArray(p2) ? new n2(p2) : q ? new n2() : void 0;
+        if (void 0 !== p2) {
+          n2 = p2.o;
+          var t2 = q = Q(n2);
+          f && (t2 |= 2);
+          k && (t2 |= 16);
+          t2 != q && R(n2, t2);
+          n2 = t2;
+          m2 = m2 || !!(2 & n2);
+          g.push(p2);
+        }
+      }
+      a2.h[c2] = g;
+      k = Q(h);
+      b = k | 33;
+      b = m2 ? b & -9 : b | 8;
+      k != b && (m2 = h, Object.isFrozen(m2) && (m2 = Array.prototype.slice.call(m2)), R(m2, b), h = m2);
+      l2 !== h && Kb(
+        a2,
+        c2,
+        h
+      );
+      (e2 || d && f) && P(g, 2);
+      d && Object.freeze(g);
+      return g;
+    }
+    e2 || (e2 = Object.isFrozen(g), d && !e2 ? Object.freeze(g) : !d && e2 && (g = Array.prototype.slice.call(g), a2.h[c2] = g));
+    return g;
+  }
+  function Ob(a2, b, c2) {
+    var d = !!(Q(a2.o) & 2);
+    b = Nb(a2, b, c2, d, d);
+    a2 = Lb(a2, c2, 3, d);
+    if (!(d || Q(a2) & 8)) {
+      for (d = 0; d < b.length; d++) {
+        c2 = b[d];
+        if (Q(c2.o) & 2) {
+          var e2 = Pb(c2, false);
+          e2.j = c2;
+        } else e2 = c2;
+        c2 !== e2 && (b[d] = e2, a2[d] = e2.o);
+      }
+      P(a2, 8);
+    }
+    return b;
+  }
+  function V(a2, b, c2) {
+    if (null != c2 && "number" !== typeof c2) throw Error("Value of float/double field must be a number|null|undefined, found " + typeof c2 + ": " + c2);
+    U(a2, b, c2);
+  }
+  function Qb(a2, b, c2, d, e2) {
+    Hb(a2);
+    var g = Nb(a2, c2, b, false, false);
+    c2 = null != d ? d : new c2();
+    a2 = Lb(a2, b, 2, false);
+    void 0 != e2 ? (g.splice(e2, 0, c2), a2.splice(e2, 0, c2.o)) : (g.push(c2), a2.push(c2.o));
+    c2.C() && zb(a2, 8);
+    return c2;
+  }
+  function Rb(a2, b) {
+    return null == a2 ? b : a2;
+  }
+  function W(a2, b, c2) {
+    c2 = void 0 === c2 ? 0 : c2;
+    return Rb(Mb(a2, b), c2);
+  }
+  var Sb;
+  function Tb(a2) {
+    switch (typeof a2) {
+      case "number":
+        return isFinite(a2) ? a2 : String(a2);
+      case "object":
+        if (a2) if (Array.isArray(a2)) {
+          if (0 !== (Q(a2) & 128)) return a2 = Array.prototype.slice.call(a2), Ib(a2), a2;
+        } else {
+          if (Ia && null != a2 && a2 instanceof Uint8Array) return Ka(a2);
+          if (a2 instanceof ib) {
+            var b = a2.V;
+            return null == b ? "" : "string" === typeof b ? b : a2.V = Ka(b);
+          }
+        }
+    }
+    return a2;
+  }
+  function Ub(a2, b, c2, d) {
+    if (null != a2) {
+      if (Array.isArray(a2)) a2 = Vb(a2, b, c2, void 0 !== d);
+      else if (Eb(a2)) {
+        var e2 = {}, g;
+        for (g in a2) e2[g] = Ub(a2[g], b, c2, d);
+        a2 = e2;
+      } else a2 = b(a2, d);
+      return a2;
+    }
+  }
+  function Vb(a2, b, c2, d) {
+    var e2 = Q(a2);
+    d = d ? !!(e2 & 16) : void 0;
+    a2 = Array.prototype.slice.call(a2);
+    for (var g = 0; g < a2.length; g++) a2[g] = Ub(a2[g], b, c2, d);
+    c2(e2, a2);
+    return a2;
+  }
+  function Wb(a2) {
+    return a2.ja === Db ? a2.toJSON() : Tb(a2);
+  }
+  function Xb(a2, b) {
+    a2 & 128 && Ib(b);
+  }
+  function Yb(a2, b, c2) {
+    c2 = void 0 === c2 ? Cb : c2;
+    if (null != a2) {
+      if (Ia && a2 instanceof Uint8Array) return a2.length ? new ib(new Uint8Array(a2), Qa) : jb();
+      if (Array.isArray(a2)) {
+        var d = Q(a2);
+        if (d & 2) return a2;
+        if (b && !(d & 32) && (d & 16 || 0 === d)) return R(a2, d | 2), a2;
+        a2 = Vb(a2, Yb, d & 4 ? Cb : c2, true);
+        b = Q(a2);
+        b & 4 && b & 2 && Object.freeze(a2);
+        return a2;
+      }
+      return a2.ja === Db ? Zb(a2) : a2;
+    }
+  }
+  function $b(a2, b, c2, d, e2, g, f) {
+    if (a2 = a2.h && a2.h[c2]) {
+      d = Q(a2);
+      d & 2 ? d = a2 : (g = Ca(a2, Zb), Cb(d, g), Object.freeze(g), d = g);
+      Hb(b);
+      f = null == d ? Fb : Ab([]);
+      if (null != d) {
+        g = !!d.length;
+        for (a2 = 0; a2 < d.length; a2++) {
+          var h = d[a2];
+          g = g && !(Q(h.o) & 2);
+          f[a2] = h.o;
+        }
+        g = (g ? 8 : 0) | 1;
+        a2 = Q(f);
+        (a2 & g) !== g && (Object.isFrozen(f) && (f = Array.prototype.slice.call(f)), R(f, a2 | g));
+        b.h || (b.h = {});
+        b.h[c2] = d;
+      } else b.h && (b.h[c2] = void 0);
+      Kb(b, c2, f, e2);
+    } else U(b, c2, Yb(d, g, f), e2);
+  }
+  function Zb(a2) {
+    if (Q(a2.o) & 2) return a2;
+    a2 = Pb(a2, true);
+    P(a2.o, 2);
+    return a2;
+  }
+  function Pb(a2, b) {
+    var c2 = a2.o, d = [];
+    P(d, 16);
+    var e2 = a2.constructor.h;
+    e2 && d.push(e2);
+    e2 = a2.B;
+    if (e2) {
+      d.length = c2.length;
+      d.fill(void 0, d.length, c2.length);
+      var g = {};
+      d[d.length - 1] = g;
+    }
+    0 !== (Q(c2) & 128) && Ib(d);
+    b = b || a2.C() ? Cb : Bb;
+    g = a2.constructor;
+    Sb = d;
+    d = new g(d);
+    Sb = void 0;
+    a2.R && (d.R = a2.R.slice());
+    g = !!(Q(c2) & 16);
+    for (var f = e2 ? c2.length - 1 : c2.length, h = 0; h < f; h++) $b(a2, d, h - a2.G, c2[h], false, g, b);
+    if (e2) for (var k in e2) $b(a2, d, +k, e2[k], true, g, b);
+    return d;
+  }
+  function X(a2, b, c2) {
+    null == a2 && (a2 = Sb);
+    Sb = void 0;
+    var d = this.constructor.i || 0, e2 = 0 < d, g = this.constructor.h, f = false;
+    if (null == a2) {
+      a2 = g ? [g] : [];
+      var h = 48;
+      var k = true;
+      e2 && (d = 0, h |= 128);
+      R(a2, h);
+    } else {
+      if (!Array.isArray(a2)) throw Error();
+      if (g && g !== a2[0]) throw Error();
+      var l2 = h = P(a2, 0);
+      if (k = 0 !== (16 & l2)) (f = 0 !== (32 & l2)) || (l2 |= 32);
+      if (e2) if (128 & l2) d = 0;
+      else {
+        if (0 < a2.length) {
+          var m2 = a2[a2.length - 1];
+          if (Eb(m2) && "g" in m2) {
+            d = 0;
+            l2 |= 128;
+            delete m2.g;
+            var r2 = true, p2;
+            for (p2 in m2) {
+              r2 = false;
+              break;
+            }
+            r2 && a2.pop();
+          }
+        }
+      }
+      else if (128 & l2) throw Error();
+      h !== l2 && R(a2, l2);
+    }
+    this.G = (g ? 0 : -1) - d;
+    this.h = void 0;
+    this.o = a2;
+    a: {
+      g = this.o.length;
+      d = g - 1;
+      if (g && (g = this.o[d], Eb(g))) {
+        this.B = g;
+        this.i = d - this.G;
+        break a;
+      }
+      void 0 !== b && -1 < b ? (this.i = Math.max(b, d + 1 - this.G), this.B = void 0) : this.i = Number.MAX_VALUE;
+    }
+    if (!e2 && this.B && "g" in this.B) throw Error('Unexpected "g" flag in sparse object of message that is not a group type.');
+    if (c2) {
+      b = k && !f && true;
+      e2 = this.i;
+      var n2;
+      for (k = 0; k < c2.length; k++) f = c2[k], f < e2 ? (f += this.G, (d = a2[f]) ? ac(d, b) : a2[f] = Fb) : (n2 || (n2 = Jb(this)), (d = n2[f]) ? ac(d, b) : n2[f] = Fb);
+    }
+  }
+  X.prototype.toJSON = function() {
+    return Vb(this.o, Wb, Xb);
+  };
+  X.prototype.C = function() {
+    return !!(Q(this.o) & 2);
+  };
+  function ac(a2, b) {
+    if (Array.isArray(a2)) {
+      var c2 = Q(a2), d = 1;
+      !b || c2 & 2 || (d |= 16);
+      (c2 & d) !== d && R(a2, c2 | d);
+    }
+  }
+  X.prototype.ja = Db;
+  X.prototype.toString = function() {
+    return this.o.toString();
+  };
+  function bc(a2, b, c2) {
+    if (c2) {
+      var d = {}, e2;
+      for (e2 in c2) {
+        var g = c2[e2], f = g.ra;
+        f || (d.J = g.xa || g.oa.W, g.ia ? (d.aa = cc(g.ia), f = /* @__PURE__ */ function(h) {
+          return function(k, l2, m2) {
+            return h.J(k, l2, m2, h.aa);
+          };
+        }(d)) : g.ka ? (d.Z = dc(g.da.P, g.ka), f = /* @__PURE__ */ function(h) {
+          return function(k, l2, m2) {
+            return h.J(k, l2, m2, h.Z);
+          };
+        }(d)) : f = d.J, g.ra = f);
+        f(b, a2, g.da);
+        d = { J: d.J, aa: d.aa, Z: d.Z };
+      }
+    }
+    yb(b, a2);
+  }
+  var ec = Symbol();
+  function fc(a2, b, c2) {
+    return a2[ec] || (a2[ec] = function(d, e2) {
+      return b(d, e2, c2);
+    });
+  }
+  function gc(a2) {
+    var b = a2[ec];
+    if (!b) {
+      var c2 = hc(a2);
+      b = function(d, e2) {
+        return ic(d, e2, c2);
+      };
+      a2[ec] = b;
+    }
+    return b;
+  }
+  function jc(a2) {
+    var b = a2.ia;
+    if (b) return gc(b);
+    if (b = a2.wa) return fc(a2.da.P, b, a2.ka);
+  }
+  function kc(a2) {
+    var b = jc(a2), c2 = a2.da, d = a2.oa.U;
+    return b ? function(e2, g) {
+      return d(e2, g, c2, b);
+    } : function(e2, g) {
+      return d(e2, g, c2);
+    };
+  }
+  function lc(a2, b) {
+    var c2 = a2[b];
+    "function" == typeof c2 && 0 === c2.length && (c2 = c2(), a2[b] = c2);
+    return Array.isArray(c2) && (mc in c2 || nc in c2 || 0 < c2.length && "function" == typeof c2[0]) ? c2 : void 0;
+  }
+  function oc(a2, b, c2, d, e2, g) {
+    b.P = a2[0];
+    var f = 1;
+    if (a2.length > f && "number" !== typeof a2[f]) {
+      var h = a2[f++];
+      c2(b, h);
+    }
+    for (; f < a2.length; ) {
+      c2 = a2[f++];
+      for (var k = f + 1; k < a2.length && "number" !== typeof a2[k]; ) k++;
+      h = a2[f++];
+      k -= f;
+      switch (k) {
+        case 0:
+          d(b, c2, h);
+          break;
+        case 1:
+          (k = lc(a2, f)) ? (f++, e2(b, c2, h, k)) : d(b, c2, h, a2[f++]);
+          break;
+        case 2:
+          k = f++;
+          k = lc(a2, k);
+          e2(b, c2, h, k, a2[f++]);
+          break;
+        case 3:
+          g(b, c2, h, a2[f++], a2[f++], a2[f++]);
+          break;
+        case 4:
+          g(b, c2, h, a2[f++], a2[f++], a2[f++], a2[f++]);
+          break;
+        default:
+          throw Error("unexpected number of binary field arguments: " + k);
+      }
+    }
+    return b;
+  }
+  var pc = Symbol();
+  function cc(a2) {
+    var b = a2[pc];
+    if (!b) {
+      var c2 = qc(a2);
+      b = function(d, e2) {
+        return rc(d, e2, c2);
+      };
+      a2[pc] = b;
+    }
+    return b;
+  }
+  function dc(a2, b) {
+    var c2 = a2[pc];
+    c2 || (c2 = function(d, e2) {
+      return bc(d, e2, b);
+    }, a2[pc] = c2);
+    return c2;
+  }
+  var nc = Symbol();
+  function sc(a2, b) {
+    a2.push(b);
+  }
+  function tc(a2, b, c2) {
+    a2.push(b, c2.W);
+  }
+  function uc(a2, b, c2, d) {
+    var e2 = cc(d), g = qc(d).P, f = c2.W;
+    a2.push(b, function(h, k, l2) {
+      return f(h, k, l2, g, e2);
+    });
+  }
+  function vc(a2, b, c2, d, e2, g) {
+    var f = dc(d, g), h = c2.W;
+    a2.push(b, function(k, l2, m2) {
+      return h(k, l2, m2, d, f);
+    });
+  }
+  function qc(a2) {
+    var b = a2[nc];
+    if (b) return b;
+    b = oc(a2, a2[nc] = [], sc, tc, uc, vc);
+    mc in a2 && nc in a2 && (a2.length = 0);
+    return b;
+  }
+  var mc = Symbol();
+  function wc(a2, b) {
+    a2[0] = b;
+  }
+  function xc(a2, b, c2, d) {
+    var e2 = c2.U;
+    a2[b] = d ? function(g, f, h) {
+      return e2(g, f, h, d);
+    } : e2;
+  }
+  function yc(a2, b, c2, d, e2) {
+    var g = c2.U, f = gc(d), h = hc(d).P;
+    a2[b] = function(k, l2, m2) {
+      return g(k, l2, m2, h, f, e2);
+    };
+  }
+  function zc(a2, b, c2, d, e2, g, f) {
+    var h = c2.U, k = fc(d, e2, g);
+    a2[b] = function(l2, m2, r2) {
+      return h(l2, m2, r2, d, k, f);
+    };
+  }
+  function hc(a2) {
+    var b = a2[mc];
+    if (b) return b;
+    b = oc(a2, a2[mc] = {}, wc, xc, yc, zc);
+    mc in a2 && nc in a2 && (a2.length = 0);
+    return b;
+  }
+  function ic(a2, b, c2) {
+    for (; ub(b) && 4 != b.i; ) {
+      var d = b.l, e2 = c2[d];
+      if (!e2) {
+        var g = c2[0];
+        g && (g = g[d]) && (e2 = c2[d] = kc(g));
+      }
+      if (!e2 || !e2(b, a2, d)) {
+        e2 = b;
+        d = a2;
+        g = e2.j;
+        vb(e2);
+        var f = e2;
+        if (!f.ca) {
+          e2 = f.h.h - g;
+          f.h.h = g;
+          f = f.h;
+          if (0 == e2) e2 = jb();
+          else {
+            g = pb(f, e2);
+            if (f.S && f.m) e2 = f.i.subarray(g, g + e2);
+            else {
+              f = f.i;
+              var h = g;
+              e2 = g + e2;
+              e2 = h === e2 ? Pa() : Ra ? f.slice(h, e2) : new Uint8Array(f.subarray(h, e2));
+            }
+            e2 = 0 == e2.length ? jb() : new ib(e2, Qa);
+          }
+          (g = d.R) ? g.push(e2) : d.R = [e2];
+        }
+      }
+    }
+    return a2;
+  }
+  function rc(a2, b, c2) {
+    for (var d = c2.length, e2 = 1 == d % 2, g = e2 ? 1 : 0; g < d; g += 2) (0, c2[g + 1])(b, a2, c2[g]);
+    bc(a2, b, e2 ? c2[0] : void 0);
+  }
+  function Ac(a2, b) {
+    return { U: a2, W: b };
+  }
+  var Y = Ac(function(a2, b, c2) {
+    if (5 !== a2.i) return false;
+    a2 = a2.h;
+    var d = a2.i, e2 = a2.h, g = d[e2];
+    var f = d[e2 + 1];
+    var h = d[e2 + 2];
+    d = d[e2 + 3];
+    L(a2, a2.h + 4);
+    f = (g << 0 | f << 8 | h << 16 | d << 24) >>> 0;
+    a2 = 2 * (f >> 31) + 1;
+    g = f >>> 23 & 255;
+    f &= 8388607;
+    U(b, c2, 255 == g ? f ? NaN : Infinity * a2 : 0 == g ? a2 * Math.pow(2, -149) * f : a2 * Math.pow(2, g - 150) * (f + Math.pow(2, 23)));
+    return true;
+  }, function(a2, b, c2) {
+    b = Mb(b, c2);
+    if (null != b) {
+      M(a2.h, 8 * c2 + 5);
+      a2 = a2.h;
+      var d = +b;
+      0 === d ? 0 < 1 / d ? G = H = 0 : (H = 0, G = 2147483648) : isNaN(d) ? (H = 0, G = 2147483647) : (d = (c2 = 0 > d ? -2147483648 : 0) ? -d : d, 34028234663852886e22 < d ? (H = 0, G = (c2 | 2139095040) >>> 0) : 11754943508222875e-54 > d ? (d = Math.round(d / Math.pow(2, -149)), H = 0, G = (c2 | d) >>> 0) : (b = Math.floor(Math.log(d) / Math.LN2), d *= Math.pow(2, -b), d = Math.round(8388608 * d), 16777216 <= d && ++b, H = 0, G = (c2 | b + 127 << 23 | d & 8388607) >>> 0));
+      c2 = G;
+      a2.h.push(c2 >>> 0 & 255);
+      a2.h.push(c2 >>> 8 & 255);
+      a2.h.push(c2 >>> 16 & 255);
+      a2.h.push(c2 >>> 24 & 255);
+    }
+  }), Bc = Ac(function(a2, b, c2) {
+    if (0 !== a2.i) return false;
+    var d = a2.h, e2 = 0, g = a2 = 0, f = d.i, h = d.h;
+    do {
+      var k = f[h++];
+      e2 |= (k & 127) << g;
+      g += 7;
+    } while (32 > g && k & 128);
+    32 < g && (a2 |= (k & 127) >> 4);
+    for (g = 3; 32 > g && k & 128; g += 7) k = f[h++], a2 |= (k & 127) << g;
+    L(
+      d,
+      h
+    );
+    if (128 > k) {
+      d = e2 >>> 0;
+      k = a2 >>> 0;
+      if (a2 = k & 2147483648) d = ~d + 1 >>> 0, k = ~k >>> 0, 0 == d && (k = k + 1 >>> 0);
+      d = 4294967296 * k + (d >>> 0);
+    } else throw Za();
+    U(b, c2, a2 ? -d : d);
+    return true;
+  }, function(a2, b, c2) {
+    b = S(b, c2);
+    null != b && ("string" === typeof b && Wa(b), null != b && (M(a2.h, 8 * c2), "number" === typeof b ? (a2 = a2.h, Sa(b), sb(a2, G, H)) : (c2 = Wa(b), sb(a2.h, c2.i, c2.h))));
+  }), Cc = Ac(function(a2, b, c2) {
+    if (0 !== a2.i) return false;
+    U(b, c2, ob(a2.h));
+    return true;
+  }, function(a2, b, c2) {
+    b = S(b, c2);
+    if (null != b && null != b) if (M(a2.h, 8 * c2), a2 = a2.h, c2 = b, 0 <= c2) M(a2, c2);
+    else {
+      for (b = 0; 9 > b; b++) a2.h.push(c2 & 127 | 128), c2 >>= 7;
+      a2.h.push(1);
+    }
+  }), Dc = Ac(function(a2, b, c2) {
+    if (2 !== a2.i) return false;
+    var d = ob(a2.h) >>> 0;
+    a2 = a2.h;
+    var e2 = pb(a2, d);
+    a2 = a2.i;
+    if (db) {
+      var g = a2, f;
+      (f = cb) || (f = cb = new TextDecoder("utf-8", { fatal: true }));
+      a2 = e2 + d;
+      g = 0 === e2 && a2 === g.length ? g : g.subarray(e2, a2);
+      try {
+        var h = f.decode(g);
+      } catch (r2) {
+        if (void 0 === bb) {
+          try {
+            f.decode(new Uint8Array([128]));
+          } catch (p2) {
+          }
+          try {
+            f.decode(new Uint8Array([97])), bb = true;
+          } catch (p2) {
+            bb = false;
+          }
+        }
+        !bb && (cb = void 0);
+        throw r2;
+      }
+    } else {
+      h = e2;
+      d = h + d;
+      e2 = [];
+      for (var k = null, l2, m2; h < d; ) l2 = a2[h++], 128 > l2 ? e2.push(l2) : 224 > l2 ? h >= d ? K() : (m2 = a2[h++], 194 > l2 || 128 !== (m2 & 192) ? (h--, K()) : e2.push((l2 & 31) << 6 | m2 & 63)) : 240 > l2 ? h >= d - 1 ? K() : (m2 = a2[h++], 128 !== (m2 & 192) || 224 === l2 && 160 > m2 || 237 === l2 && 160 <= m2 || 128 !== ((g = a2[h++]) & 192) ? (h--, K()) : e2.push((l2 & 15) << 12 | (m2 & 63) << 6 | g & 63)) : 244 >= l2 ? h >= d - 2 ? K() : (m2 = a2[h++], 128 !== (m2 & 192) || 0 !== (l2 << 28) + (m2 - 144) >> 30 || 128 !== ((g = a2[h++]) & 192) || 128 !== ((f = a2[h++]) & 192) ? (h--, K()) : (l2 = (l2 & 7) << 18 | (m2 & 63) << 12 | (g & 63) << 6 | f & 63, l2 -= 65536, e2.push((l2 >> 10 & 1023) + 55296, (l2 & 1023) + 56320))) : K(), 8192 <= e2.length && (k = ab(k, e2), e2.length = 0);
+      h = ab(k, e2);
+    }
+    U(b, c2, h);
+    return true;
+  }, function(a2, b, c2) {
+    b = S(b, c2);
+    if (null != b) {
+      var d = false;
+      d = void 0 === d ? false : d;
+      if (fb) {
+        if (d && /(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])/.test(b)) throw Error("Found an unpaired surrogate");
+        b = (eb || (eb = new TextEncoder())).encode(b);
+      } else {
+        for (var e2 = 0, g = new Uint8Array(3 * b.length), f = 0; f < b.length; f++) {
+          var h = b.charCodeAt(f);
+          if (128 > h) g[e2++] = h;
+          else {
+            if (2048 > h) g[e2++] = h >> 6 | 192;
+            else {
+              if (55296 <= h && 57343 >= h) {
+                if (56319 >= h && f < b.length) {
+                  var k = b.charCodeAt(++f);
+                  if (56320 <= k && 57343 >= k) {
+                    h = 1024 * (h - 55296) + k - 56320 + 65536;
+                    g[e2++] = h >> 18 | 240;
+                    g[e2++] = h >> 12 & 63 | 128;
+                    g[e2++] = h >> 6 & 63 | 128;
+                    g[e2++] = h & 63 | 128;
+                    continue;
+                  } else f--;
+                }
+                if (d) throw Error("Found an unpaired surrogate");
+                h = 65533;
+              }
+              g[e2++] = h >> 12 | 224;
+              g[e2++] = h >> 6 & 63 | 128;
+            }
+            g[e2++] = h & 63 | 128;
+          }
+        }
+        b = e2 === g.length ? g : g.subarray(0, e2);
+      }
+      M(a2.h, 8 * c2 + 2);
+      M(a2.h, b.length);
+      N(a2, a2.h.end());
+      N(a2, b);
+    }
+  }), Ec = Ac(function(a2, b, c2, d, e2) {
+    if (2 !== a2.i) return false;
+    b = Qb(b, c2, d);
+    c2 = a2.h.j;
+    d = ob(a2.h) >>> 0;
+    var g = a2.h.h + d, f = g - c2;
+    0 >= f && (a2.h.j = g, e2(b, a2, void 0, void 0, void 0), f = g - a2.h.h);
+    if (f) throw Error("Message parsing ended unexpectedly. Expected to read " + (d + " bytes, instead read " + (d - f) + " bytes, either the data ended unexpectedly or the message misreported its own length"));
+    a2.h.h = g;
+    a2.h.j = c2;
+    return true;
+  }, function(a2, b, c2, d, e2) {
+    b = Ob(b, d, c2);
+    if (null != b) for (d = 0; d < b.length; d++) {
+      var g = a2;
+      M(g.h, 8 * c2 + 2);
+      var f = g.h.end();
+      N(g, f);
+      f.push(g.i);
+      g = f;
+      e2(b[d], a2);
+      f = a2;
+      var h = g.pop();
+      for (h = f.i + f.h.length() - h; 127 < h; ) g.push(h & 127 | 128), h >>>= 7, f.i++;
+      g.push(h);
+      f.i++;
+    }
+  });
+  function Fc(a2) {
+    return function(b, c2) {
+      a: {
+        if (wb.length) {
+          var d = wb.pop();
+          d.setOptions(c2);
+          nb(d.h, b, c2);
+          b = d;
+        } else b = new tb(b, c2);
+        try {
+          var e2 = hc(a2);
+          var g = ic(new e2.P(), b, e2);
+          break a;
+        } finally {
+          e2 = b.h, e2.i = null, e2.m = false, e2.l = 0, e2.j = 0, e2.h = 0, e2.S = false, b.l = -1, b.i = -1, 100 > wb.length && wb.push(b);
+        }
+        g = void 0;
+      }
+      return g;
+    };
+  }
+  function Gc(a2) {
+    return function() {
+      var b = new xb();
+      rc(this, b, qc(a2));
+      N(b, b.h.end());
+      for (var c2 = new Uint8Array(b.i), d = b.j, e2 = d.length, g = 0, f = 0; f < e2; f++) {
+        var h = d[f];
+        c2.set(h, g);
+        g += h.length;
+      }
+      b.j = [c2];
+      return c2;
+    };
+  }
+  function Z(a2) {
+    X.call(this, a2);
+  }
+  na(Z, X);
+  var Hc = [Z, 1, Cc, 2, Y, 3, Dc, 4, Dc];
+  Z.prototype.l = Gc(Hc);
+  function Ic(a2) {
+    X.call(this, a2, -1, Jc);
+  }
+  na(Ic, X);
+  Ic.prototype.addClassification = function(a2, b) {
+    Qb(this, 1, Z, a2, b);
+    return this;
+  };
+  var Jc = [1], Kc = Fc([Ic, 1, Ec, Hc]);
+  function Lc(a2) {
+    X.call(this, a2);
+  }
+  na(Lc, X);
+  var Mc = [Lc, 1, Y, 2, Y, 3, Y, 4, Y, 5, Y];
+  Lc.prototype.l = Gc(Mc);
+  function Nc(a2) {
+    X.call(this, a2, -1, Oc);
+  }
+  na(Nc, X);
+  var Oc = [1], Pc = Fc([Nc, 1, Ec, Mc]);
+  function Qc(a2) {
+    X.call(this, a2);
+  }
+  na(Qc, X);
+  var Rc = [Qc, 1, Y, 2, Y, 3, Y, 4, Y, 5, Y, 6, Bc], Sc = Fc(Rc);
+  Qc.prototype.l = Gc(Rc);
+  function Tc(a2, b, c2) {
+    c2 = a2.createShader(0 === c2 ? a2.VERTEX_SHADER : a2.FRAGMENT_SHADER);
+    a2.shaderSource(c2, b);
+    a2.compileShader(c2);
+    if (!a2.getShaderParameter(c2, a2.COMPILE_STATUS)) throw Error("Could not compile WebGL shader.\n\n" + a2.getShaderInfoLog(c2));
+    return c2;
+  }
+  function Uc(a2) {
+    return Ob(a2, Z, 1).map(function(b) {
+      var c2 = S(b, 1);
+      return { index: null == c2 ? 0 : c2, qa: W(b, 2), label: null != S(b, 3) ? Rb(S(b, 3), "") : void 0, displayName: null != S(b, 4) ? Rb(S(b, 4), "") : void 0 };
+    });
+  }
+  function Vc(a2) {
+    return { x: W(a2, 1), y: W(a2, 2), z: W(a2, 3), visibility: null != Mb(a2, 4) ? W(a2, 4) : void 0 };
+  }
+  function Wc(a2, b) {
+    this.i = a2;
+    this.h = b;
+    this.m = 0;
+  }
+  function Xc(a2, b, c2) {
+    Yc(a2, b);
+    if ("function" === typeof a2.h.canvas.transferToImageBitmap) return Promise.resolve(a2.h.canvas.transferToImageBitmap());
+    if (c2) return Promise.resolve(a2.h.canvas);
+    if ("function" === typeof createImageBitmap) return createImageBitmap(a2.h.canvas);
+    void 0 === a2.j && (a2.j = document.createElement("canvas"));
+    return new Promise(function(d) {
+      a2.j.height = a2.h.canvas.height;
+      a2.j.width = a2.h.canvas.width;
+      a2.j.getContext("2d", {}).drawImage(a2.h.canvas, 0, 0, a2.h.canvas.width, a2.h.canvas.height);
+      d(a2.j);
+    });
+  }
+  function Yc(a2, b) {
+    var c2 = a2.h;
+    if (void 0 === a2.s) {
+      var d = Tc(c2, "\n  attribute vec2 aVertex;\n  attribute vec2 aTex;\n  varying vec2 vTex;\n  void main(void) {\n    gl_Position = vec4(aVertex, 0.0, 1.0);\n    vTex = aTex;\n  }", 0), e2 = Tc(c2, "\n  precision mediump float;\n  varying vec2 vTex;\n  uniform sampler2D sampler0;\n  void main(){\n    gl_FragColor = texture2D(sampler0, vTex);\n  }", 1), g = c2.createProgram();
+      c2.attachShader(g, d);
+      c2.attachShader(g, e2);
+      c2.linkProgram(g);
+      if (!c2.getProgramParameter(g, c2.LINK_STATUS)) throw Error("Could not compile WebGL program.\n\n" + c2.getProgramInfoLog(g));
+      d = a2.s = g;
+      c2.useProgram(d);
+      e2 = c2.getUniformLocation(d, "sampler0");
+      a2.l = { O: c2.getAttribLocation(d, "aVertex"), N: c2.getAttribLocation(d, "aTex"), ya: e2 };
+      a2.v = c2.createBuffer();
+      c2.bindBuffer(c2.ARRAY_BUFFER, a2.v);
+      c2.enableVertexAttribArray(a2.l.O);
+      c2.vertexAttribPointer(a2.l.O, 2, c2.FLOAT, false, 0, 0);
+      c2.bufferData(c2.ARRAY_BUFFER, new Float32Array([-1, -1, -1, 1, 1, 1, 1, -1]), c2.STATIC_DRAW);
+      c2.bindBuffer(c2.ARRAY_BUFFER, null);
+      a2.u = c2.createBuffer();
+      c2.bindBuffer(c2.ARRAY_BUFFER, a2.u);
+      c2.enableVertexAttribArray(a2.l.N);
+      c2.vertexAttribPointer(
+        a2.l.N,
+        2,
+        c2.FLOAT,
+        false,
+        0,
+        0
+      );
+      c2.bufferData(c2.ARRAY_BUFFER, new Float32Array([0, 1, 0, 0, 1, 0, 1, 1]), c2.STATIC_DRAW);
+      c2.bindBuffer(c2.ARRAY_BUFFER, null);
+      c2.uniform1i(e2, 0);
+    }
+    d = a2.l;
+    c2.useProgram(a2.s);
+    c2.canvas.width = b.width;
+    c2.canvas.height = b.height;
+    c2.viewport(0, 0, b.width, b.height);
+    c2.activeTexture(c2.TEXTURE0);
+    a2.i.bindTexture2d(b.glName);
+    c2.enableVertexAttribArray(d.O);
+    c2.bindBuffer(c2.ARRAY_BUFFER, a2.v);
+    c2.vertexAttribPointer(d.O, 2, c2.FLOAT, false, 0, 0);
+    c2.enableVertexAttribArray(d.N);
+    c2.bindBuffer(c2.ARRAY_BUFFER, a2.u);
+    c2.vertexAttribPointer(
+      d.N,
+      2,
+      c2.FLOAT,
+      false,
+      0,
+      0
+    );
+    c2.bindFramebuffer(c2.DRAW_FRAMEBUFFER ? c2.DRAW_FRAMEBUFFER : c2.FRAMEBUFFER, null);
+    c2.clearColor(0, 0, 0, 0);
+    c2.clear(c2.COLOR_BUFFER_BIT);
+    c2.colorMask(true, true, true, true);
+    c2.drawArrays(c2.TRIANGLE_FAN, 0, 4);
+    c2.disableVertexAttribArray(d.O);
+    c2.disableVertexAttribArray(d.N);
+    c2.bindBuffer(c2.ARRAY_BUFFER, null);
+    a2.i.bindTexture2d(0);
+  }
+  function Zc(a2) {
+    this.h = a2;
+  }
+  var $c = new Uint8Array([0, 97, 115, 109, 1, 0, 0, 0, 1, 4, 1, 96, 0, 0, 3, 2, 1, 0, 10, 9, 1, 7, 0, 65, 0, 253, 15, 26, 11]);
+  function ad(a2, b) {
+    return b + a2;
+  }
+  function bd(a2, b) {
+    window[a2] = b;
+  }
+  function cd(a2) {
+    var b = document.createElement("script");
+    b.setAttribute("src", a2);
+    b.setAttribute("crossorigin", "anonymous");
+    return new Promise(function(c2) {
+      b.addEventListener("load", function() {
+        c2();
+      }, false);
+      b.addEventListener("error", function() {
+        c2();
+      }, false);
+      document.body.appendChild(b);
+    });
+  }
+  function dd() {
+    return E(function(a2) {
+      switch (a2.h) {
+        case 1:
+          return a2.s = 2, D(a2, WebAssembly.instantiate($c), 4);
+        case 4:
+          a2.h = 3;
+          a2.s = 0;
+          break;
+        case 2:
+          return a2.s = 0, a2.l = null, a2.return(false);
+        case 3:
+          return a2.return(true);
+      }
+    });
+  }
+  function ed(a2) {
+    this.h = a2;
+    this.listeners = {};
+    this.l = {};
+    this.L = {};
+    this.s = {};
+    this.v = {};
+    this.M = this.u = this.ga = true;
+    this.I = Promise.resolve();
+    this.fa = "";
+    this.D = {};
+    this.locateFile = a2 && a2.locateFile || ad;
+    if ("object" === typeof window) var b = window.location.pathname.toString().substring(0, window.location.pathname.toString().lastIndexOf("/")) + "/";
+    else if ("undefined" !== typeof location) b = location.pathname.toString().substring(0, location.pathname.toString().lastIndexOf("/")) + "/";
+    else throw Error("solutions can only be loaded on a web page or in a web worker");
+    this.ha = b;
+    if (a2.options) {
+      b = A(Object.keys(a2.options));
+      for (var c2 = b.next(); !c2.done; c2 = b.next()) {
+        c2 = c2.value;
+        var d = a2.options[c2].default;
+        void 0 !== d && (this.l[c2] = "function" === typeof d ? d() : d);
+      }
+    }
+  }
+  x = ed.prototype;
+  x.close = function() {
+    this.j && this.j.delete();
+    return Promise.resolve();
+  };
+  function fd(a2) {
+    var b, c2, d, e2, g, f, h, k, l2, m2, r2;
+    return E(function(p2) {
+      switch (p2.h) {
+        case 1:
+          if (!a2.ga) return p2.return();
+          b = void 0 === a2.h.files ? [] : "function" === typeof a2.h.files ? a2.h.files(a2.l) : a2.h.files;
+          return D(p2, dd(), 2);
+        case 2:
+          c2 = p2.i;
+          if ("object" === typeof window) return bd("createMediapipeSolutionsWasm", { locateFile: a2.locateFile }), bd("createMediapipeSolutionsPackedAssets", { locateFile: a2.locateFile }), f = b.filter(function(n2) {
+            return void 0 !== n2.data;
+          }), h = b.filter(function(n2) {
+            return void 0 === n2.data;
+          }), k = Promise.all(f.map(function(n2) {
+            var q = gd(a2, n2.url);
+            if (void 0 !== n2.path) {
+              var t2 = n2.path;
+              q = q.then(function(w) {
+                a2.overrideFile(t2, w);
+                return Promise.resolve(w);
+              });
+            }
+            return q;
+          })), l2 = Promise.all(h.map(function(n2) {
+            return void 0 === n2.simd || n2.simd && c2 || !n2.simd && !c2 ? cd(a2.locateFile(n2.url, a2.ha)) : Promise.resolve();
+          })).then(function() {
+            var n2, q, t2;
+            return E(function(w) {
+              if (1 == w.h) return n2 = window.createMediapipeSolutionsWasm, q = window.createMediapipeSolutionsPackedAssets, t2 = a2, D(w, n2(q), 2);
+              t2.i = w.i;
+              w.h = 0;
+            });
+          }), m2 = function() {
+            return E(function(n2) {
+              a2.h.graph && a2.h.graph.url ? n2 = D(
+                n2,
+                gd(a2, a2.h.graph.url),
+                0
+              ) : (n2.h = 0, n2 = void 0);
+              return n2;
+            });
+          }(), D(p2, Promise.all([l2, k, m2]), 7);
+          if ("function" !== typeof importScripts) throw Error("solutions can only be loaded on a web page or in a web worker");
+          d = b.filter(function(n2) {
+            return void 0 === n2.simd || n2.simd && c2 || !n2.simd && !c2;
+          }).map(function(n2) {
+            return a2.locateFile(n2.url, a2.ha);
+          });
+          importScripts.apply(null, ea(d));
+          e2 = a2;
+          return D(p2, createMediapipeSolutionsWasm(Module), 6);
+        case 6:
+          e2.i = p2.i;
+          a2.m = new OffscreenCanvas(1, 1);
+          a2.i.canvas = a2.m;
+          g = a2.i.GL.createContext(a2.m, {
+            antialias: false,
+            alpha: false,
+            va: "undefined" !== typeof WebGL2RenderingContext ? 2 : 1
+          });
+          a2.i.GL.makeContextCurrent(g);
+          p2.h = 4;
+          break;
+        case 7:
+          a2.m = document.createElement("canvas");
+          r2 = a2.m.getContext("webgl2", {});
+          if (!r2 && (r2 = a2.m.getContext("webgl", {}), !r2)) return alert("Failed to create WebGL canvas context when passing video frame."), p2.return();
+          a2.K = r2;
+          a2.i.canvas = a2.m;
+          a2.i.createContext(a2.m, true, true, {});
+        case 4:
+          a2.j = new a2.i.SolutionWasm(), a2.ga = false, p2.h = 0;
+      }
+    });
+  }
+  function hd(a2) {
+    var b, c2, d, e2, g, f, h, k;
+    return E(function(l2) {
+      if (1 == l2.h) {
+        if (a2.h.graph && a2.h.graph.url && a2.fa === a2.h.graph.url) return l2.return();
+        a2.u = true;
+        if (!a2.h.graph || !a2.h.graph.url) {
+          l2.h = 2;
+          return;
+        }
+        a2.fa = a2.h.graph.url;
+        return D(l2, gd(a2, a2.h.graph.url), 3);
+      }
+      2 != l2.h && (b = l2.i, a2.j.loadGraph(b));
+      c2 = A(Object.keys(a2.D));
+      for (d = c2.next(); !d.done; d = c2.next()) e2 = d.value, a2.j.overrideFile(e2, a2.D[e2]);
+      a2.D = {};
+      if (a2.h.listeners) for (g = A(a2.h.listeners), f = g.next(); !f.done; f = g.next()) h = f.value, id(a2, h);
+      k = a2.l;
+      a2.l = {};
+      a2.setOptions(k);
+      l2.h = 0;
+    });
+  }
+  x.reset = function() {
+    var a2 = this;
+    return E(function(b) {
+      a2.j && (a2.j.reset(), a2.s = {}, a2.v = {});
+      b.h = 0;
+    });
+  };
+  x.setOptions = function(a2, b) {
+    var c2 = this;
+    if (b = b || this.h.options) {
+      for (var d = [], e2 = [], g = {}, f = A(Object.keys(a2)), h = f.next(); !h.done; g = { X: g.X, Y: g.Y }, h = f.next()) if (h = h.value, !(h in this.l && this.l[h] === a2[h])) {
+        this.l[h] = a2[h];
+        var k = b[h];
+        void 0 !== k && (k.onChange && (g.X = k.onChange, g.Y = a2[h], d.push(/* @__PURE__ */ function(l2) {
+          return function() {
+            var m2;
+            return E(function(r2) {
+              if (1 == r2.h) return D(r2, l2.X(l2.Y), 2);
+              m2 = r2.i;
+              true === m2 && (c2.u = true);
+              r2.h = 0;
+            });
+          };
+        }(g))), k.graphOptionXref && (h = Object.assign(
+          {},
+          { calculatorName: "", calculatorIndex: 0 },
+          k.graphOptionXref,
+          { valueNumber: 1 === k.type ? a2[h] : 0, valueBoolean: 0 === k.type ? a2[h] : false, valueString: 2 === k.type ? a2[h] : "" }
+        ), e2.push(h)));
+      }
+      if (0 !== d.length || 0 !== e2.length) this.u = true, this.H = (void 0 === this.H ? [] : this.H).concat(e2), this.F = (void 0 === this.F ? [] : this.F).concat(d);
+    }
+  };
+  function jd(a2) {
+    var b, c2, d, e2, g, f, h;
+    return E(function(k) {
+      switch (k.h) {
+        case 1:
+          if (!a2.u) return k.return();
+          if (!a2.F) {
+            k.h = 2;
+            break;
+          }
+          b = A(a2.F);
+          c2 = b.next();
+        case 3:
+          if (c2.done) {
+            k.h = 5;
+            break;
+          }
+          d = c2.value;
+          return D(k, d(), 4);
+        case 4:
+          c2 = b.next();
+          k.h = 3;
+          break;
+        case 5:
+          a2.F = void 0;
+        case 2:
+          if (a2.H) {
+            e2 = new a2.i.GraphOptionChangeRequestList();
+            g = A(a2.H);
+            for (f = g.next(); !f.done; f = g.next()) h = f.value, e2.push_back(h);
+            a2.j.changeOptions(e2);
+            e2.delete();
+            a2.H = void 0;
+          }
+          a2.u = false;
+          k.h = 0;
+      }
+    });
+  }
+  x.initialize = function() {
+    var a2 = this;
+    return E(function(b) {
+      return 1 == b.h ? D(b, fd(a2), 2) : 3 != b.h ? D(b, hd(a2), 3) : D(b, jd(a2), 0);
+    });
+  };
+  function gd(a2, b) {
+    var c2, d;
+    return E(function(e2) {
+      if (b in a2.L) return e2.return(a2.L[b]);
+      c2 = a2.locateFile(b, "");
+      d = fetch(c2).then(function(g) {
+        return g.arrayBuffer();
+      });
+      a2.L[b] = d;
+      return e2.return(d);
+    });
+  }
+  x.overrideFile = function(a2, b) {
+    this.j ? this.j.overrideFile(a2, b) : this.D[a2] = b;
+  };
+  x.clearOverriddenFiles = function() {
+    this.D = {};
+    this.j && this.j.clearOverriddenFiles();
+  };
+  x.send = function(a2, b) {
+    var c2 = this, d, e2, g, f, h, k, l2, m2, r2;
+    return E(function(p2) {
+      switch (p2.h) {
+        case 1:
+          if (!c2.h.inputs) return p2.return();
+          d = 1e3 * (void 0 === b || null === b ? performance.now() : b);
+          return D(p2, c2.I, 2);
+        case 2:
+          return D(p2, c2.initialize(), 3);
+        case 3:
+          e2 = new c2.i.PacketDataList();
+          g = A(Object.keys(a2));
+          for (f = g.next(); !f.done; f = g.next()) if (h = f.value, k = c2.h.inputs[h]) {
+            a: {
+              var n2 = a2[h];
+              switch (k.type) {
+                case "video":
+                  var q = c2.s[k.stream];
+                  q || (q = new Wc(c2.i, c2.K), c2.s[k.stream] = q);
+                  0 === q.m && (q.m = q.i.createTexture());
+                  if ("undefined" !== typeof HTMLVideoElement && n2 instanceof HTMLVideoElement) {
+                    var t2 = n2.videoWidth;
+                    var w = n2.videoHeight;
+                  } else "undefined" !== typeof HTMLImageElement && n2 instanceof HTMLImageElement ? (t2 = n2.naturalWidth, w = n2.naturalHeight) : (t2 = n2.width, w = n2.height);
+                  w = { glName: q.m, width: t2, height: w };
+                  t2 = q.h;
+                  t2.canvas.width = w.width;
+                  t2.canvas.height = w.height;
+                  t2.activeTexture(t2.TEXTURE0);
+                  q.i.bindTexture2d(q.m);
+                  t2.texImage2D(t2.TEXTURE_2D, 0, t2.RGBA, t2.RGBA, t2.UNSIGNED_BYTE, n2);
+                  q.i.bindTexture2d(0);
+                  q = w;
+                  break a;
+                case "detections":
+                  q = c2.s[k.stream];
+                  q || (q = new Zc(c2.i), c2.s[k.stream] = q);
+                  q.data || (q.data = new q.h.DetectionListData());
+                  q.data.reset(n2.length);
+                  for (w = 0; w < n2.length; ++w) {
+                    t2 = n2[w];
+                    var v = q.data, B = v.setBoundingBox, J = w;
+                    var I = t2.la;
+                    var u2 = new Qc();
+                    V(u2, 1, I.sa);
+                    V(u2, 2, I.ta);
+                    V(u2, 3, I.height);
+                    V(u2, 4, I.width);
+                    V(u2, 5, I.rotation);
+                    U(u2, 6, I.pa);
+                    I = u2.l();
+                    B.call(v, J, I);
+                    if (t2.ea) for (v = 0; v < t2.ea.length; ++v) {
+                      u2 = t2.ea[v];
+                      B = q.data;
+                      J = B.addNormalizedLandmark;
+                      I = w;
+                      u2 = Object.assign({}, u2, { visibility: u2.visibility ? u2.visibility : 0 });
+                      var C2 = new Lc();
+                      V(C2, 1, u2.x);
+                      V(C2, 2, u2.y);
+                      V(C2, 3, u2.z);
+                      u2.visibility && V(C2, 4, u2.visibility);
+                      u2 = C2.l();
+                      J.call(
+                        B,
+                        I,
+                        u2
+                      );
+                    }
+                    if (t2.ba) for (v = 0; v < t2.ba.length; ++v) B = q.data, J = B.addClassification, I = w, u2 = t2.ba[v], C2 = new Z(), V(C2, 2, u2.qa), u2.index && U(C2, 1, u2.index), u2.label && U(C2, 3, u2.label), u2.displayName && U(C2, 4, u2.displayName), u2 = C2.l(), J.call(B, I, u2);
+                  }
+                  q = q.data;
+                  break a;
+                default:
+                  q = {};
+              }
+            }
+            l2 = q;
+            m2 = k.stream;
+            switch (k.type) {
+              case "video":
+                e2.pushTexture2d(Object.assign({}, l2, { stream: m2, timestamp: d }));
+                break;
+              case "detections":
+                r2 = l2;
+                r2.stream = m2;
+                r2.timestamp = d;
+                e2.pushDetectionList(r2);
+                break;
+              default:
+                throw Error("Unknown input config type: '" + k.type + "'");
+            }
+          }
+          c2.j.send(e2);
+          return D(p2, c2.I, 4);
+        case 4:
+          e2.delete(), p2.h = 0;
+      }
+    });
+  };
+  function kd(a2, b, c2) {
+    var d, e2, g, f, h, k, l2, m2, r2, p2, n2, q, t2, w;
+    return E(function(v) {
+      switch (v.h) {
+        case 1:
+          if (!c2) return v.return(b);
+          d = {};
+          e2 = 0;
+          g = A(Object.keys(c2));
+          for (f = g.next(); !f.done; f = g.next()) h = f.value, k = c2[h], "string" !== typeof k && "texture" === k.type && void 0 !== b[k.stream] && ++e2;
+          1 < e2 && (a2.M = false);
+          l2 = A(Object.keys(c2));
+          f = l2.next();
+        case 2:
+          if (f.done) {
+            v.h = 4;
+            break;
+          }
+          m2 = f.value;
+          r2 = c2[m2];
+          if ("string" === typeof r2) return t2 = d, w = m2, D(v, ld(a2, m2, b[r2]), 14);
+          p2 = b[r2.stream];
+          if ("detection_list" === r2.type) {
+            if (p2) {
+              var B = p2.getRectList();
+              for (var J = p2.getLandmarksList(), I = p2.getClassificationsList(), u2 = [], C2 = 0; C2 < B.size(); ++C2) {
+                var T = Sc(B.get(C2)), od = W(T, 1), pd = W(T, 2), qd = W(T, 3), rd = W(T, 4), sd = W(T, 5, 0), za = void 0;
+                za = void 0 === za ? 0 : za;
+                T = { la: { sa: od, ta: pd, height: qd, width: rd, rotation: sd, pa: Rb(S(T, 6), za) }, ea: Ob(Pc(J.get(C2)), Lc, 1).map(Vc), ba: Uc(Kc(I.get(C2))) };
+                u2.push(T);
+              }
+              B = u2;
+            } else B = [];
+            d[m2] = B;
+            v.h = 7;
+            break;
+          }
+          if ("proto_list" === r2.type) {
+            if (p2) {
+              B = Array(p2.size());
+              for (J = 0; J < p2.size(); J++) B[J] = p2.get(J);
+              p2.delete();
+            } else B = [];
+            d[m2] = B;
+            v.h = 7;
+            break;
+          }
+          if (void 0 === p2) {
+            v.h = 3;
+            break;
+          }
+          if ("float_list" === r2.type) {
+            d[m2] = p2;
+            v.h = 7;
+            break;
+          }
+          if ("proto" === r2.type) {
+            d[m2] = p2;
+            v.h = 7;
+            break;
+          }
+          if ("texture" !== r2.type) throw Error("Unknown output config type: '" + r2.type + "'");
+          n2 = a2.v[m2];
+          n2 || (n2 = new Wc(a2.i, a2.K), a2.v[m2] = n2);
+          return D(v, Xc(n2, p2, a2.M), 13);
+        case 13:
+          q = v.i, d[m2] = q;
+        case 7:
+          r2.transform && d[m2] && (d[m2] = r2.transform(d[m2]));
+          v.h = 3;
+          break;
+        case 14:
+          t2[w] = v.i;
+        case 3:
+          f = l2.next();
+          v.h = 2;
+          break;
+        case 4:
+          return v.return(d);
+      }
+    });
+  }
+  function ld(a2, b, c2) {
+    var d;
+    return E(function(e2) {
+      return "number" === typeof c2 || c2 instanceof Uint8Array || c2 instanceof a2.i.Uint8BlobList ? e2.return(c2) : c2 instanceof a2.i.Texture2dDataOut ? (d = a2.v[b], d || (d = new Wc(a2.i, a2.K), a2.v[b] = d), e2.return(Xc(d, c2, a2.M))) : e2.return(void 0);
+    });
+  }
+  function id(a2, b) {
+    for (var c2 = b.name || "$", d = [].concat(ea(b.wants)), e2 = new a2.i.StringList(), g = A(b.wants), f = g.next(); !f.done; f = g.next()) e2.push_back(f.value);
+    g = a2.i.PacketListener.implement({ onResults: function(h) {
+      for (var k = {}, l2 = 0; l2 < b.wants.length; ++l2) k[d[l2]] = h.get(l2);
+      var m2 = a2.listeners[c2];
+      m2 && (a2.I = kd(a2, k, b.outs).then(function(r2) {
+        r2 = m2(r2);
+        for (var p2 = 0; p2 < b.wants.length; ++p2) {
+          var n2 = k[d[p2]];
+          "object" === typeof n2 && n2.hasOwnProperty && n2.hasOwnProperty("delete") && n2.delete();
+        }
+        r2 && (a2.I = r2);
+      }));
+    } });
+    a2.j.attachMultiListener(e2, g);
+    e2.delete();
+  }
+  x.onResults = function(a2, b) {
+    this.listeners[b || "$"] = a2;
+  };
+  Aa("Solution", ed);
+  Aa("OptionType", { BOOL: 0, NUMBER: 1, ua: 2, 0: "BOOL", 1: "NUMBER", 2: "STRING" });
+  function md(a2) {
+    void 0 === a2 && (a2 = 0);
+    switch (a2) {
+      case 1:
+        return "selfie_segmentation_landscape.tflite";
+      default:
+        return "selfie_segmentation.tflite";
+    }
+  }
+  function nd(a2) {
+    var b = this;
+    a2 = a2 || {};
+    this.h = new ed({ locateFile: a2.locateFile, files: function(c2) {
+      return [{ simd: true, url: "selfie_segmentation_solution_simd_wasm_bin.js" }, { simd: false, url: "selfie_segmentation_solution_wasm_bin.js" }, { data: true, url: md(c2.modelSelection) }];
+    }, graph: { url: "selfie_segmentation.binarypb" }, listeners: [{ wants: ["segmentation_mask", "image_transformed"], outs: { image: { type: "texture", stream: "image_transformed" }, segmentationMask: { type: "texture", stream: "segmentation_mask" } } }], inputs: { image: {
+      type: "video",
+      stream: "input_frames_gpu"
+    } }, options: { useCpuInference: { type: 0, graphOptionXref: { calculatorType: "InferenceCalculator", fieldName: "use_cpu_inference" }, default: "object" !== typeof window || void 0 === window.navigator ? false : "iPad Simulator;iPhone Simulator;iPod Simulator;iPad;iPhone;iPod".split(";").includes(navigator.platform) || navigator.userAgent.includes("Mac") && "ontouchend" in document }, selfieMode: { type: 0, graphOptionXref: { calculatorType: "GlScalerCalculator", calculatorIndex: 1, fieldName: "flip_horizontal" } }, modelSelection: {
+      type: 1,
+      graphOptionXref: { calculatorType: "ConstantSidePacketCalculator", calculatorName: "ConstantSidePacketCalculatorModelSelection", fieldName: "int_value" },
+      onChange: function(c2) {
+        var d, e2, g;
+        return E(function(f) {
+          if (1 == f.h) return d = md(c2), e2 = "third_party/mediapipe/modules/selfie_segmentation/" + d, D(f, gd(b.h, d), 2);
+          g = f.i;
+          b.h.overrideFile(e2, g);
+          return f.return(true);
+        });
+      }
+    } } });
+  }
+  x = nd.prototype;
+  x.close = function() {
+    this.h.close();
+    return Promise.resolve();
+  };
+  x.onResults = function(a2) {
+    this.h.onResults(a2);
+  };
+  x.initialize = function() {
+    var a2 = this;
+    return E(function(b) {
+      return D(b, a2.h.initialize(), 0);
+    });
+  };
+  x.reset = function() {
+    this.h.reset();
+  };
+  x.send = function(a2) {
+    var b = this;
+    return E(function(c2) {
+      return D(c2, b.h.send(a2), 0);
+    });
+  };
+  x.setOptions = function(a2) {
+    this.h.setOptions(a2);
+  };
+  Aa("SelfieSegmentation", nd);
+  Aa("VERSION", "0.1.1675465747");
+}).call(commonjsGlobal);
+const MEDIAPIPE_CDN_BASE = "https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation";
+const elIdCanvas = "input_canvas";
+const elIdVideoInput = "input_video";
+class Mediapipe {
+  constructor() {
+    __publicField(this, "segmenter");
+    __publicField(this, "mode", ModeBlur.none);
+    __publicField(this, "animationId", null);
+    // Cache background image để tránh nháy (load 1 lần thay vì mỗi frame)
+    __publicField(this, "imageId", 0);
+    // Optional consumer-provided base path pointing at the locally-served
+    // `dist/mediapipe/` assets folder. When unset, MediaPipe falls back to CDN.
+    __publicField(this, "mapImages", /* @__PURE__ */ new Map());
+    // Track đầu ra của canvas (captureStream(0)). Khi set, mỗi frame vẽ xong
+    // sẽ gọi requestFrame() để push đúng tốc độ xử lý → mượt, không khung rỗng.
+    __publicField(this, "outputTrack", null);
+    __publicField(this, "loop", async () => {
+      const video = document.getElementById(elIdVideoInput);
+      if (!video) {
+        this.animationId = requestAnimationFrame(this.loop);
+        return;
+      }
+      if (video.videoWidth === 0 || video.videoHeight === 0) {
+        this.animationId = requestAnimationFrame(this.loop);
+        return;
+      }
+      await this.segmenter.send({ image: video });
+      this.animationId = requestAnimationFrame(this.loop);
+    });
+    this.createElement();
+    this.initMediapipe({ mediapipeBasePath: "" });
+    this.createImage();
+  }
+  createImage(data = config_url_image) {
+    if (!(data == null ? void 0 : data.length)) return;
+    this.mapImages.clear();
+    data.forEach((r2) => {
+      const image2 = new Image();
+      image2.src = r2.url;
+      image2.crossOrigin = "anonymous";
+      this.mapImages.set(r2.id, image2);
+      image2.onerror = () => {
+        client_socket.emit(Event_SDK.MediPipeEvent, r2);
+        this.mapImages.delete(r2.id);
+      };
+    });
+  }
+  createElement() {
+    const createCanvas = document.createElement("canvas");
+    const createInputVideo = document.createElement("video");
+    createCanvas.id = elIdCanvas;
+    createCanvas.width = SCREEN_RESOLUTION.get("FULL_HD").width.ideal;
+    createCanvas.height = SCREEN_RESOLUTION.get("FULL_HD").height.ideal;
+    createInputVideo.style.display = "none";
+    createInputVideo.width = SCREEN_RESOLUTION.get("FULL_HD").width.ideal;
+    createInputVideo.height = SCREEN_RESOLUTION.get("FULL_HD").height.ideal;
+    createInputVideo.id = elIdVideoInput;
+    document.body.appendChild(createInputVideo);
+    document.body.appendChild(createCanvas);
+  }
+  getElement() {
+    return this.segmenter;
+  }
+  initMediapipe({ mediapipeBasePath }) {
+    const SelfieSegmentationCtor = (
+      // Prefer module export when available
+      selfie_segmentation.SelfieSegmentation || // Fallback to global attached by the UMD build
+      (globalThis == null ? void 0 : globalThis.SelfieSegmentation)
+    );
+    if (!SelfieSegmentationCtor) {
+      throw new Error(
+        "SelfieSegmentation constructor not found. Ensure @mediapipe/selfie_segmentation is loaded."
+      );
+    }
+    this.segmenter = new SelfieSegmentationCtor({
+      locateFile: (file) => {
+        if (mediapipeBasePath) {
+          return `${mediapipeBasePath.replace(/\/$/, "")}/${file}`;
+        }
+        return `${MEDIAPIPE_CDN_BASE}/${file}`;
+      }
+    });
+    this.segmenter.setOptions({ modelSelection: 1 });
+  }
+  async start(imageId) {
+    this.imageId = imageId;
+    const video = document.getElementById(elIdVideoInput);
+    let canvas = document.getElementById(elIdCanvas);
+    if (!canvas) {
+      canvas = document.createElement("canvas");
+      canvas.id = elIdCanvas;
+      canvas.width = SCREEN_RESOLUTION.get("FULL_HD").width.ideal;
+      canvas.height = SCREEN_RESOLUTION.get("FULL_HD").height.ideal;
+      canvas.style.display = "none";
+      document.body.appendChild(canvas);
+    }
+    this.sendBackgroundBlur({
+      mode: ModeBlur.image,
+      imageId: this.imageId
+    });
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        height: { ideal: 1080 },
+        width: { ideal: 1920 }
+      }
+    });
+    video.srcObject = stream;
+    video.onloadedmetadata = () => {
+      const c2 = document.getElementById(elIdCanvas);
+      if (c2) {
+        const vw = video.videoWidth || 640;
+        const vh = video.videoHeight || 480;
+        c2.width = vw;
+        c2.height = vh;
+      }
+      video.play();
+      this.loop();
+    };
+  }
+  async stop() {
+    this.segmenter.close();
+  }
+  async resetMediapipe() {
+    this.segmenter.reset();
+    cancelAnimationFrame(this.animationId);
+    this.animationId = null;
+    const canvas = document.getElementById(elIdCanvas);
+    const video = document.getElementById(elIdVideoInput);
+    if (video.srcObject) {
+      video.srcObject.getTracks().forEach((t2) => t2.stop());
+    }
+    if (canvas) {
+      canvas.captureStream(30).getTracks().forEach((tr) => tr.stop());
+      video.remove();
+    }
+  }
+  async sendBackgroundBlur({ mode = ModeBlur.none, imageId = 0 }, callback) {
+    const getBgImage = this.mapImages.get(imageId);
+    if (ModeBlur.image) {
+      if (!imageId || !getBgImage) {
+        mode = ModeBlur.blur;
+      }
+    }
+    const canvas = document.getElementById(elIdCanvas);
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    if (this.imageId !== imageId) {
+      this.imageId = imageId;
+    }
+    this.segmenter.onResults((results) => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.globalCompositeOperation = "source-over";
+      ctx.filter = "none";
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
+      this.mode = mode;
+      switch (mode) {
+        case ModeBlur.blur:
+          ctx.drawImage(
+            results.segmentationMask,
+            0,
+            0,
+            canvas.width,
+            canvas.height
+          );
+          ctx.globalCompositeOperation = "source-out";
+          ctx.filter = "blur(8px)";
+          ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
+          ctx.globalCompositeOperation = "destination-over";
+          ctx.filter = "none";
+          ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
+          break;
+        case ModeBlur.image:
+          ctx.save();
+          ctx.drawImage(
+            results.segmentationMask,
+            0,
+            0,
+            canvas.width,
+            canvas.height
+          );
+          ctx.globalCompositeOperation = "source-in";
+          ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
+          ctx.globalCompositeOperation = "destination-over";
+          ctx.drawImage(getBgImage, 0, 0, canvas.width, canvas.height);
+          break;
+        case ModeBlur.none:
+          ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
+          ctx.globalCompositeOperation = "destination-over";
+          ctx.filter = "none";
+          this.mode = ModeBlur.none;
+          break;
+      }
+      ctx.globalCompositeOperation = "source-over";
+      ctx.filter = "none";
+      if (this.outputTrack && this.outputTrack.requestFrame) {
+        try {
+          this.outputTrack.requestFrame();
+        } catch (e2) {
+        }
+      }
+      ctx.restore();
+    });
+    setTimeout(() => {
+      callback && callback();
+    }, 1e3);
+  }
+  // async mediaPipeReset() {
+  //   const video = document.getElementById(
+  //     hardCodeLocalVideoId,
+  //   ) as HTMLVideoElement;
+  //   const canvas = document.getElementById(elIdCanvas) as HTMLCanvasElement;
+  //   if (video || canvas) {
+  //     video.srcObject = null;
+  //     video?.pause();
+  //     canvas.getContext("2d")?.clearRect(0, 0, canvas.width, canvas.height);
+  //     canvas.captureStream(30).getVideoTracks()[0].stop();
+  //     this.stopUserMedia();
+  //   }
+  // }
+  async stopUserMedia() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      stream.getTracks().forEach((track) => track.stop());
+    } catch (error) {
+      console.log("error stopUserMedia", error);
+    }
+  }
+  /**
+   * Set track đầu ra từ canvas.captureStream(0).
+   * Sau mỗi frame vẽ xong trong onResults, track.requestFrame() được gọi
+   * để push frame → đồng bộ fps với tốc độ xử lý Mediapipe → mượt.
+   */
+  setOutputTrack(track) {
+    this.outputTrack = track;
+  }
+}
 class Port_Sip {
   constructor() {
     __publicField(this, "port_sip_sdk");
@@ -83761,6 +90229,8 @@ class Port_Sip {
     __publicField(this, "agent_info");
     __publicField(this, "extJoinRooms", /* @__PURE__ */ new Map());
     __publicField(this, "inComingVideoCallExtensions", /* @__PURE__ */ new Map());
+    __publicField(this, "transcriptIntegration", null);
+    __publicField(this, "mediaPipeML", null);
     __publicField(this, "attemptReconnection", (reconnectionAttempt = 1, agentId) => {
       var _a, _b;
       if (!this.shouldBeConnected) {
@@ -83821,6 +90291,9 @@ class Port_Sip {
         reconnectionAttempt === 1 ? 0 : this.reconnectionDelay * 1e3
       );
     });
+    if (config_video_call.enable_media_pipe) {
+      this.mediaPipeML = new Mediapipe();
+    }
   }
   set userAction(v) {
     this.user_action = v;
@@ -83967,11 +90440,10 @@ class Port_Sip {
         document.body.appendChild(createVideo);
       }
     } else {
-      const defaultLocalId = "local";
-      const el = document.getElementById(defaultLocalId);
+      const el = document.getElementById(hardCodeLocalVideoId);
       if (!el) {
         const createVideo = document.createElement("video");
-        createVideo.id = defaultLocalId;
+        createVideo.id = hardCodeLocalVideoId;
         createVideo.autoplay = true;
         createVideo.muted = true;
         createVideo.setAttribute("playsinline", "true");
@@ -83988,6 +90460,10 @@ class Port_Sip {
           createVideo.muted = true;
           createVideo.setAttribute("playsinline", "true");
           document.body.appendChild(createVideo);
+        } else {
+          el.onloadedmetadata = () => {
+            console.log("onloadedmetadata", elId);
+          };
         }
       });
     } else {
@@ -84015,8 +90491,15 @@ class Port_Sip {
     const sdk = new PortSipSdk(
       {
         onRegisterSuccess: () => {
+          var _a2, _b2, _c2, _d2, _e2;
+          (_c2 = this.port_sip_sdk) == null ? void 0 : _c2.setVideoResolution(
+            ((_a2 = SCREEN_RESOLUTION.get("FULL_HD")) == null ? void 0 : _a2.width.ideal) || 1280,
+            ((_b2 = SCREEN_RESOLUTION.get("FULL_HD")) == null ? void 0 : _b2.height.ideal) ?? 720
+          );
+          (_d2 = this.port_sip_sdk) == null ? void 0 : _d2.setVideoBitrate(4e3);
+          (_e2 = this.port_sip_sdk) == null ? void 0 : _e2.setVideoFrameRate(60);
           setTimeout(() => {
-            var _a2, _b2, _c2, _d2, _e2;
+            var _a3, _b3, _c3, _d3, _e3;
             client_socket.emit(Event_SDK.AppEvent, {
               type: AppEventType$1.CONNECTED,
               message: AppEventType$1.CONNECTED
@@ -84029,22 +90512,22 @@ class Port_Sip {
                 event: Event_SDK.AppEvent
               },
               {
-                tenantId: (_a2 = info == null ? void 0 : info.tenant) == null ? void 0 : _a2.id,
-                agentId: (_b2 = info == null ? void 0 : info.user) == null ? void 0 : _b2.id,
+                tenantId: (_a3 = info == null ? void 0 : info.tenant) == null ? void 0 : _a3.id,
+                agentId: (_b3 = info == null ? void 0 : info.user) == null ? void 0 : _b3.id,
                 isLogServer: true,
                 isLogClient: false
               }
             );
             getCurrentAgentStatus({
-              cloudAgentId: (_c2 = info == null ? void 0 : info.user) == null ? void 0 : _c2.id,
-              cloudTenantId: (_d2 = info == null ? void 0 : info.tenant) == null ? void 0 : _d2.id,
-              cloudAgentName: (_e2 = info == null ? void 0 : info.user) == null ? void 0 : _e2.fullName
+              cloudAgentId: (_c3 = info == null ? void 0 : info.user) == null ? void 0 : _c3.id,
+              cloudTenantId: (_d3 = info == null ? void 0 : info.tenant) == null ? void 0 : _d3.id,
+              cloudAgentName: (_e3 = info == null ? void 0 : info.user) == null ? void 0 : _e3.fullName
             }).then((res) => {
-              var _a3, _b3, _c3, _d3, _e3, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q;
-              if ((_a3 = res.data) == null ? void 0 : _a3.success) {
+              var _a4, _b4, _c4, _d4, _e4, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q;
+              if ((_a4 = res.data) == null ? void 0 : _a4.success) {
                 client_socket.emit(Event_SDK.AgentStatusEvent, {
-                  agentId: (_c3 = (_b3 = res.data) == null ? void 0 : _b3.data) == null ? void 0 : _c3.cloudAgentId,
-                  tenantId: (_e3 = (_d3 = res.data) == null ? void 0 : _d3.data) == null ? void 0 : _e3.cloudTenantId,
+                  agentId: (_c4 = (_b4 = res.data) == null ? void 0 : _b4.data) == null ? void 0 : _c4.cloudAgentId,
+                  tenantId: (_e4 = (_d4 = res.data) == null ? void 0 : _d4.data) == null ? void 0 : _e4.cloudTenantId,
                   agentName: (_g = (_f = res.data) == null ? void 0 : _f.data) == null ? void 0 : _g.cloudAgentName,
                   statusName: (_i = (_h = res.data) == null ? void 0 : _h.data) == null ? void 0 : _i.statusName,
                   changeTime: (_k = (_j = res.data) == null ? void 0 : _j.data) == null ? void 0 : _k.changeTime,
@@ -84082,9 +90565,8 @@ class Port_Sip {
         },
         onConnect: () => {
           var _a2, _b2;
-          console.log("onConnect");
           traceLog(
-            "onDisconnect",
+            "onConnect",
             {},
             {
               tenantId: (_a2 = info == null ? void 0 : info.tenant) == null ? void 0 : _a2.id,
@@ -84274,13 +90756,17 @@ class Port_Sip {
         onRecvInfo: (ext, message2) => {
         },
         onInviteClosed: async (id, reason) => {
-          var _a2, _b2, _c2, _d2, _e2, _f;
+          var _a2, _b2, _c2, _d2, _e2, _f, _g, _h, _i;
           const sessionId = this.getDataSessionId(id);
+          (_a2 = this.transcriptIntegration) == null ? void 0 : _a2.stopTranscriptionWithAudioCapture(
+            sessionId
+          );
+          (_b2 = this.transcriptIntegration) == null ? void 0 : _b2.stopRemoteMediaRecorder(sessionId);
           traceLog(
             `inviteClosed-${sessionId}`,
             {
               id,
-              state: (_c2 = (_b2 = (_a2 = this.port_sip_sdk) == null ? void 0 : _a2.sessions.get(id)) == null ? void 0 : _b2.session) == null ? void 0 : _c2.state,
+              state: (_e2 = (_d2 = (_c2 = this.port_sip_sdk) == null ? void 0 : _c2.sessions.get(id)) == null ? void 0 : _d2.session) == null ? void 0 : _e2.state,
               sessionId,
               mainId: this.main_id,
               data: this.getDataStringify(),
@@ -84289,12 +90775,12 @@ class Port_Sip {
             {
               isLogServer: true,
               isLogClient: false,
-              tenantId: (_d2 = info == null ? void 0 : info.tenant) == null ? void 0 : _d2.id,
-              agentId: (_e2 = info == null ? void 0 : info.user) == null ? void 0 : _e2.id,
+              tenantId: (_f = info == null ? void 0 : info.tenant) == null ? void 0 : _f.id,
+              agentId: (_g = info == null ? void 0 : info.user) == null ? void 0 : _g.id,
               sessionId
             }
           );
-          (_f = delegate == null ? void 0 : delegate.onHangup) == null ? void 0 : _f.call(delegate, sessionId, {});
+          (_h = delegate == null ? void 0 : delegate.onHangup) == null ? void 0 : _h.call(delegate, sessionId, {});
           if (sessionId === this.main_id) {
             cbCheckTask && cbCheckTask(sessionId, "IDLE");
             cbInviteClosed && cbInviteClosed(() => {
@@ -84305,6 +90791,7 @@ class Port_Sip {
               });
             });
             this.main_id = "";
+            (_i = this.mediaPipeML) == null ? void 0 : _i.resetMediapipe();
           }
           this.deleteDataKey(id);
         },
@@ -84445,7 +90932,7 @@ class Port_Sip {
         }
       },
       {
-        localVideoID: localVideoId || "local",
+        localVideoID: hardCodeLocalVideoId,
         remoteScreenID: "mpt-body",
         remoteAudioID: remoteAudioId ?? [],
         remoteVideoID: remoteVideoId ?? []
@@ -84564,8 +91051,28 @@ class Port_Sip {
       );
     }
   }
-  async answer(session2, cbCheckTask, cbFails, isVideo = false, isQueue = false) {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k;
+  startTranscriptIntegration(sessionId) {
+    var _a, _b, _c, _d;
+    if (!config_video_call.enable_transcript) return;
+    this.transcriptIntegration = new TranscriptIntegration({
+      tenantId: (_b = (_a = this.agent_info) == null ? void 0 : _a.tenant) == null ? void 0 : _b.id,
+      agentId: (_d = (_c = this.agent_info) == null ? void 0 : _c.user) == null ? void 0 : _d.id
+    });
+    this.transcriptIntegration.startTranscriptionWithAudioCapture(
+      sessionId,
+      (response) => {
+        client_socket.emit(Event_SDK.AssistantEvent, {
+          data: response,
+          sessionId,
+          type: TypeAssistants.TRANSCRIPT
+        });
+      },
+      this.getDataCallId(sessionId),
+      this.port_sip_sdk
+    );
+  }
+  async answer(session2, cbCheckTask, cbFails) {
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j;
     this.userAction = false;
     const _callId = this.getDataCallId(session2);
     traceLog(
@@ -84587,9 +91094,8 @@ class Port_Sip {
         await this.port_sip_sdk.answerCall(_callId, true);
         const params = this.inComingVideoCallExtensions.get(session2) ?? {};
         cbCheckTask && cbCheckTask(session2, "TALKING", _callId, params);
-        await ((_e = this.port_sip_sdk) == null ? void 0 : _e.sendVideo(_callId, true));
       } catch (error) {
-        const s2 = (_g = (_f = this.port_sip_sdk.sessions.get(_callId)) == null ? void 0 : _f.session) == null ? void 0 : _g.state;
+        const s2 = (_f = (_e = this.port_sip_sdk.sessions.get(_callId)) == null ? void 0 : _e.session) == null ? void 0 : _f.state;
         const text = s2 === SessionState$2.Established ? "Vui lòng không nhấc máy nhiều lần!" : "Cuộc gọi đã kết thúc, không tồn tại hoặc đã vào IVR nhỡ.";
         alertSnackbar()({
           status: "error",
@@ -84608,8 +91114,8 @@ class Port_Sip {
           {
             isLogClient: false,
             isLogServer: true,
-            tenantId: (_i = (_h = this.agent_info) == null ? void 0 : _h.tenant) == null ? void 0 : _i.id,
-            agentId: (_k = (_j = this.agent_info) == null ? void 0 : _j.user) == null ? void 0 : _k.id,
+            tenantId: (_h = (_g = this.agent_info) == null ? void 0 : _g.tenant) == null ? void 0 : _h.id,
+            agentId: (_j = (_i = this.agent_info) == null ? void 0 : _i.user) == null ? void 0 : _j.id,
             sessionId: session2
           }
         );
@@ -84624,7 +91130,7 @@ class Port_Sip {
     }
   }
   async rejectCall(session2) {
-    var _a, _b, _c, _d, _e;
+    var _a, _b, _c, _d, _e, _f, _g;
     const _callId = this.getDataCallId(session2);
     traceLog(
       "reject call function",
@@ -84641,9 +91147,13 @@ class Port_Sip {
     );
     if (_callId) {
       try {
-        (_e = this.port_sip_sdk) == null ? void 0 : _e.hangUp(_callId).then(() => {
+        (_e = this.transcriptIntegration) == null ? void 0 : _e.stopTranscriptionWithAudioCapture(session2);
+        (_f = this.transcriptIntegration) == null ? void 0 : _f.stopRemoteMediaRecorder(session2);
+        (_g = this.port_sip_sdk) == null ? void 0 : _g.hangUp(_callId).then(() => {
+          var _a2;
           if (this.main_id === session2) {
             this.main_id = "";
+            (_a2 = this.mediaPipeML) == null ? void 0 : _a2.resetMediapipe();
           }
           this.deleteDataKey(session2);
         }).catch((e2) => {
@@ -84668,12 +91178,15 @@ class Port_Sip {
     }
   }
   async hang_up(session2, agentId, cbCheckTab) {
-    var _a, _b, _c, _d, _e;
+    var _a, _b, _c, _d, _e, _f, _g, _h;
     const _callId = this.getDataCallId(session2);
     try {
-      await ((_a = this.port_sip_sdk) == null ? void 0 : _a.hangUp(_callId));
+      (_a = this.transcriptIntegration) == null ? void 0 : _a.stopTranscriptionWithAudioCapture(session2);
+      (_b = this.transcriptIntegration) == null ? void 0 : _b.stopRemoteMediaRecorder(session2);
+      await ((_c = this.port_sip_sdk) == null ? void 0 : _c.hangUp(_callId));
       if (this.main_id === session2) {
         this.main_id = "";
+        (_d = this.mediaPipeML) == null ? void 0 : _d.resetMediapipe();
       }
       this.deleteDataKey(session2);
       cbCheckTab && cbCheckTab(session2, "IDLE");
@@ -84694,19 +91207,22 @@ class Port_Sip {
         {
           isLogClient: false,
           isLogServer: true,
-          tenantId: (_c = (_b = this.agent_info) == null ? void 0 : _b.tenant) == null ? void 0 : _c.id,
-          agentId: (_e = (_d = this.agent_info) == null ? void 0 : _d.user) == null ? void 0 : _e.id,
+          tenantId: (_f = (_e = this.agent_info) == null ? void 0 : _e.tenant) == null ? void 0 : _f.id,
+          agentId: (_h = (_g = this.agent_info) == null ? void 0 : _g.user) == null ? void 0 : _h.id,
           sessionId: session2
         }
       );
     }
   }
   async hang_up_server(session2, agentId) {
-    var _a, _b, _c, _d;
+    var _a, _b, _c, _d, _e, _f, _g;
     try {
+      (_a = this.transcriptIntegration) == null ? void 0 : _a.stopTranscriptionWithAudioCapture(session2);
+      (_b = this.transcriptIntegration) == null ? void 0 : _b.stopRemoteMediaRecorder(session2);
       await postEndCall({ sessionId: session2, agentId });
       if (this.main_id === session2) {
         this.main_id = "";
+        (_c = this.mediaPipeML) == null ? void 0 : _c.resetMediapipe();
       }
       this.deleteDataKey(session2);
     } catch (error) {
@@ -84719,15 +91235,15 @@ class Port_Sip {
         {
           isLogClient: false,
           isLogServer: true,
-          tenantId: (_b = (_a = this.agent_info) == null ? void 0 : _a.tenant) == null ? void 0 : _b.id,
-          agentId: (_d = (_c = this.agent_info) == null ? void 0 : _c.user) == null ? void 0 : _d.id,
+          tenantId: (_e = (_d = this.agent_info) == null ? void 0 : _d.tenant) == null ? void 0 : _e.id,
+          agentId: (_g = (_f = this.agent_info) == null ? void 0 : _f.user) == null ? void 0 : _g.id,
           sessionId: session2
         }
       );
     }
   }
   async hold_call_client(session2, agentId) {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _i;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j;
     const _callId = this.getDataCallId(session2);
     if (_callId) {
       traceLog(
@@ -84743,6 +91259,12 @@ class Port_Sip {
       );
       try {
         await ((_e = this.port_sip_sdk) == null ? void 0 : _e.hold(_callId));
+        const record = this.data.get(session2);
+        (_f = this.transcriptIntegration) == null ? void 0 : _f.setLocalAudioSendEnabled(
+          session2,
+          false,
+          "hold-call-client"
+        );
         this.pushCallEventEmitter(CallEventType.CALL_HOLD, {
           sessionId: session2,
           hangupBy: null
@@ -84784,8 +91306,8 @@ class Port_Sip {
           {
             isLogClient: false,
             isLogServer: true,
-            tenantId: (_g = (_f = this.agent_info) == null ? void 0 : _f.tenant) == null ? void 0 : _g.id,
-            agentId: (_i = (_h = this.agent_info) == null ? void 0 : _h.user) == null ? void 0 : _i.id,
+            tenantId: (_h = (_g = this.agent_info) == null ? void 0 : _g.tenant) == null ? void 0 : _h.id,
+            agentId: (_j = (_i = this.agent_info) == null ? void 0 : _i.user) == null ? void 0 : _j.id,
             sessionId: session2
           }
         );
@@ -84793,11 +91315,16 @@ class Port_Sip {
     }
   }
   async un_hold_call_client(session2, agentId) {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _i;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j;
     const _callId = this.getDataCallId(session2);
     if (_callId) {
       try {
         await ((_a = this.port_sip_sdk) == null ? void 0 : _a.unhold(_callId));
+        (_b = this.transcriptIntegration) == null ? void 0 : _b.setLocalAudioSendEnabled(
+          session2,
+          true,
+          "unhold-call-client"
+        );
         this.pushCallEventEmitter(CallEventType.CALL_UNHOLD, {
           sessionId: session2,
           hangupBy: null
@@ -84835,8 +91362,8 @@ class Port_Sip {
         traceLog("un_hold_call_client success", {
           isLogClient: false,
           isLogServer: true,
-          tenantId: (_c = (_b = this.agent_info) == null ? void 0 : _b.tenant) == null ? void 0 : _c.id,
-          agentId: (_e = (_d = this.agent_info) == null ? void 0 : _d.user) == null ? void 0 : _e.id,
+          tenantId: (_d = (_c = this.agent_info) == null ? void 0 : _c.tenant) == null ? void 0 : _d.id,
+          agentId: (_f = (_e = this.agent_info) == null ? void 0 : _e.user) == null ? void 0 : _f.id,
           sessionId: session2
         });
       } catch (error) {
@@ -84846,8 +91373,8 @@ class Port_Sip {
           {
             isLogClient: false,
             isLogServer: true,
-            tenantId: (_g = (_f = this.agent_info) == null ? void 0 : _f.tenant) == null ? void 0 : _g.id,
-            agentId: (_i = (_h = this.agent_info) == null ? void 0 : _h.user) == null ? void 0 : _i.id,
+            tenantId: (_h = (_g = this.agent_info) == null ? void 0 : _g.tenant) == null ? void 0 : _h.id,
+            agentId: (_j = (_i = this.agent_info) == null ? void 0 : _i.user) == null ? void 0 : _j.id,
             sessionId: session2
           }
         );
@@ -84855,7 +91382,7 @@ class Port_Sip {
     }
   }
   async hold_call(session2, agentId) {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _i;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j;
     const _callId = this.getDataCallId(session2);
     if (_callId) {
       traceLog("hold_call server", _callId, {
@@ -84873,6 +91400,11 @@ class Port_Sip {
           remoteHold: true
         });
         if ((_e = response == null ? void 0 : response.data) == null ? void 0 : _e.success) {
+          (_f = this.transcriptIntegration) == null ? void 0 : _f.setLocalAudioSendEnabled(
+            session2,
+            false,
+            "hold-call-server"
+          );
           this.pushCallEventEmitter(CallEventType.CALL_HOLD, {
             sessionId: session2,
             hangupBy: null
@@ -84887,8 +91419,8 @@ class Port_Sip {
           {
             isLogClient: false,
             isLogServer: true,
-            tenantId: (_g = (_f = this.agent_info) == null ? void 0 : _f.tenant) == null ? void 0 : _g.id,
-            agentId: (_i = (_h = this.agent_info) == null ? void 0 : _h.user) == null ? void 0 : _i.id,
+            tenantId: (_h = (_g = this.agent_info) == null ? void 0 : _g.tenant) == null ? void 0 : _h.id,
+            agentId: (_j = (_i = this.agent_info) == null ? void 0 : _i.user) == null ? void 0 : _j.id,
             sessionId: session2
           }
         );
@@ -84896,7 +91428,7 @@ class Port_Sip {
     }
   }
   async unHold_call(session2, agentId) {
-    var _a, _b, _c, _d, _e;
+    var _a, _b, _c, _d, _e, _f;
     const _callId = this.getDataCallId(session2);
     if (_callId) {
       try {
@@ -84907,6 +91439,11 @@ class Port_Sip {
           remoteHold: true
         });
         if ((_a = response == null ? void 0 : response.data) == null ? void 0 : _a.success) {
+          (_b = this.transcriptIntegration) == null ? void 0 : _b.setLocalAudioSendEnabled(
+            session2,
+            true,
+            "unhold-call-server"
+          );
           this.pushCallEventEmitter(CallEventType.CALL_UNHOLD, {
             sessionId: session2,
             hangupBy: null
@@ -84921,8 +91458,8 @@ class Port_Sip {
           {
             isLogClient: true,
             isLogServer: false,
-            tenantId: (_c = (_b = this.agent_info) == null ? void 0 : _b.tenant) == null ? void 0 : _c.id,
-            agentId: (_e = (_d = this.agent_info) == null ? void 0 : _d.user) == null ? void 0 : _e.id,
+            tenantId: (_d = (_c = this.agent_info) == null ? void 0 : _c.tenant) == null ? void 0 : _d.id,
+            agentId: (_f = (_e = this.agent_info) == null ? void 0 : _e.user) == null ? void 0 : _f.id,
             sessionId: session2
           }
         );
@@ -84930,7 +91467,7 @@ class Port_Sip {
     }
   }
   async mute_call(session2, enableMute) {
-    var _a, _b, _c, _d, _e;
+    var _a, _b, _c, _d, _e, _f;
     const _callId = this.getDataCallId(session2);
     if (_callId) {
       try {
@@ -84942,6 +91479,11 @@ class Port_Sip {
             hangupBy: null
           }
         );
+        (_b = this.transcriptIntegration) == null ? void 0 : _b.setLocalAudioSendEnabled(
+          session2,
+          !enableMute,
+          enableMute ? "mute-call" : "unmute-call"
+        );
       } catch (error) {
         traceLog(
           "error mute_call",
@@ -84949,8 +91491,8 @@ class Port_Sip {
           {
             isLogClient: false,
             isLogServer: true,
-            tenantId: (_c = (_b = this.agent_info) == null ? void 0 : _b.tenant) == null ? void 0 : _c.id,
-            agentId: (_e = (_d = this.agent_info) == null ? void 0 : _d.user) == null ? void 0 : _e.id,
+            tenantId: (_d = (_c = this.agent_info) == null ? void 0 : _c.tenant) == null ? void 0 : _d.id,
+            agentId: (_f = (_e = this.agent_info) == null ? void 0 : _e.user) == null ? void 0 : _f.id,
             sessionId: session2
           }
         );
@@ -84972,8 +91514,47 @@ class Port_Sip {
       }
     }
   }
+  getElement(id) {
+    const element = document.querySelector("#" + id);
+    return element;
+  }
+  async sendCameraManual(sessionId, enableMute) {
+    var _a, _b, _c;
+    const el = this.getElement(hardCodeLocalVideoId);
+    const stream = el.srcObject;
+    stream.getTracks().forEach((track) => {
+      if (track.kind === "video") {
+        track.enabled = enableMute;
+      }
+    });
+    try {
+      const callId = this.getDataCallId(sessionId);
+      const session2 = (_a = this.port_sip_sdk) == null ? void 0 : _a.sessions.get(callId);
+      if (!session2) throw new Error("session does not exti");
+      const pc = (_c = (_b = session2.session) == null ? void 0 : _b.sessionDescriptionHandler) == null ? void 0 : _c.peerConnection;
+      if (enableMute) {
+        session2.constraints.video = true;
+        pc.getSenders().forEach((sender) => {
+          var _a2;
+          if (((_a2 = sender.track) == null ? void 0 : _a2.kind) === "video") {
+            sender.track.enabled = enableMute;
+          }
+        });
+      } else {
+        pc.getSenders().forEach((sender) => {
+          var _a2;
+          if (((_a2 = sender.track) == null ? void 0 : _a2.kind) === "video") {
+            sender.track.enabled = enableMute;
+          }
+        });
+        session2.constraints.video = false;
+      }
+    } catch (error) {
+      console.log("erro sendCaemera", error);
+    }
+  }
   async update(session2, enableVideo) {
-    var _a, _b, _c, _d, _e, _f;
+    var _a, _b;
     const _callId = this.getDataCallId(session2) ?? 0;
     console.log("updateCall", session2, _callId);
     if (!_callId) return;
@@ -84981,13 +91562,12 @@ class Port_Sip {
       console.log("updateCall skipped due to pending re-INVITE", _callId);
       return;
     }
-    ((_b = (_a = this.port_sip_sdk) == null ? void 0 : _a.sessions.get(_callId)) == null ? void 0 : _b.ext) ?? ((_d = (_c = this.agent_info) == null ? void 0 : _c.user) == null ? void 0 : _d.extension) ?? "";
     try {
-      const s2 = (_e = this.port_sip_sdk) == null ? void 0 : _e.sessions.get(_callId);
+      const s2 = (_a = this.port_sip_sdk) == null ? void 0 : _a.sessions.get(_callId);
       if (s2) {
         s2.constraints.video = true;
       }
-      await ((_f = this.port_sip_sdk) == null ? void 0 : _f.updateCall(_callId, true, true));
+      await ((_b = this.port_sip_sdk) == null ? void 0 : _b.updateCall(_callId, true, true));
     } catch (error) {
       console.log("error updateCall", error);
       this.pendingReinvite.delete(_callId);
@@ -85210,18 +91790,26 @@ class Port_Sip {
       console.log("error updateCall", error);
     }
   }
-  async blurBackground(sessionId, enable = false, localVideoId) {
-    var _a, _b, _c;
+  async blurBackground(sessionId, imageId) {
+    var _a, _b, _c, _d;
+    if (!sessionId) sessionId = this.main_id;
+    (_a = this.mediaPipeML) == null ? void 0 : _a.start(imageId);
     const callId = this.getDataCallId(sessionId);
-    const canvas = document.getElementById("outputCanvas");
+    const canvas = document.getElementById(elIdCanvas);
     const localVideo = document.getElementById(
-      localVideoId ?? ""
+      hardCodeLocalVideoId
     );
     const processedStream = canvas.captureStream(60);
+    console.log("abac", {
+      videoWidth: localVideo.videoWidth,
+      videoHeight: localVideo.videoHeight,
+      canvasWidth: canvas.width,
+      canvasHeight: canvas.height
+    });
     try {
-      const session2 = (_a = this.port_sip_sdk) == null ? void 0 : _a.sessions.get(callId);
+      const session2 = (_b = this.port_sip_sdk) == null ? void 0 : _b.sessions.get(callId);
       if (!session2) throw new Error("session does not exti");
-      const pc = (_c = (_b = session2.session) == null ? void 0 : _b.sessionDescriptionHandler) == null ? void 0 : _c.peerConnection;
+      const pc = (_d = (_c = session2.session) == null ? void 0 : _c.sessionDescriptionHandler) == null ? void 0 : _d.peerConnection;
       const newTrack = processedStream.getVideoTracks()[0];
       session2.constraints.video = true;
       const sender = pc.getSenders().find((sender2) => {
@@ -85229,17 +91817,35 @@ class Port_Sip {
         return ((_a2 = sender2.track) == null ? void 0 : _a2.kind) === "video";
       });
       if (sender) {
-        if (enable && newTrack) {
+        if (newTrack) {
+          if (localVideo) {
+            localVideo.srcObject = canvas.captureStream(30);
+            localVideo.play().catch((e2) => console.log("local play error", e2));
+          }
           await sender.replaceTrack(newTrack);
+          return Promise.resolve({
+            success: true,
+            message: "blurBackground success"
+          });
         } else {
           const remoteLocalStream = localVideo.srcObject;
           const originalTrack = remoteLocalStream.getVideoTracks()[0];
           await (sender == null ? void 0 : sender.replaceTrack(originalTrack));
+          return Promise.resolve({
+            success: true,
+            message: "blurBackground success"
+          });
         }
-        console.log("✅ Replaced video track with blurred stream");
+      } else {
+        throw new Error("sender not found");
       }
     } catch (error) {
       console.log("error blurBackground", error);
+      return Promise.reject({
+        success: false,
+        message: "",
+        error
+      });
     }
   }
   async waitUntilStable(session2) {
@@ -85375,74 +91981,6 @@ class Port_Sip {
     const session2 = (_a = this.port_sip_sdk) == null ? void 0 : _a.sessions.get(callId);
     return ((_b = session2 == null ? void 0 : session2.session) == null ? void 0 : _b.state) ?? SessionState$2.Terminated;
   }
-  /**
-   * replaceTrack and enableVideo handle replacing video tracks in a WebRTC call.
-   *
-   * replaceTrack:
-   *  - Takes a session ID, local video element ID, and an enable flag.
-   *  - Captures the processed video stream from a canvas element.
-   *  Replaces the video track in the ongoing call with a new track from the processed stream.
-   */
-  async replaceTrack(sessionId, localVideoId, enable = false) {
-    var _a, _b, _c;
-    const callId = this.getDataCallId(sessionId);
-    document.getElementById("outputCanvas");
-    const localVideo = document.getElementById(
-      localVideoId ?? ""
-    );
-    const processedStream = localVideo.srcObject;
-    try {
-      const session2 = (_a = this.port_sip_sdk) == null ? void 0 : _a.sessions.get(callId);
-      if (!session2) throw new Error("session does not exti");
-      const pc = (_c = (_b = session2.session) == null ? void 0 : _b.sessionDescriptionHandler) == null ? void 0 : _c.peerConnection;
-      const newTrack = processedStream.getVideoTracks()[0];
-      session2.constraints.video = true;
-      const sender = pc.getSenders().find((sender2) => {
-        var _a2;
-        return ((_a2 = sender2.track) == null ? void 0 : _a2.kind) === "video";
-      });
-      if (sender) {
-        if (enable && newTrack) {
-          await sender.replaceTrack(newTrack);
-        } else {
-          const remoteLocalStream = localVideo.srcObject;
-          const originalTrack = remoteLocalStream.getVideoTracks()[0];
-          await (sender == null ? void 0 : sender.replaceTrack(originalTrack));
-        }
-        console.log("✅ Replaced video track with blurred stream2");
-      }
-    } catch (error) {
-      console.log("error blurBackground", error);
-    }
-  }
-  async enableVideo(sessionId, enable, localVideoId) {
-    var _a, _b, _c;
-    const callId = this.getDataCallId(sessionId);
-    const localVideo = document.getElementById(
-      localVideoId ?? ""
-    );
-    const session2 = (_a = this.port_sip_sdk) == null ? void 0 : _a.sessions.get(callId);
-    if (!session2) throw new Error("session does not exti");
-    const pc = (_c = (_b = session2.session) == null ? void 0 : _b.sessionDescriptionHandler) == null ? void 0 : _c.peerConnection;
-    try {
-      if (enable) {
-        session2.constraints.video = true;
-        localVideo.play();
-        this.replaceTrack(sessionId, localVideoId, true);
-      } else {
-        localVideo.pause();
-        pc.getSenders().forEach((sender) => {
-          var _a2;
-          if (((_a2 = sender.track) == null ? void 0 : _a2.kind) === "video") {
-            sender.track.enabled = enable;
-          }
-        });
-        session2.constraints.video = false;
-      }
-    } catch (error) {
-      console.log("error pauseVideo", error);
-    }
-  }
   pushMsgSnapshot() {
     var _a, _b, _c, _d, _e;
     const id = this.getDataCallId(this.main_id);
@@ -85460,6 +91998,50 @@ class Port_Sip {
       );
     } catch (error) {
       console.log("error push msg", error);
+    }
+  }
+  async offblackground(sessionId) {
+    var _a, _b, _c, _d, _e;
+    try {
+      (_a = this.mediaPipeML) == null ? void 0 : _a.resetMediapipe();
+      (_b = this.mediaPipeML) == null ? void 0 : _b.setOutputTrack(null);
+      const video = document.getElementById(
+        hardCodeLocalVideoId
+      );
+      if (video.srcObject) {
+        video.srcObject.getTracks().forEach((t2) => t2.stop());
+      }
+      if (!sessionId) sessionId = this.main_id;
+      const callId = this.getDataCallId(sessionId);
+      const session2 = (_c = this.port_sip_sdk) == null ? void 0 : _c.sessions.get(callId);
+      if (!session2) throw new Error("session does not exist");
+      const pc = (_e = (_d = session2.session) == null ? void 0 : _d.sessionDescriptionHandler) == null ? void 0 : _e.peerConnection;
+      const newStream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          ...SCREEN_RESOLUTION.get("FULL_HD")
+        }
+      });
+      video.srcObject = newStream;
+      const newTrack = newStream.getVideoTracks()[0];
+      const sender = pc.getSenders().find((s2) => {
+        var _a2;
+        return ((_a2 = s2.track) == null ? void 0 : _a2.kind) === "video";
+      });
+      if (sender && newTrack) {
+        await sender.replaceTrack(newTrack);
+        return Promise.resolve({
+          success: true,
+          message: "offblackground success"
+        });
+      } else {
+        throw new Error("Không lỗi không off blackground");
+      }
+    } catch (error) {
+      return Promise.reject({
+        success: true,
+        message: "",
+        error
+      });
     }
   }
   /**
@@ -85480,3307 +92062,350 @@ class Port_Sip {
     });
   }
 }
-const PACKET_TYPES = /* @__PURE__ */ Object.create(null);
-PACKET_TYPES["open"] = "0";
-PACKET_TYPES["close"] = "1";
-PACKET_TYPES["ping"] = "2";
-PACKET_TYPES["pong"] = "3";
-PACKET_TYPES["message"] = "4";
-PACKET_TYPES["upgrade"] = "5";
-PACKET_TYPES["noop"] = "6";
-const PACKET_TYPES_REVERSE = /* @__PURE__ */ Object.create(null);
-Object.keys(PACKET_TYPES).forEach((key) => {
-  PACKET_TYPES_REVERSE[PACKET_TYPES[key]] = key;
-});
-const ERROR_PACKET = { type: "error", data: "parser error" };
-const withNativeBlob$1 = typeof Blob === "function" || typeof Blob !== "undefined" && Object.prototype.toString.call(Blob) === "[object BlobConstructor]";
-const withNativeArrayBuffer$2 = typeof ArrayBuffer === "function";
-const isView$1 = (obj) => {
-  return typeof ArrayBuffer.isView === "function" ? ArrayBuffer.isView(obj) : obj && obj.buffer instanceof ArrayBuffer;
+const { fetchRestful, callApiNotAuth } = new AxiosExternal();
+const postAIAssistants = (body) => axiosAuth.post(
+  "chat-acd/conversation/ai-assistant",
+  body
+);
+const getHistoryTranscripts = (body) => {
+  return axiosAuth.get(
+    `chat-acd/transcript/history/${body == null ? void 0 : body.conversationId}`
+  );
 };
-const encodePacket = ({ type, data }, supportsBinary, callback) => {
-  if (withNativeBlob$1 && data instanceof Blob) {
-    if (supportsBinary) {
-      return callback(data);
-    } else {
-      return encodeBlobAsBase64(data, callback);
-    }
-  } else if (withNativeArrayBuffer$2 && (data instanceof ArrayBuffer || isView$1(data))) {
-    if (supportsBinary) {
-      return callback(data);
-    } else {
-      return encodeBlobAsBase64(new Blob([data]), callback);
-    }
+class AIAssistant {
+  constructor(socket_service) {
+    __publicField(this, "status", StatusRenderAssistant.INITIAL);
+    __publicField(this, "listeners", /* @__PURE__ */ new Map());
+    __publicField(this, "socket_service", null);
+    __publicField(this, "data", []);
+    this.data = [];
+    this.status = StatusRenderAssistant.INITIAL;
+    this.socket_service = socket_service;
   }
-  return callback(PACKET_TYPES[type] + (data || ""));
-};
-const encodeBlobAsBase64 = (data, callback) => {
-  const fileReader = new FileReader();
-  fileReader.onload = function() {
-    const content2 = fileReader.result.split(",")[1];
-    callback("b" + (content2 || ""));
-  };
-  return fileReader.readAsDataURL(data);
-};
-function toArray(data) {
-  if (data instanceof Uint8Array) {
-    return data;
-  } else if (data instanceof ArrayBuffer) {
-    return new Uint8Array(data);
-  } else {
-    return new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
+  setStatus(status2) {
+    this.status = status2;
   }
-}
-let TEXT_ENCODER;
-function encodePacketToBinary(packet, callback) {
-  if (withNativeBlob$1 && packet.data instanceof Blob) {
-    return packet.data.arrayBuffer().then(toArray).then(callback);
-  } else if (withNativeArrayBuffer$2 && (packet.data instanceof ArrayBuffer || isView$1(packet.data))) {
-    return callback(toArray(packet.data));
-  }
-  encodePacket(packet, false, (encoded) => {
-    if (!TEXT_ENCODER) {
-      TEXT_ENCODER = new TextEncoder();
-    }
-    callback(TEXT_ENCODER.encode(encoded));
-  });
-}
-const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-const lookup$1 = typeof Uint8Array === "undefined" ? [] : new Uint8Array(256);
-for (let i2 = 0; i2 < chars.length; i2++) {
-  lookup$1[chars.charCodeAt(i2)] = i2;
-}
-const decode$1 = (base64) => {
-  let bufferLength = base64.length * 0.75, len = base64.length, i2, p2 = 0, encoded1, encoded2, encoded3, encoded4;
-  if (base64[base64.length - 1] === "=") {
-    bufferLength--;
-    if (base64[base64.length - 2] === "=") {
-      bufferLength--;
-    }
-  }
-  const arraybuffer = new ArrayBuffer(bufferLength), bytes = new Uint8Array(arraybuffer);
-  for (i2 = 0; i2 < len; i2 += 4) {
-    encoded1 = lookup$1[base64.charCodeAt(i2)];
-    encoded2 = lookup$1[base64.charCodeAt(i2 + 1)];
-    encoded3 = lookup$1[base64.charCodeAt(i2 + 2)];
-    encoded4 = lookup$1[base64.charCodeAt(i2 + 3)];
-    bytes[p2++] = encoded1 << 2 | encoded2 >> 4;
-    bytes[p2++] = (encoded2 & 15) << 4 | encoded3 >> 2;
-    bytes[p2++] = (encoded3 & 3) << 6 | encoded4 & 63;
-  }
-  return arraybuffer;
-};
-const withNativeArrayBuffer$1 = typeof ArrayBuffer === "function";
-const decodePacket = (encodedPacket, binaryType) => {
-  if (typeof encodedPacket !== "string") {
-    return {
-      type: "message",
-      data: mapBinary(encodedPacket, binaryType)
-    };
-  }
-  const type = encodedPacket.charAt(0);
-  if (type === "b") {
-    return {
-      type: "message",
-      data: decodeBase64Packet(encodedPacket.substring(1), binaryType)
-    };
-  }
-  const packetType = PACKET_TYPES_REVERSE[type];
-  if (!packetType) {
-    return ERROR_PACKET;
-  }
-  return encodedPacket.length > 1 ? {
-    type: PACKET_TYPES_REVERSE[type],
-    data: encodedPacket.substring(1)
-  } : {
-    type: PACKET_TYPES_REVERSE[type]
-  };
-};
-const decodeBase64Packet = (data, binaryType) => {
-  if (withNativeArrayBuffer$1) {
-    const decoded = decode$1(data);
-    return mapBinary(decoded, binaryType);
-  } else {
-    return { base64: true, data };
-  }
-};
-const mapBinary = (data, binaryType) => {
-  switch (binaryType) {
-    case "blob":
-      if (data instanceof Blob) {
-        return data;
-      } else {
-        return new Blob([data]);
-      }
-    case "arraybuffer":
-    default:
-      if (data instanceof ArrayBuffer) {
-        return data;
-      } else {
-        return data.buffer;
-      }
-  }
-};
-const SEPARATOR = String.fromCharCode(30);
-const encodePayload = (packets, callback) => {
-  const length = packets.length;
-  const encodedPackets = new Array(length);
-  let count = 0;
-  packets.forEach((packet, i2) => {
-    encodePacket(packet, false, (encodedPacket) => {
-      encodedPackets[i2] = encodedPacket;
-      if (++count === length) {
-        callback(encodedPackets.join(SEPARATOR));
-      }
-    });
-  });
-};
-const decodePayload = (encodedPayload, binaryType) => {
-  const encodedPackets = encodedPayload.split(SEPARATOR);
-  const packets = [];
-  for (let i2 = 0; i2 < encodedPackets.length; i2++) {
-    const decodedPacket = decodePacket(encodedPackets[i2], binaryType);
-    packets.push(decodedPacket);
-    if (decodedPacket.type === "error") {
-      break;
-    }
-  }
-  return packets;
-};
-function createPacketEncoderStream() {
-  return new TransformStream({
-    transform(packet, controller) {
-      encodePacketToBinary(packet, (encodedPacket) => {
-        const payloadLength = encodedPacket.length;
-        let header;
-        if (payloadLength < 126) {
-          header = new Uint8Array(1);
-          new DataView(header.buffer).setUint8(0, payloadLength);
-        } else if (payloadLength < 65536) {
-          header = new Uint8Array(3);
-          const view = new DataView(header.buffer);
-          view.setUint8(0, 126);
-          view.setUint16(1, payloadLength);
-        } else {
-          header = new Uint8Array(9);
-          const view = new DataView(header.buffer);
-          view.setUint8(0, 127);
-          view.setBigUint64(1, BigInt(payloadLength));
-        }
-        if (packet.data && typeof packet.data !== "string") {
-          header[0] |= 128;
-        }
-        controller.enqueue(header);
-        controller.enqueue(encodedPacket);
-      });
-    }
-  });
-}
-let TEXT_DECODER;
-function totalLength(chunks) {
-  return chunks.reduce((acc, chunk) => acc + chunk.length, 0);
-}
-function concatChunks(chunks, size) {
-  if (chunks[0].length === size) {
-    return chunks.shift();
-  }
-  const buffer = new Uint8Array(size);
-  let j = 0;
-  for (let i2 = 0; i2 < size; i2++) {
-    buffer[i2] = chunks[0][j++];
-    if (j === chunks[0].length) {
-      chunks.shift();
-      j = 0;
-    }
-  }
-  if (chunks.length && j < chunks[0].length) {
-    chunks[0] = chunks[0].slice(j);
-  }
-  return buffer;
-}
-function createPacketDecoderStream(maxPayload, binaryType) {
-  if (!TEXT_DECODER) {
-    TEXT_DECODER = new TextDecoder();
-  }
-  const chunks = [];
-  let state = 0;
-  let expectedLength = -1;
-  let isBinary2 = false;
-  return new TransformStream({
-    transform(chunk, controller) {
-      chunks.push(chunk);
-      while (true) {
-        if (state === 0) {
-          if (totalLength(chunks) < 1) {
-            break;
-          }
-          const header = concatChunks(chunks, 1);
-          isBinary2 = (header[0] & 128) === 128;
-          expectedLength = header[0] & 127;
-          if (expectedLength < 126) {
-            state = 3;
-          } else if (expectedLength === 126) {
-            state = 1;
-          } else {
-            state = 2;
-          }
-        } else if (state === 1) {
-          if (totalLength(chunks) < 2) {
-            break;
-          }
-          const headerArray = concatChunks(chunks, 2);
-          expectedLength = new DataView(headerArray.buffer, headerArray.byteOffset, headerArray.length).getUint16(0);
-          state = 3;
-        } else if (state === 2) {
-          if (totalLength(chunks) < 8) {
-            break;
-          }
-          const headerArray = concatChunks(chunks, 8);
-          const view = new DataView(headerArray.buffer, headerArray.byteOffset, headerArray.length);
-          const n2 = view.getUint32(0);
-          if (n2 > Math.pow(2, 53 - 32) - 1) {
-            controller.enqueue(ERROR_PACKET);
-            break;
-          }
-          expectedLength = n2 * Math.pow(2, 32) + view.getUint32(4);
-          state = 3;
-        } else {
-          if (totalLength(chunks) < expectedLength) {
-            break;
-          }
-          const data = concatChunks(chunks, expectedLength);
-          controller.enqueue(decodePacket(isBinary2 ? data : TEXT_DECODER.decode(data), binaryType));
-          state = 0;
-        }
-        if (expectedLength === 0 || expectedLength > maxPayload) {
-          controller.enqueue(ERROR_PACKET);
-          break;
-        }
-      }
-    }
-  });
-}
-const protocol$1 = 4;
-function Emitter(obj) {
-  if (obj) return mixin(obj);
-}
-function mixin(obj) {
-  for (var key in Emitter.prototype) {
-    obj[key] = Emitter.prototype[key];
-  }
-  return obj;
-}
-Emitter.prototype.on = Emitter.prototype.addEventListener = function(event, fn) {
-  this._callbacks = this._callbacks || {};
-  (this._callbacks["$" + event] = this._callbacks["$" + event] || []).push(fn);
-  return this;
-};
-Emitter.prototype.once = function(event, fn) {
-  function on2() {
-    this.off(event, on2);
-    fn.apply(this, arguments);
-  }
-  on2.fn = fn;
-  this.on(event, on2);
-  return this;
-};
-Emitter.prototype.off = Emitter.prototype.removeListener = Emitter.prototype.removeAllListeners = Emitter.prototype.removeEventListener = function(event, fn) {
-  this._callbacks = this._callbacks || {};
-  if (0 == arguments.length) {
-    this._callbacks = {};
-    return this;
-  }
-  var callbacks = this._callbacks["$" + event];
-  if (!callbacks) return this;
-  if (1 == arguments.length) {
-    delete this._callbacks["$" + event];
-    return this;
-  }
-  var cb;
-  for (var i2 = 0; i2 < callbacks.length; i2++) {
-    cb = callbacks[i2];
-    if (cb === fn || cb.fn === fn) {
-      callbacks.splice(i2, 1);
-      break;
-    }
-  }
-  if (callbacks.length === 0) {
-    delete this._callbacks["$" + event];
-  }
-  return this;
-};
-Emitter.prototype.emit = function(event) {
-  this._callbacks = this._callbacks || {};
-  var args = new Array(arguments.length - 1), callbacks = this._callbacks["$" + event];
-  for (var i2 = 1; i2 < arguments.length; i2++) {
-    args[i2 - 1] = arguments[i2];
-  }
-  if (callbacks) {
-    callbacks = callbacks.slice(0);
-    for (var i2 = 0, len = callbacks.length; i2 < len; ++i2) {
-      callbacks[i2].apply(this, args);
-    }
-  }
-  return this;
-};
-Emitter.prototype.emitReserved = Emitter.prototype.emit;
-Emitter.prototype.listeners = function(event) {
-  this._callbacks = this._callbacks || {};
-  return this._callbacks["$" + event] || [];
-};
-Emitter.prototype.hasListeners = function(event) {
-  return !!this.listeners(event).length;
-};
-const nextTick = (() => {
-  const isPromiseAvailable = typeof Promise === "function" && typeof Promise.resolve === "function";
-  if (isPromiseAvailable) {
-    return (cb) => Promise.resolve().then(cb);
-  } else {
-    return (cb, setTimeoutFn) => setTimeoutFn(cb, 0);
-  }
-})();
-const globalThisShim = (() => {
-  if (typeof self !== "undefined") {
-    return self;
-  } else if (typeof window !== "undefined") {
-    return window;
-  } else {
-    return Function("return this")();
-  }
-})();
-const defaultBinaryType = "arraybuffer";
-function createCookieJar() {
-}
-function pick(obj, ...attr) {
-  return attr.reduce((acc, k) => {
-    if (obj.hasOwnProperty(k)) {
-      acc[k] = obj[k];
-    }
-    return acc;
-  }, {});
-}
-const NATIVE_SET_TIMEOUT = globalThisShim.setTimeout;
-const NATIVE_CLEAR_TIMEOUT = globalThisShim.clearTimeout;
-function installTimerFunctions(obj, opts) {
-  if (opts.useNativeTimers) {
-    obj.setTimeoutFn = NATIVE_SET_TIMEOUT.bind(globalThisShim);
-    obj.clearTimeoutFn = NATIVE_CLEAR_TIMEOUT.bind(globalThisShim);
-  } else {
-    obj.setTimeoutFn = globalThisShim.setTimeout.bind(globalThisShim);
-    obj.clearTimeoutFn = globalThisShim.clearTimeout.bind(globalThisShim);
-  }
-}
-const BASE64_OVERHEAD = 1.33;
-function byteLength(obj) {
-  if (typeof obj === "string") {
-    return utf8Length(obj);
-  }
-  return Math.ceil((obj.byteLength || obj.size) * BASE64_OVERHEAD);
-}
-function utf8Length(str) {
-  let c2 = 0, length = 0;
-  for (let i2 = 0, l2 = str.length; i2 < l2; i2++) {
-    c2 = str.charCodeAt(i2);
-    if (c2 < 128) {
-      length += 1;
-    } else if (c2 < 2048) {
-      length += 2;
-    } else if (c2 < 55296 || c2 >= 57344) {
-      length += 3;
-    } else {
-      i2++;
-      length += 4;
-    }
-  }
-  return length;
-}
-function randomString() {
-  return Date.now().toString(36).substring(3) + Math.random().toString(36).substring(2, 5);
-}
-function encode(obj) {
-  let str = "";
-  for (let i2 in obj) {
-    if (obj.hasOwnProperty(i2)) {
-      if (str.length)
-        str += "&";
-      str += encodeURIComponent(i2) + "=" + encodeURIComponent(obj[i2]);
-    }
-  }
-  return str;
-}
-function decode(qs) {
-  let qry = {};
-  let pairs = qs.split("&");
-  for (let i2 = 0, l2 = pairs.length; i2 < l2; i2++) {
-    let pair = pairs[i2].split("=");
-    qry[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]);
-  }
-  return qry;
-}
-class TransportError3 extends Error {
-  constructor(reason, description, context) {
-    super(reason);
-    this.description = description;
-    this.context = context;
-    this.type = "TransportError";
-  }
-}
-class Transport3 extends Emitter {
-  /**
-   * Transport abstract constructor.
-   *
-   * @param {Object} opts - options
-   * @protected
-   */
-  constructor(opts) {
-    super();
-    this.writable = false;
-    installTimerFunctions(this, opts);
-    this.opts = opts;
-    this.query = opts.query;
-    this.socket = opts.socket;
-    this.supportsBinary = !opts.forceBase64;
+  getStatus() {
+    return this.status;
   }
   /**
-   * Emits an error.
-   *
-   * @param {String} reason
-   * @param description
-   * @param context - the error context
-   * @return {Transport} for chaining
-   * @protected
+   * subscribe event
    */
-  onError(reason, description, context) {
-    super.emitReserved("error", new TransportError3(reason, description, context));
-    return this;
-  }
-  /**
-   * Opens the transport.
-   */
-  open() {
-    this.readyState = "opening";
-    this.doOpen();
-    return this;
-  }
-  /**
-   * Closes the transport.
-   */
-  close() {
-    if (this.readyState === "opening" || this.readyState === "open") {
-      this.doClose();
-      this.onClose();
-    }
-    return this;
-  }
-  /**
-   * Sends multiple packets.
-   *
-   * @param {Array} packets
-   */
-  send(packets) {
-    if (this.readyState === "open") {
-      this.write(packets);
-    }
-  }
-  /**
-   * Called upon open
-   *
-   * @protected
-   */
-  onOpen() {
-    this.readyState = "open";
-    this.writable = true;
-    super.emitReserved("open");
-  }
-  /**
-   * Called with data.
-   *
-   * @param {String} data
-   * @protected
-   */
-  onData(data) {
-    const packet = decodePacket(data, this.socket.binaryType);
-    this.onPacket(packet);
-  }
-  /**
-   * Called with a decoded packet.
-   *
-   * @protected
-   */
-  onPacket(packet) {
-    super.emitReserved("packet", packet);
-  }
-  /**
-   * Called upon close.
-   *
-   * @protected
-   */
-  onClose(details) {
-    this.readyState = "closed";
-    super.emitReserved("close", details);
-  }
-  /**
-   * Pauses the transport, in order not to lose packets during an upgrade.
-   *
-   * @param onPause
-   */
-  pause(onPause) {
-  }
-  createUri(schema, query = {}) {
-    return schema + "://" + this._hostname() + this._port() + this.opts.path + this._query(query);
-  }
-  _hostname() {
-    const hostname = this.opts.hostname;
-    return hostname.indexOf(":") === -1 ? hostname : "[" + hostname + "]";
-  }
-  _port() {
-    if (this.opts.port && (this.opts.secure && Number(this.opts.port !== 443) || !this.opts.secure && Number(this.opts.port) !== 80)) {
-      return ":" + this.opts.port;
-    } else {
-      return "";
-    }
-  }
-  _query(query) {
-    const encodedQuery = encode(query);
-    return encodedQuery.length ? "?" + encodedQuery : "";
-  }
-}
-class Polling extends Transport3 {
-  constructor() {
-    super(...arguments);
-    this._polling = false;
-  }
-  get name() {
-    return "polling";
-  }
-  /**
-   * Opens the socket (triggers polling). We write a PING message to determine
-   * when the transport is open.
-   *
-   * @protected
-   */
-  doOpen() {
-    this._poll();
-  }
-  /**
-   * Pauses polling.
-   *
-   * @param {Function} onPause - callback upon buffers are flushed and transport is paused
-   * @package
-   */
-  pause(onPause) {
-    this.readyState = "pausing";
-    const pause = () => {
-      this.readyState = "paused";
-      onPause();
-    };
-    if (this._polling || !this.writable) {
-      let total = 0;
-      if (this._polling) {
-        total++;
-        this.once("pollComplete", function() {
-          --total || pause();
-        });
-      }
-      if (!this.writable) {
-        total++;
-        this.once("drain", function() {
-          --total || pause();
-        });
-      }
-    } else {
-      pause();
-    }
-  }
-  /**
-   * Starts polling cycle.
-   *
-   * @private
-   */
-  _poll() {
-    this._polling = true;
-    this.doPoll();
-    this.emitReserved("poll");
-  }
-  /**
-   * Overloads onData to detect payloads.
-   *
-   * @protected
-   */
-  onData(data) {
-    const callback = (packet) => {
-      if ("opening" === this.readyState && packet.type === "open") {
-        this.onOpen();
-      }
-      if ("close" === packet.type) {
-        this.onClose({ description: "transport closed by the server" });
-        return false;
-      }
-      this.onPacket(packet);
-    };
-    decodePayload(data, this.socket.binaryType).forEach(callback);
-    if ("closed" !== this.readyState) {
-      this._polling = false;
-      this.emitReserved("pollComplete");
-      if ("open" === this.readyState) {
-        this._poll();
-      }
-    }
-  }
-  /**
-   * For polling, send a close packet.
-   *
-   * @protected
-   */
-  doClose() {
-    const close2 = () => {
-      this.write([{ type: "close" }]);
-    };
-    if ("open" === this.readyState) {
-      close2();
-    } else {
-      this.once("open", close2);
-    }
-  }
-  /**
-   * Writes a packets payload.
-   *
-   * @param {Array} packets - data packets
-   * @protected
-   */
-  write(packets) {
-    this.writable = false;
-    encodePayload(packets, (data) => {
-      this.doWrite(data, () => {
-        this.writable = true;
-        this.emitReserved("drain");
-      });
-    });
-  }
-  /**
-   * Generates uri for connection.
-   *
-   * @private
-   */
-  uri() {
-    const schema = this.opts.secure ? "https" : "http";
-    const query = this.query || {};
-    if (false !== this.opts.timestampRequests) {
-      query[this.opts.timestampParam] = randomString();
-    }
-    if (!this.supportsBinary && !query.sid) {
-      query.b64 = 1;
-    }
-    return this.createUri(schema, query);
-  }
-}
-let value = false;
-try {
-  value = typeof XMLHttpRequest !== "undefined" && "withCredentials" in new XMLHttpRequest();
-} catch (err) {
-}
-const hasCORS = value;
-function empty() {
-}
-class BaseXHR extends Polling {
-  /**
-   * XHR Polling constructor.
-   *
-   * @param {Object} opts
-   * @package
-   */
-  constructor(opts) {
-    super(opts);
-    if (typeof location !== "undefined") {
-      const isSSL = "https:" === location.protocol;
-      let port = location.port;
-      if (!port) {
-        port = isSSL ? "443" : "80";
-      }
-      this.xd = typeof location !== "undefined" && opts.hostname !== location.hostname || port !== opts.port;
-    }
-  }
-  /**
-   * Sends data.
-   *
-   * @param {String} data to send.
-   * @param {Function} called upon flush.
-   * @private
-   */
-  doWrite(data, fn) {
-    const req = this.request({
-      method: "POST",
-      data
-    });
-    req.on("success", fn);
-    req.on("error", (xhrStatus, context) => {
-      this.onError("xhr post error", xhrStatus, context);
-    });
-  }
-  /**
-   * Starts a poll cycle.
-   *
-   * @private
-   */
-  doPoll() {
-    const req = this.request();
-    req.on("data", this.onData.bind(this));
-    req.on("error", (xhrStatus, context) => {
-      this.onError("xhr poll error", xhrStatus, context);
-    });
-    this.pollXhr = req;
-  }
-}
-let Request$1 = class Request2 extends Emitter {
-  /**
-   * Request constructor
-   *
-   * @param {Object} options
-   * @package
-   */
-  constructor(createRequest, uri, opts) {
-    super();
-    this.createRequest = createRequest;
-    installTimerFunctions(this, opts);
-    this._opts = opts;
-    this._method = opts.method || "GET";
-    this._uri = uri;
-    this._data = void 0 !== opts.data ? opts.data : null;
-    this._create();
-  }
-  /**
-   * Creates the XHR object and sends the request.
-   *
-   * @private
-   */
-  _create() {
+  subscribe(event, callback) {
     var _a;
-    const opts = pick(this._opts, "agent", "pfx", "key", "passphrase", "cert", "ca", "ciphers", "rejectUnauthorized", "autoUnref");
-    opts.xdomain = !!this._opts.xd;
-    const xhr = this._xhr = this.createRequest(opts);
-    try {
-      xhr.open(this._method, this._uri, true);
-      try {
-        if (this._opts.extraHeaders) {
-          xhr.setDisableHeaderCheck && xhr.setDisableHeaderCheck(true);
-          for (let i2 in this._opts.extraHeaders) {
-            if (this._opts.extraHeaders.hasOwnProperty(i2)) {
-              xhr.setRequestHeader(i2, this._opts.extraHeaders[i2]);
-            }
-          }
-        }
-      } catch (e2) {
-      }
-      if ("POST" === this._method) {
-        try {
-          xhr.setRequestHeader("Content-type", "text/plain;charset=UTF-8");
-        } catch (e2) {
-        }
-      }
-      try {
-        xhr.setRequestHeader("Accept", "*/*");
-      } catch (e2) {
-      }
-      (_a = this._opts.cookieJar) === null || _a === void 0 ? void 0 : _a.addCookies(xhr);
-      if ("withCredentials" in xhr) {
-        xhr.withCredentials = this._opts.withCredentials;
-      }
-      if (this._opts.requestTimeout) {
-        xhr.timeout = this._opts.requestTimeout;
-      }
-      xhr.onreadystatechange = () => {
-        var _a2;
-        if (xhr.readyState === 3) {
-          (_a2 = this._opts.cookieJar) === null || _a2 === void 0 ? void 0 : _a2.parseCookies(
-            // @ts-ignore
-            xhr.getResponseHeader("set-cookie")
-          );
-        }
-        if (4 !== xhr.readyState)
-          return;
-        if (200 === xhr.status || 1223 === xhr.status) {
-          this._onLoad();
-        } else {
-          this.setTimeoutFn(() => {
-            this._onError(typeof xhr.status === "number" ? xhr.status : 0);
-          }, 0);
-        }
-      };
-      xhr.send(this._data);
-    } catch (e2) {
-      this.setTimeoutFn(() => {
-        this._onError(e2);
-      }, 0);
-      return;
-    }
-    if (typeof document !== "undefined") {
-      this._index = Request2.requestsCount++;
-      Request2.requests[this._index] = this;
-    }
+    this.listeners.set(event, callback);
+    (_a = this.socket_service) == null ? void 0 : _a.on(event, callback);
+  }
+  onSocket() {
   }
   /**
-   * Called upon error.
-   *
-   * @private
+   * subscribe event once
    */
-  _onError(err) {
-    this.emitReserved("error", err, this._xhr);
-    this._cleanup(true);
-  }
-  /**
-   * Cleans up house.
-   *
-   * @private
-   */
-  _cleanup(fromError) {
-    if ("undefined" === typeof this._xhr || null === this._xhr) {
-      return;
-    }
-    this._xhr.onreadystatechange = empty;
-    if (fromError) {
-      try {
-        this._xhr.abort();
-      } catch (e2) {
-      }
-    }
-    if (typeof document !== "undefined") {
-      delete Request2.requests[this._index];
-    }
-    this._xhr = null;
-  }
-  /**
-   * Called upon load.
-   *
-   * @private
-   */
-  _onLoad() {
-    const data = this._xhr.responseText;
-    if (data !== null) {
-      this.emitReserved("data", data);
-      this.emitReserved("success");
-      this._cleanup();
-    }
-  }
-  /**
-   * Aborts the request.
-   *
-   * @package
-   */
-  abort() {
-    this._cleanup();
-  }
-};
-Request$1.requestsCount = 0;
-Request$1.requests = {};
-if (typeof document !== "undefined") {
-  if (typeof attachEvent === "function") {
-    attachEvent("onunload", unloadHandler);
-  } else if (typeof addEventListener === "function") {
-    const terminationEvent = "onpagehide" in globalThisShim ? "pagehide" : "unload";
-    addEventListener(terminationEvent, unloadHandler, false);
-  }
-}
-function unloadHandler() {
-  for (let i2 in Request$1.requests) {
-    if (Request$1.requests.hasOwnProperty(i2)) {
-      Request$1.requests[i2].abort();
-    }
-  }
-}
-const hasXHR2 = function() {
-  const xhr = newRequest({
-    xdomain: false
-  });
-  return xhr && xhr.responseType !== null;
-}();
-class XHR extends BaseXHR {
-  constructor(opts) {
-    super(opts);
-    const forceBase64 = opts && opts.forceBase64;
-    this.supportsBinary = hasXHR2 && !forceBase64;
-  }
-  request(opts = {}) {
-    Object.assign(opts, { xd: this.xd }, this.opts);
-    return new Request$1(newRequest, this.uri(), opts);
-  }
-}
-function newRequest(opts) {
-  const xdomain = opts.xdomain;
-  try {
-    if ("undefined" !== typeof XMLHttpRequest && (!xdomain || hasCORS)) {
-      return new XMLHttpRequest();
-    }
-  } catch (e2) {
-  }
-  if (!xdomain) {
-    try {
-      return new globalThisShim[["Active"].concat("Object").join("X")]("Microsoft.XMLHTTP");
-    } catch (e2) {
-    }
-  }
-}
-const isReactNative = typeof navigator !== "undefined" && typeof navigator.product === "string" && navigator.product.toLowerCase() === "reactnative";
-class BaseWS extends Transport3 {
-  get name() {
-    return "websocket";
-  }
-  doOpen() {
-    const uri = this.uri();
-    const protocols = this.opts.protocols;
-    const opts = isReactNative ? {} : pick(this.opts, "agent", "perMessageDeflate", "pfx", "key", "passphrase", "cert", "ca", "ciphers", "rejectUnauthorized", "localAddress", "protocolVersion", "origin", "maxPayload", "family", "checkServerIdentity");
-    if (this.opts.extraHeaders) {
-      opts.headers = this.opts.extraHeaders;
-    }
-    try {
-      this.ws = this.createSocket(uri, protocols, opts);
-    } catch (err) {
-      return this.emitReserved("error", err);
-    }
-    this.ws.binaryType = this.socket.binaryType;
-    this.addEventListeners();
-  }
-  /**
-   * Adds event listeners to the socket
-   *
-   * @private
-   */
-  addEventListeners() {
-    this.ws.onopen = () => {
-      if (this.opts.autoUnref) {
-        this.ws._socket.unref();
-      }
-      this.onOpen();
-    };
-    this.ws.onclose = (closeEvent) => this.onClose({
-      description: "websocket connection closed",
-      context: closeEvent
-    });
-    this.ws.onmessage = (ev) => this.onData(ev.data);
-    this.ws.onerror = (e2) => this.onError("websocket error", e2);
-  }
-  write(packets) {
-    this.writable = false;
-    for (let i2 = 0; i2 < packets.length; i2++) {
-      const packet = packets[i2];
-      const lastPacket = i2 === packets.length - 1;
-      encodePacket(packet, this.supportsBinary, (data) => {
-        try {
-          this.doWrite(packet, data);
-        } catch (e2) {
-        }
-        if (lastPacket) {
-          nextTick(() => {
-            this.writable = true;
-            this.emitReserved("drain");
-          }, this.setTimeoutFn);
-        }
-      });
-    }
-  }
-  doClose() {
-    if (typeof this.ws !== "undefined") {
-      this.ws.onerror = () => {
-      };
-      this.ws.close();
-      this.ws = null;
-    }
-  }
-  /**
-   * Generates uri for connection.
-   *
-   * @private
-   */
-  uri() {
-    const schema = this.opts.secure ? "wss" : "ws";
-    const query = this.query || {};
-    if (this.opts.timestampRequests) {
-      query[this.opts.timestampParam] = randomString();
-    }
-    if (!this.supportsBinary) {
-      query.b64 = 1;
-    }
-    return this.createUri(schema, query);
-  }
-}
-const WebSocketCtor = globalThisShim.WebSocket || globalThisShim.MozWebSocket;
-class WS extends BaseWS {
-  createSocket(uri, protocols, opts) {
-    return !isReactNative ? protocols ? new WebSocketCtor(uri, protocols) : new WebSocketCtor(uri) : new WebSocketCtor(uri, protocols, opts);
-  }
-  doWrite(_packet, data) {
-    this.ws.send(data);
-  }
-}
-class WT extends Transport3 {
-  get name() {
-    return "webtransport";
-  }
-  doOpen() {
-    try {
-      this._transport = new WebTransport(this.createUri("https"), this.opts.transportOptions[this.name]);
-    } catch (err) {
-      return this.emitReserved("error", err);
-    }
-    this._transport.closed.then(() => {
-      this.onClose();
-    }).catch((err) => {
-      this.onError("webtransport error", err);
-    });
-    this._transport.ready.then(() => {
-      this._transport.createBidirectionalStream().then((stream) => {
-        const decoderStream = createPacketDecoderStream(Number.MAX_SAFE_INTEGER, this.socket.binaryType);
-        const reader = stream.readable.pipeThrough(decoderStream).getReader();
-        const encoderStream = createPacketEncoderStream();
-        encoderStream.readable.pipeTo(stream.writable);
-        this._writer = encoderStream.writable.getWriter();
-        const read = () => {
-          reader.read().then(({ done: done2, value: value2 }) => {
-            if (done2) {
-              return;
-            }
-            this.onPacket(value2);
-            read();
-          }).catch((err) => {
-          });
-        };
-        read();
-        const packet = { type: "open" };
-        if (this.query.sid) {
-          packet.data = `{"sid":"${this.query.sid}"}`;
-        }
-        this._writer.write(packet).then(() => this.onOpen());
-      });
-    });
-  }
-  write(packets) {
-    this.writable = false;
-    for (let i2 = 0; i2 < packets.length; i2++) {
-      const packet = packets[i2];
-      const lastPacket = i2 === packets.length - 1;
-      this._writer.write(packet).then(() => {
-        if (lastPacket) {
-          nextTick(() => {
-            this.writable = true;
-            this.emitReserved("drain");
-          }, this.setTimeoutFn);
-        }
-      });
-    }
-  }
-  doClose() {
-    var _a;
-    (_a = this._transport) === null || _a === void 0 ? void 0 : _a.close();
-  }
-}
-const transports = {
-  websocket: WS,
-  webtransport: WT,
-  polling: XHR
-};
-const re = /^(?:(?![^:@\/?#]+:[^:@\/]*@)(http|https|ws|wss):\/\/)?((?:(([^:@\/?#]*)(?::([^:@\/?#]*))?)?@)?((?:[a-f0-9]{0,4}:){2,7}[a-f0-9]{0,4}|[^:\/?#]*)(?::(\d*))?)(((\/(?:[^?#](?![^?#\/]*\.[^?#\/.]+(?:[?#]|$)))*\/?)?([^?#\/]*))(?:\?([^#]*))?(?:#(.*))?)/;
-const parts = [
-  "source",
-  "protocol",
-  "authority",
-  "userInfo",
-  "user",
-  "password",
-  "host",
-  "port",
-  "relative",
-  "path",
-  "directory",
-  "file",
-  "query",
-  "anchor"
-];
-function parse(str) {
-  if (str.length > 8e3) {
-    throw "URI too long";
-  }
-  const src = str, b = str.indexOf("["), e2 = str.indexOf("]");
-  if (b != -1 && e2 != -1) {
-    str = str.substring(0, b) + str.substring(b, e2).replace(/:/g, ";") + str.substring(e2, str.length);
-  }
-  let m2 = re.exec(str || ""), uri = {}, i2 = 14;
-  while (i2--) {
-    uri[parts[i2]] = m2[i2] || "";
-  }
-  if (b != -1 && e2 != -1) {
-    uri.source = src;
-    uri.host = uri.host.substring(1, uri.host.length - 1).replace(/;/g, ":");
-    uri.authority = uri.authority.replace("[", "").replace("]", "").replace(/;/g, ":");
-    uri.ipv6uri = true;
-  }
-  uri.pathNames = pathNames(uri, uri["path"]);
-  uri.queryKey = queryKey(uri, uri["query"]);
-  return uri;
-}
-function pathNames(obj, path) {
-  const regx = /\/{2,9}/g, names2 = path.replace(regx, "/").split("/");
-  if (path.slice(0, 1) == "/" || path.length === 0) {
-    names2.splice(0, 1);
-  }
-  if (path.slice(-1) == "/") {
-    names2.splice(names2.length - 1, 1);
-  }
-  return names2;
-}
-function queryKey(uri, query) {
-  const data = {};
-  query.replace(/(?:^|&)([^&=]*)=?([^&]*)/g, function($0, $1, $2) {
-    if ($1) {
-      data[$1] = $2;
-    }
-  });
-  return data;
-}
-const withEventListeners = typeof addEventListener === "function" && typeof removeEventListener === "function";
-const OFFLINE_EVENT_LISTENERS = [];
-if (withEventListeners) {
-  addEventListener("offline", () => {
-    OFFLINE_EVENT_LISTENERS.forEach((listener) => listener());
-  }, false);
-}
-class SocketWithoutUpgrade extends Emitter {
-  /**
-   * Socket constructor.
-   *
-   * @param {String|Object} uri - uri or options
-   * @param {Object} opts - options
-   */
-  constructor(uri, opts) {
-    super();
-    this.binaryType = defaultBinaryType;
-    this.writeBuffer = [];
-    this._prevBufferLen = 0;
-    this._pingInterval = -1;
-    this._pingTimeout = -1;
-    this._maxPayload = -1;
-    this._pingTimeoutTime = Infinity;
-    if (uri && "object" === typeof uri) {
-      opts = uri;
-      uri = null;
-    }
-    if (uri) {
-      const parsedUri = parse(uri);
-      opts.hostname = parsedUri.host;
-      opts.secure = parsedUri.protocol === "https" || parsedUri.protocol === "wss";
-      opts.port = parsedUri.port;
-      if (parsedUri.query)
-        opts.query = parsedUri.query;
-    } else if (opts.host) {
-      opts.hostname = parse(opts.host).host;
-    }
-    installTimerFunctions(this, opts);
-    this.secure = null != opts.secure ? opts.secure : typeof location !== "undefined" && "https:" === location.protocol;
-    if (opts.hostname && !opts.port) {
-      opts.port = this.secure ? "443" : "80";
-    }
-    this.hostname = opts.hostname || (typeof location !== "undefined" ? location.hostname : "localhost");
-    this.port = opts.port || (typeof location !== "undefined" && location.port ? location.port : this.secure ? "443" : "80");
-    this.transports = [];
-    this._transportsByName = {};
-    opts.transports.forEach((t2) => {
-      const transportName = t2.prototype.name;
-      this.transports.push(transportName);
-      this._transportsByName[transportName] = t2;
-    });
-    this.opts = Object.assign({
-      path: "/engine.io",
-      agent: false,
-      withCredentials: false,
-      upgrade: true,
-      timestampParam: "t",
-      rememberUpgrade: false,
-      addTrailingSlash: true,
-      rejectUnauthorized: true,
-      perMessageDeflate: {
-        threshold: 1024
+  join_rooms(rooms, callback) {
+    this.publish(
+      socket_rooms.agent_join_rooms,
+      {
+        rooms
       },
-      transportOptions: {},
-      closeOnBeforeunload: false
-    }, opts);
-    this.opts.path = this.opts.path.replace(/\/$/, "") + (this.opts.addTrailingSlash ? "/" : "");
-    if (typeof this.opts.query === "string") {
-      this.opts.query = decode(this.opts.query);
-    }
-    if (withEventListeners) {
-      if (this.opts.closeOnBeforeunload) {
-        this._beforeunloadEventListener = () => {
-          if (this.transport) {
-            this.transport.removeAllListeners();
-            this.transport.close();
-          }
-        };
-        addEventListener("beforeunload", this._beforeunloadEventListener, false);
+      (response) => {
+        callback && callback(response);
       }
-      if (this.hostname !== "localhost") {
-        this._offlineEventListener = () => {
-          this._onClose("transport close", {
-            description: "network connection lost"
-          });
-        };
-        OFFLINE_EVENT_LISTENERS.push(this._offlineEventListener);
-      }
-    }
-    if (this.opts.withCredentials) {
-      this._cookieJar = createCookieJar();
-    }
-    this._open();
-  }
-  /**
-   * Creates transport of the given type.
-   *
-   * @param {String} name - transport name
-   * @return {Transport}
-   * @private
-   */
-  createTransport(name2) {
-    const query = Object.assign({}, this.opts.query);
-    query.EIO = protocol$1;
-    query.transport = name2;
-    if (this.id)
-      query.sid = this.id;
-    const opts = Object.assign({}, this.opts, {
-      query,
-      socket: this,
-      hostname: this.hostname,
-      secure: this.secure,
-      port: this.port
-    }, this.opts.transportOptions[name2]);
-    return new this._transportsByName[name2](opts);
-  }
-  /**
-   * Initializes transport to use and starts probe.
-   *
-   * @private
-   */
-  _open() {
-    if (this.transports.length === 0) {
-      this.setTimeoutFn(() => {
-        this.emitReserved("error", "No transports available");
-      }, 0);
-      return;
-    }
-    const transportName = this.opts.rememberUpgrade && SocketWithoutUpgrade.priorWebsocketSuccess && this.transports.indexOf("websocket") !== -1 ? "websocket" : this.transports[0];
-    this.readyState = "opening";
-    const transport = this.createTransport(transportName);
-    transport.open();
-    this.setTransport(transport);
-  }
-  /**
-   * Sets the current transport. Disables the existing one (if any).
-   *
-   * @private
-   */
-  setTransport(transport) {
-    if (this.transport) {
-      this.transport.removeAllListeners();
-    }
-    this.transport = transport;
-    transport.on("drain", this._onDrain.bind(this)).on("packet", this._onPacket.bind(this)).on("error", this._onError.bind(this)).on("close", (reason) => this._onClose("transport close", reason));
-  }
-  /**
-   * Called when connection is deemed open.
-   *
-   * @private
-   */
-  onOpen() {
-    this.readyState = "open";
-    SocketWithoutUpgrade.priorWebsocketSuccess = "websocket" === this.transport.name;
-    this.emitReserved("open");
-    this.flush();
-  }
-  /**
-   * Handles a packet.
-   *
-   * @private
-   */
-  _onPacket(packet) {
-    if ("opening" === this.readyState || "open" === this.readyState || "closing" === this.readyState) {
-      this.emitReserved("packet", packet);
-      this.emitReserved("heartbeat");
-      switch (packet.type) {
-        case "open":
-          this.onHandshake(JSON.parse(packet.data));
-          break;
-        case "ping":
-          this._sendPacket("pong");
-          this.emitReserved("ping");
-          this.emitReserved("pong");
-          this._resetPingTimeout();
-          break;
-        case "error":
-          const err = new Error("server error");
-          err.code = packet.data;
-          this._onError(err);
-          break;
-        case "message":
-          this.emitReserved("data", packet.data);
-          this.emitReserved("message", packet.data);
-          break;
-      }
-    }
-  }
-  /**
-   * Called upon handshake completion.
-   *
-   * @param {Object} data - handshake obj
-   * @private
-   */
-  onHandshake(data) {
-    this.emitReserved("handshake", data);
-    this.id = data.sid;
-    this.transport.query.sid = data.sid;
-    this._pingInterval = data.pingInterval;
-    this._pingTimeout = data.pingTimeout;
-    this._maxPayload = data.maxPayload;
-    this.onOpen();
-    if ("closed" === this.readyState)
-      return;
-    this._resetPingTimeout();
-  }
-  /**
-   * Sets and resets ping timeout timer based on server pings.
-   *
-   * @private
-   */
-  _resetPingTimeout() {
-    this.clearTimeoutFn(this._pingTimeoutTimer);
-    const delay = this._pingInterval + this._pingTimeout;
-    this._pingTimeoutTime = Date.now() + delay;
-    this._pingTimeoutTimer = this.setTimeoutFn(() => {
-      this._onClose("ping timeout");
-    }, delay);
-    if (this.opts.autoUnref) {
-      this._pingTimeoutTimer.unref();
-    }
-  }
-  /**
-   * Called on `drain` event
-   *
-   * @private
-   */
-  _onDrain() {
-    this.writeBuffer.splice(0, this._prevBufferLen);
-    this._prevBufferLen = 0;
-    if (0 === this.writeBuffer.length) {
-      this.emitReserved("drain");
-    } else {
-      this.flush();
-    }
-  }
-  /**
-   * Flush write buffers.
-   *
-   * @private
-   */
-  flush() {
-    if ("closed" !== this.readyState && this.transport.writable && !this.upgrading && this.writeBuffer.length) {
-      const packets = this._getWritablePackets();
-      this.transport.send(packets);
-      this._prevBufferLen = packets.length;
-      this.emitReserved("flush");
-    }
-  }
-  /**
-   * Ensure the encoded size of the writeBuffer is below the maxPayload value sent by the server (only for HTTP
-   * long-polling)
-   *
-   * @private
-   */
-  _getWritablePackets() {
-    const shouldCheckPayloadSize = this._maxPayload && this.transport.name === "polling" && this.writeBuffer.length > 1;
-    if (!shouldCheckPayloadSize) {
-      return this.writeBuffer;
-    }
-    let payloadSize = 1;
-    for (let i2 = 0; i2 < this.writeBuffer.length; i2++) {
-      const data = this.writeBuffer[i2].data;
-      if (data) {
-        payloadSize += byteLength(data);
-      }
-      if (i2 > 0 && payloadSize > this._maxPayload) {
-        return this.writeBuffer.slice(0, i2);
-      }
-      payloadSize += 2;
-    }
-    return this.writeBuffer;
-  }
-  /**
-   * Checks whether the heartbeat timer has expired but the socket has not yet been notified.
-   *
-   * Note: this method is private for now because it does not really fit the WebSocket API, but if we put it in the
-   * `write()` method then the message would not be buffered by the Socket.IO client.
-   *
-   * @return {boolean}
-   * @private
-   */
-  /* private */
-  _hasPingExpired() {
-    if (!this._pingTimeoutTime)
-      return true;
-    const hasExpired = Date.now() > this._pingTimeoutTime;
-    if (hasExpired) {
-      this._pingTimeoutTime = 0;
-      nextTick(() => {
-        this._onClose("ping timeout");
-      }, this.setTimeoutFn);
-    }
-    return hasExpired;
-  }
-  /**
-   * Sends a message.
-   *
-   * @param {String} msg - message.
-   * @param {Object} options.
-   * @param {Function} fn - callback function.
-   * @return {Socket} for chaining.
-   */
-  write(msg, options, fn) {
-    this._sendPacket("message", msg, options, fn);
-    return this;
-  }
-  /**
-   * Sends a message. Alias of {@link Socket#write}.
-   *
-   * @param {String} msg - message.
-   * @param {Object} options.
-   * @param {Function} fn - callback function.
-   * @return {Socket} for chaining.
-   */
-  send(msg, options, fn) {
-    this._sendPacket("message", msg, options, fn);
-    return this;
-  }
-  /**
-   * Sends a packet.
-   *
-   * @param {String} type: packet type.
-   * @param {String} data.
-   * @param {Object} options.
-   * @param {Function} fn - callback function.
-   * @private
-   */
-  _sendPacket(type, data, options, fn) {
-    if ("function" === typeof data) {
-      fn = data;
-      data = void 0;
-    }
-    if ("function" === typeof options) {
-      fn = options;
-      options = null;
-    }
-    if ("closing" === this.readyState || "closed" === this.readyState) {
-      return;
-    }
-    options = options || {};
-    options.compress = false !== options.compress;
-    const packet = {
-      type,
-      data,
-      options
-    };
-    this.emitReserved("packetCreate", packet);
-    this.writeBuffer.push(packet);
-    if (fn)
-      this.once("flush", fn);
-    this.flush();
-  }
-  /**
-   * Closes the connection.
-   */
-  close() {
-    const close2 = () => {
-      this._onClose("forced close");
-      this.transport.close();
-    };
-    const cleanupAndClose = () => {
-      this.off("upgrade", cleanupAndClose);
-      this.off("upgradeError", cleanupAndClose);
-      close2();
-    };
-    const waitForUpgrade = () => {
-      this.once("upgrade", cleanupAndClose);
-      this.once("upgradeError", cleanupAndClose);
-    };
-    if ("opening" === this.readyState || "open" === this.readyState) {
-      this.readyState = "closing";
-      if (this.writeBuffer.length) {
-        this.once("drain", () => {
-          if (this.upgrading) {
-            waitForUpgrade();
-          } else {
-            close2();
-          }
-        });
-      } else if (this.upgrading) {
-        waitForUpgrade();
-      } else {
-        close2();
-      }
-    }
-    return this;
-  }
-  /**
-   * Called upon transport error
-   *
-   * @private
-   */
-  _onError(err) {
-    SocketWithoutUpgrade.priorWebsocketSuccess = false;
-    if (this.opts.tryAllTransports && this.transports.length > 1 && this.readyState === "opening") {
-      this.transports.shift();
-      return this._open();
-    }
-    this.emitReserved("error", err);
-    this._onClose("transport error", err);
-  }
-  /**
-   * Called upon transport close.
-   *
-   * @private
-   */
-  _onClose(reason, description) {
-    if ("opening" === this.readyState || "open" === this.readyState || "closing" === this.readyState) {
-      this.clearTimeoutFn(this._pingTimeoutTimer);
-      this.transport.removeAllListeners("close");
-      this.transport.close();
-      this.transport.removeAllListeners();
-      if (withEventListeners) {
-        if (this._beforeunloadEventListener) {
-          removeEventListener("beforeunload", this._beforeunloadEventListener, false);
-        }
-        if (this._offlineEventListener) {
-          const i2 = OFFLINE_EVENT_LISTENERS.indexOf(this._offlineEventListener);
-          if (i2 !== -1) {
-            OFFLINE_EVENT_LISTENERS.splice(i2, 1);
-          }
-        }
-      }
-      this.readyState = "closed";
-      this.id = null;
-      this.emitReserved("close", reason, description);
-      this.writeBuffer = [];
-      this._prevBufferLen = 0;
-    }
-  }
-}
-SocketWithoutUpgrade.protocol = protocol$1;
-class SocketWithUpgrade extends SocketWithoutUpgrade {
-  constructor() {
-    super(...arguments);
-    this._upgrades = [];
-  }
-  onOpen() {
-    super.onOpen();
-    if ("open" === this.readyState && this.opts.upgrade) {
-      for (let i2 = 0; i2 < this._upgrades.length; i2++) {
-        this._probe(this._upgrades[i2]);
-      }
-    }
-  }
-  /**
-   * Probes a transport.
-   *
-   * @param {String} name - transport name
-   * @private
-   */
-  _probe(name2) {
-    let transport = this.createTransport(name2);
-    let failed = false;
-    SocketWithoutUpgrade.priorWebsocketSuccess = false;
-    const onTransportOpen = () => {
-      if (failed)
-        return;
-      transport.send([{ type: "ping", data: "probe" }]);
-      transport.once("packet", (msg) => {
-        if (failed)
-          return;
-        if ("pong" === msg.type && "probe" === msg.data) {
-          this.upgrading = true;
-          this.emitReserved("upgrading", transport);
-          if (!transport)
-            return;
-          SocketWithoutUpgrade.priorWebsocketSuccess = "websocket" === transport.name;
-          this.transport.pause(() => {
-            if (failed)
-              return;
-            if ("closed" === this.readyState)
-              return;
-            cleanup();
-            this.setTransport(transport);
-            transport.send([{ type: "upgrade" }]);
-            this.emitReserved("upgrade", transport);
-            transport = null;
-            this.upgrading = false;
-            this.flush();
-          });
-        } else {
-          const err = new Error("probe error");
-          err.transport = transport.name;
-          this.emitReserved("upgradeError", err);
-        }
-      });
-    };
-    function freezeTransport() {
-      if (failed)
-        return;
-      failed = true;
-      cleanup();
-      transport.close();
-      transport = null;
-    }
-    const onerror = (err) => {
-      const error = new Error("probe error: " + err);
-      error.transport = transport.name;
-      freezeTransport();
-      this.emitReserved("upgradeError", error);
-    };
-    function onTransportClose() {
-      onerror("transport closed");
-    }
-    function onclose() {
-      onerror("socket closed");
-    }
-    function onupgrade(to) {
-      if (transport && to.name !== transport.name) {
-        freezeTransport();
-      }
-    }
-    const cleanup = () => {
-      transport.removeListener("open", onTransportOpen);
-      transport.removeListener("error", onerror);
-      transport.removeListener("close", onTransportClose);
-      this.off("close", onclose);
-      this.off("upgrading", onupgrade);
-    };
-    transport.once("open", onTransportOpen);
-    transport.once("error", onerror);
-    transport.once("close", onTransportClose);
-    this.once("close", onclose);
-    this.once("upgrading", onupgrade);
-    if (this._upgrades.indexOf("webtransport") !== -1 && name2 !== "webtransport") {
-      this.setTimeoutFn(() => {
-        if (!failed) {
-          transport.open();
-        }
-      }, 200);
-    } else {
-      transport.open();
-    }
-  }
-  onHandshake(data) {
-    this._upgrades = this._filterUpgrades(data.upgrades);
-    super.onHandshake(data);
-  }
-  /**
-   * Filters upgrades, returning only those matching client transports.
-   *
-   * @param {Array} upgrades - server upgrades
-   * @private
-   */
-  _filterUpgrades(upgrades) {
-    const filteredUpgrades = [];
-    for (let i2 = 0; i2 < upgrades.length; i2++) {
-      if (~this.transports.indexOf(upgrades[i2]))
-        filteredUpgrades.push(upgrades[i2]);
-    }
-    return filteredUpgrades;
-  }
-}
-let Socket$1 = class Socket extends SocketWithUpgrade {
-  constructor(uri, opts = {}) {
-    const o2 = typeof uri === "object" ? uri : opts;
-    if (!o2.transports || o2.transports && typeof o2.transports[0] === "string") {
-      o2.transports = (o2.transports || ["polling", "websocket", "webtransport"]).map((transportName) => transports[transportName]).filter((t2) => !!t2);
-    }
-    super(uri, o2);
-  }
-};
-function url(uri, path = "", loc) {
-  let obj = uri;
-  loc = loc || typeof location !== "undefined" && location;
-  if (null == uri)
-    uri = loc.protocol + "//" + loc.host;
-  if (typeof uri === "string") {
-    if ("/" === uri.charAt(0)) {
-      if ("/" === uri.charAt(1)) {
-        uri = loc.protocol + uri;
-      } else {
-        uri = loc.host + uri;
-      }
-    }
-    if (!/^(https?|wss?):\/\//.test(uri)) {
-      if ("undefined" !== typeof loc) {
-        uri = loc.protocol + "//" + uri;
-      } else {
-        uri = "https://" + uri;
-      }
-    }
-    obj = parse(uri);
-  }
-  if (!obj.port) {
-    if (/^(http|ws)$/.test(obj.protocol)) {
-      obj.port = "80";
-    } else if (/^(http|ws)s$/.test(obj.protocol)) {
-      obj.port = "443";
-    }
-  }
-  obj.path = obj.path || "/";
-  const ipv6 = obj.host.indexOf(":") !== -1;
-  const host = ipv6 ? "[" + obj.host + "]" : obj.host;
-  obj.id = obj.protocol + "://" + host + ":" + obj.port + path;
-  obj.href = obj.protocol + "://" + host + (loc && loc.port === obj.port ? "" : ":" + obj.port);
-  return obj;
-}
-const withNativeArrayBuffer = typeof ArrayBuffer === "function";
-const isView = (obj) => {
-  return typeof ArrayBuffer.isView === "function" ? ArrayBuffer.isView(obj) : obj.buffer instanceof ArrayBuffer;
-};
-const toString3 = Object.prototype.toString;
-const withNativeBlob = typeof Blob === "function" || typeof Blob !== "undefined" && toString3.call(Blob) === "[object BlobConstructor]";
-const withNativeFile = typeof File === "function" || typeof File !== "undefined" && toString3.call(File) === "[object FileConstructor]";
-function isBinary(obj) {
-  return withNativeArrayBuffer && (obj instanceof ArrayBuffer || isView(obj)) || withNativeBlob && obj instanceof Blob || withNativeFile && obj instanceof File;
-}
-function hasBinary(obj, toJSON2) {
-  if (!obj || typeof obj !== "object") {
-    return false;
-  }
-  if (Array.isArray(obj)) {
-    for (let i2 = 0, l2 = obj.length; i2 < l2; i2++) {
-      if (hasBinary(obj[i2])) {
-        return true;
-      }
-    }
-    return false;
-  }
-  if (isBinary(obj)) {
-    return true;
-  }
-  if (obj.toJSON && typeof obj.toJSON === "function" && arguments.length === 1) {
-    return hasBinary(obj.toJSON(), true);
-  }
-  for (const key in obj) {
-    if (Object.prototype.hasOwnProperty.call(obj, key) && hasBinary(obj[key])) {
-      return true;
-    }
-  }
-  return false;
-}
-function deconstructPacket(packet) {
-  const buffers = [];
-  const packetData = packet.data;
-  const pack = packet;
-  pack.data = _deconstructPacket(packetData, buffers);
-  pack.attachments = buffers.length;
-  return { packet: pack, buffers };
-}
-function _deconstructPacket(data, buffers) {
-  if (!data)
-    return data;
-  if (isBinary(data)) {
-    const placeholder = { _placeholder: true, num: buffers.length };
-    buffers.push(data);
-    return placeholder;
-  } else if (Array.isArray(data)) {
-    const newData = new Array(data.length);
-    for (let i2 = 0; i2 < data.length; i2++) {
-      newData[i2] = _deconstructPacket(data[i2], buffers);
-    }
-    return newData;
-  } else if (typeof data === "object" && !(data instanceof Date)) {
-    const newData = {};
-    for (const key in data) {
-      if (Object.prototype.hasOwnProperty.call(data, key)) {
-        newData[key] = _deconstructPacket(data[key], buffers);
-      }
-    }
-    return newData;
-  }
-  return data;
-}
-function reconstructPacket(packet, buffers) {
-  packet.data = _reconstructPacket(packet.data, buffers);
-  delete packet.attachments;
-  return packet;
-}
-function _reconstructPacket(data, buffers) {
-  if (!data)
-    return data;
-  if (data && data._placeholder === true) {
-    const isIndexValid = typeof data.num === "number" && data.num >= 0 && data.num < buffers.length;
-    if (isIndexValid) {
-      return buffers[data.num];
-    } else {
-      throw new Error("illegal attachments");
-    }
-  } else if (Array.isArray(data)) {
-    for (let i2 = 0; i2 < data.length; i2++) {
-      data[i2] = _reconstructPacket(data[i2], buffers);
-    }
-  } else if (typeof data === "object") {
-    for (const key in data) {
-      if (Object.prototype.hasOwnProperty.call(data, key)) {
-        data[key] = _reconstructPacket(data[key], buffers);
-      }
-    }
-  }
-  return data;
-}
-const RESERVED_EVENTS$1 = [
-  "connect",
-  "connect_error",
-  "disconnect",
-  "disconnecting",
-  "newListener",
-  "removeListener"
-  // used by the Node.js EventEmitter
-];
-const protocol = 5;
-var PacketType;
-(function(PacketType2) {
-  PacketType2[PacketType2["CONNECT"] = 0] = "CONNECT";
-  PacketType2[PacketType2["DISCONNECT"] = 1] = "DISCONNECT";
-  PacketType2[PacketType2["EVENT"] = 2] = "EVENT";
-  PacketType2[PacketType2["ACK"] = 3] = "ACK";
-  PacketType2[PacketType2["CONNECT_ERROR"] = 4] = "CONNECT_ERROR";
-  PacketType2[PacketType2["BINARY_EVENT"] = 5] = "BINARY_EVENT";
-  PacketType2[PacketType2["BINARY_ACK"] = 6] = "BINARY_ACK";
-})(PacketType || (PacketType = {}));
-class Encoder {
-  /**
-   * Encoder constructor
-   *
-   * @param {function} replacer - custom replacer to pass down to JSON.parse
-   */
-  constructor(replacer) {
-    this.replacer = replacer;
-  }
-  /**
-   * Encode a packet as a single string if non-binary, or as a
-   * buffer sequence, depending on packet type.
-   *
-   * @param {Object} obj - packet object
-   */
-  encode(obj) {
-    if (obj.type === PacketType.EVENT || obj.type === PacketType.ACK) {
-      if (hasBinary(obj)) {
-        return this.encodeAsBinary({
-          type: obj.type === PacketType.EVENT ? PacketType.BINARY_EVENT : PacketType.BINARY_ACK,
-          nsp: obj.nsp,
-          data: obj.data,
-          id: obj.id
-        });
-      }
-    }
-    return [this.encodeAsString(obj)];
-  }
-  /**
-   * Encode packet as string.
-   */
-  encodeAsString(obj) {
-    let str = "" + obj.type;
-    if (obj.type === PacketType.BINARY_EVENT || obj.type === PacketType.BINARY_ACK) {
-      str += obj.attachments + "-";
-    }
-    if (obj.nsp && "/" !== obj.nsp) {
-      str += obj.nsp + ",";
-    }
-    if (null != obj.id) {
-      str += obj.id;
-    }
-    if (null != obj.data) {
-      str += JSON.stringify(obj.data, this.replacer);
-    }
-    return str;
-  }
-  /**
-   * Encode packet as 'buffer sequence' by removing blobs, and
-   * deconstructing packet into object with placeholders and
-   * a list of buffers.
-   */
-  encodeAsBinary(obj) {
-    const deconstruction = deconstructPacket(obj);
-    const pack = this.encodeAsString(deconstruction.packet);
-    const buffers = deconstruction.buffers;
-    buffers.unshift(pack);
-    return buffers;
-  }
-}
-function isObject(value2) {
-  return Object.prototype.toString.call(value2) === "[object Object]";
-}
-class Decoder extends Emitter {
-  /**
-   * Decoder constructor
-   *
-   * @param {function} reviver - custom reviver to pass down to JSON.stringify
-   */
-  constructor(reviver) {
-    super();
-    this.reviver = reviver;
-  }
-  /**
-   * Decodes an encoded packet string into packet JSON.
-   *
-   * @param {String} obj - encoded packet
-   */
-  add(obj) {
-    let packet;
-    if (typeof obj === "string") {
-      if (this.reconstructor) {
-        throw new Error("got plaintext data when reconstructing a packet");
-      }
-      packet = this.decodeString(obj);
-      const isBinaryEvent = packet.type === PacketType.BINARY_EVENT;
-      if (isBinaryEvent || packet.type === PacketType.BINARY_ACK) {
-        packet.type = isBinaryEvent ? PacketType.EVENT : PacketType.ACK;
-        this.reconstructor = new BinaryReconstructor(packet);
-        if (packet.attachments === 0) {
-          super.emitReserved("decoded", packet);
-        }
-      } else {
-        super.emitReserved("decoded", packet);
-      }
-    } else if (isBinary(obj) || obj.base64) {
-      if (!this.reconstructor) {
-        throw new Error("got binary data when not reconstructing a packet");
-      } else {
-        packet = this.reconstructor.takeBinaryData(obj);
-        if (packet) {
-          this.reconstructor = null;
-          super.emitReserved("decoded", packet);
-        }
-      }
-    } else {
-      throw new Error("Unknown type: " + obj);
-    }
-  }
-  /**
-   * Decode a packet String (JSON data)
-   *
-   * @param {String} str
-   * @return {Object} packet
-   */
-  decodeString(str) {
-    let i2 = 0;
-    const p2 = {
-      type: Number(str.charAt(0))
-    };
-    if (PacketType[p2.type] === void 0) {
-      throw new Error("unknown packet type " + p2.type);
-    }
-    if (p2.type === PacketType.BINARY_EVENT || p2.type === PacketType.BINARY_ACK) {
-      const start = i2 + 1;
-      while (str.charAt(++i2) !== "-" && i2 != str.length) {
-      }
-      const buf = str.substring(start, i2);
-      if (buf != Number(buf) || str.charAt(i2) !== "-") {
-        throw new Error("Illegal attachments");
-      }
-      p2.attachments = Number(buf);
-    }
-    if ("/" === str.charAt(i2 + 1)) {
-      const start = i2 + 1;
-      while (++i2) {
-        const c2 = str.charAt(i2);
-        if ("," === c2)
-          break;
-        if (i2 === str.length)
-          break;
-      }
-      p2.nsp = str.substring(start, i2);
-    } else {
-      p2.nsp = "/";
-    }
-    const next = str.charAt(i2 + 1);
-    if ("" !== next && Number(next) == next) {
-      const start = i2 + 1;
-      while (++i2) {
-        const c2 = str.charAt(i2);
-        if (null == c2 || Number(c2) != c2) {
-          --i2;
-          break;
-        }
-        if (i2 === str.length)
-          break;
-      }
-      p2.id = Number(str.substring(start, i2 + 1));
-    }
-    if (str.charAt(++i2)) {
-      const payload = this.tryParse(str.substr(i2));
-      if (Decoder.isPayloadValid(p2.type, payload)) {
-        p2.data = payload;
-      } else {
-        throw new Error("invalid payload");
-      }
-    }
-    return p2;
-  }
-  tryParse(str) {
-    try {
-      return JSON.parse(str, this.reviver);
-    } catch (e2) {
-      return false;
-    }
-  }
-  static isPayloadValid(type, payload) {
-    switch (type) {
-      case PacketType.CONNECT:
-        return isObject(payload);
-      case PacketType.DISCONNECT:
-        return payload === void 0;
-      case PacketType.CONNECT_ERROR:
-        return typeof payload === "string" || isObject(payload);
-      case PacketType.EVENT:
-      case PacketType.BINARY_EVENT:
-        return Array.isArray(payload) && (typeof payload[0] === "number" || typeof payload[0] === "string" && RESERVED_EVENTS$1.indexOf(payload[0]) === -1);
-      case PacketType.ACK:
-      case PacketType.BINARY_ACK:
-        return Array.isArray(payload);
-    }
-  }
-  /**
-   * Deallocates a parser's resources
-   */
-  destroy() {
-    if (this.reconstructor) {
-      this.reconstructor.finishedReconstruction();
-      this.reconstructor = null;
-    }
-  }
-}
-class BinaryReconstructor {
-  constructor(packet) {
-    this.packet = packet;
-    this.buffers = [];
-    this.reconPack = packet;
-  }
-  /**
-   * Method to be called when binary data received from connection
-   * after a BINARY_EVENT packet.
-   *
-   * @param {Buffer | ArrayBuffer} binData - the raw binary data received
-   * @return {null | Object} returns null if more binary data is expected or
-   *   a reconstructed packet object if all buffers have been received.
-   */
-  takeBinaryData(binData) {
-    this.buffers.push(binData);
-    if (this.buffers.length === this.reconPack.attachments) {
-      const packet = reconstructPacket(this.reconPack, this.buffers);
-      this.finishedReconstruction();
-      return packet;
-    }
-    return null;
-  }
-  /**
-   * Cleans up binary packet reconstruction variables.
-   */
-  finishedReconstruction() {
-    this.reconPack = null;
-    this.buffers = [];
-  }
-}
-const parser = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
-  __proto__: null,
-  Decoder,
-  Encoder,
-  get PacketType() {
-    return PacketType;
-  },
-  protocol
-}, Symbol.toStringTag, { value: "Module" }));
-function on(obj, ev, fn) {
-  obj.on(ev, fn);
-  return function subDestroy() {
-    obj.off(ev, fn);
-  };
-}
-const RESERVED_EVENTS = Object.freeze({
-  connect: 1,
-  connect_error: 1,
-  disconnect: 1,
-  disconnecting: 1,
-  // EventEmitter reserved events: https://nodejs.org/api/events.html#events_event_newlistener
-  newListener: 1,
-  removeListener: 1
-});
-class Socket2 extends Emitter {
-  /**
-   * `Socket` constructor.
-   */
-  constructor(io, nsp, opts) {
-    super();
-    this.connected = false;
-    this.recovered = false;
-    this.receiveBuffer = [];
-    this.sendBuffer = [];
-    this._queue = [];
-    this._queueSeq = 0;
-    this.ids = 0;
-    this.acks = {};
-    this.flags = {};
-    this.io = io;
-    this.nsp = nsp;
-    if (opts && opts.auth) {
-      this.auth = opts.auth;
-    }
-    this._opts = Object.assign({}, opts);
-    if (this.io._autoConnect)
-      this.open();
-  }
-  /**
-   * Whether the socket is currently disconnected
-   *
-   * @example
-   * const socket = io();
-   *
-   * socket.on("connect", () => {
-   *   console.log(socket.disconnected); // false
-   * });
-   *
-   * socket.on("disconnect", () => {
-   *   console.log(socket.disconnected); // true
-   * });
-   */
-  get disconnected() {
-    return !this.connected;
-  }
-  /**
-   * Subscribe to open, close and packet events
-   *
-   * @private
-   */
-  subEvents() {
-    if (this.subs)
-      return;
-    const io = this.io;
-    this.subs = [
-      on(io, "open", this.onopen.bind(this)),
-      on(io, "packet", this.onpacket.bind(this)),
-      on(io, "error", this.onerror.bind(this)),
-      on(io, "close", this.onclose.bind(this))
-    ];
-  }
-  /**
-   * Whether the Socket will try to reconnect when its Manager connects or reconnects.
-   *
-   * @example
-   * const socket = io();
-   *
-   * console.log(socket.active); // true
-   *
-   * socket.on("disconnect", (reason) => {
-   *   if (reason === "io server disconnect") {
-   *     // the disconnection was initiated by the server, you need to manually reconnect
-   *     console.log(socket.active); // false
-   *   }
-   *   // else the socket will automatically try to reconnect
-   *   console.log(socket.active); // true
-   * });
-   */
-  get active() {
-    return !!this.subs;
-  }
-  /**
-   * "Opens" the socket.
-   *
-   * @example
-   * const socket = io({
-   *   autoConnect: false
-   * });
-   *
-   * socket.connect();
-   */
-  connect() {
-    if (this.connected)
-      return this;
-    this.subEvents();
-    if (!this.io["_reconnecting"])
-      this.io.open();
-    if ("open" === this.io._readyState)
-      this.onopen();
-    return this;
-  }
-  /**
-   * Alias for {@link connect()}.
-   */
-  open() {
-    return this.connect();
-  }
-  /**
-   * Sends a `message` event.
-   *
-   * This method mimics the WebSocket.send() method.
-   *
-   * @see https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/send
-   *
-   * @example
-   * socket.send("hello");
-   *
-   * // this is equivalent to
-   * socket.emit("message", "hello");
-   *
-   * @return self
-   */
-  send(...args) {
-    args.unshift("message");
-    this.emit.apply(this, args);
-    return this;
-  }
-  /**
-   * Override `emit`.
-   * If the event is in `events`, it's emitted normally.
-   *
-   * @example
-   * socket.emit("hello", "world");
-   *
-   * // all serializable datastructures are supported (no need to call JSON.stringify)
-   * socket.emit("hello", 1, "2", { 3: ["4"], 5: Uint8Array.from([6]) });
-   *
-   * // with an acknowledgement from the server
-   * socket.emit("hello", "world", (val) => {
-   *   // ...
-   * });
-   *
-   * @return self
-   */
-  emit(ev, ...args) {
-    var _a, _b, _c;
-    if (RESERVED_EVENTS.hasOwnProperty(ev)) {
-      throw new Error('"' + ev.toString() + '" is a reserved event name');
-    }
-    args.unshift(ev);
-    if (this._opts.retries && !this.flags.fromQueue && !this.flags.volatile) {
-      this._addToQueue(args);
-      return this;
-    }
-    const packet = {
-      type: PacketType.EVENT,
-      data: args
-    };
-    packet.options = {};
-    packet.options.compress = this.flags.compress !== false;
-    if ("function" === typeof args[args.length - 1]) {
-      const id = this.ids++;
-      const ack = args.pop();
-      this._registerAckCallback(id, ack);
-      packet.id = id;
-    }
-    const isTransportWritable = (_b = (_a = this.io.engine) === null || _a === void 0 ? void 0 : _a.transport) === null || _b === void 0 ? void 0 : _b.writable;
-    const isConnected = this.connected && !((_c = this.io.engine) === null || _c === void 0 ? void 0 : _c._hasPingExpired());
-    const discardPacket = this.flags.volatile && !isTransportWritable;
-    if (discardPacket) ;
-    else if (isConnected) {
-      this.notifyOutgoingListeners(packet);
-      this.packet(packet);
-    } else {
-      this.sendBuffer.push(packet);
-    }
-    this.flags = {};
-    return this;
-  }
-  /**
-   * @private
-   */
-  _registerAckCallback(id, ack) {
-    var _a;
-    const timeout2 = (_a = this.flags.timeout) !== null && _a !== void 0 ? _a : this._opts.ackTimeout;
-    if (timeout2 === void 0) {
-      this.acks[id] = ack;
-      return;
-    }
-    const timer = this.io.setTimeoutFn(() => {
-      delete this.acks[id];
-      for (let i2 = 0; i2 < this.sendBuffer.length; i2++) {
-        if (this.sendBuffer[i2].id === id) {
-          this.sendBuffer.splice(i2, 1);
-        }
-      }
-      ack.call(this, new Error("operation has timed out"));
-    }, timeout2);
-    const fn = (...args) => {
-      this.io.clearTimeoutFn(timer);
-      ack.apply(this, args);
-    };
-    fn.withError = true;
-    this.acks[id] = fn;
-  }
-  /**
-   * Emits an event and waits for an acknowledgement
-   *
-   * @example
-   * // without timeout
-   * const response = await socket.emitWithAck("hello", "world");
-   *
-   * // with a specific timeout
-   * try {
-   *   const response = await socket.timeout(1000).emitWithAck("hello", "world");
-   * } catch (err) {
-   *   // the server did not acknowledge the event in the given delay
-   * }
-   *
-   * @return a Promise that will be fulfilled when the server acknowledges the event
-   */
-  emitWithAck(ev, ...args) {
-    return new Promise((resolve, reject) => {
-      const fn = (arg1, arg2) => {
-        return arg1 ? reject(arg1) : resolve(arg2);
-      };
-      fn.withError = true;
-      args.push(fn);
-      this.emit(ev, ...args);
-    });
-  }
-  /**
-   * Add the packet to the queue.
-   * @param args
-   * @private
-   */
-  _addToQueue(args) {
-    let ack;
-    if (typeof args[args.length - 1] === "function") {
-      ack = args.pop();
-    }
-    const packet = {
-      id: this._queueSeq++,
-      tryCount: 0,
-      pending: false,
-      args,
-      flags: Object.assign({ fromQueue: true }, this.flags)
-    };
-    args.push((err, ...responseArgs) => {
-      if (packet !== this._queue[0]) {
-        return;
-      }
-      const hasError = err !== null;
-      if (hasError) {
-        if (packet.tryCount > this._opts.retries) {
-          this._queue.shift();
-          if (ack) {
-            ack(err);
-          }
-        }
-      } else {
-        this._queue.shift();
-        if (ack) {
-          ack(null, ...responseArgs);
-        }
-      }
-      packet.pending = false;
-      return this._drainQueue();
-    });
-    this._queue.push(packet);
-    this._drainQueue();
-  }
-  /**
-   * Send the first packet of the queue, and wait for an acknowledgement from the server.
-   * @param force - whether to resend a packet that has not been acknowledged yet
-   *
-   * @private
-   */
-  _drainQueue(force = false) {
-    if (!this.connected || this._queue.length === 0) {
-      return;
-    }
-    const packet = this._queue[0];
-    if (packet.pending && !force) {
-      return;
-    }
-    packet.pending = true;
-    packet.tryCount++;
-    this.flags = packet.flags;
-    this.emit.apply(this, packet.args);
-  }
-  /**
-   * Sends a packet.
-   *
-   * @param packet
-   * @private
-   */
-  packet(packet) {
-    packet.nsp = this.nsp;
-    this.io._packet(packet);
-  }
-  /**
-   * Called upon engine `open`.
-   *
-   * @private
-   */
-  onopen() {
-    if (typeof this.auth == "function") {
-      this.auth((data) => {
-        this._sendConnectPacket(data);
-      });
-    } else {
-      this._sendConnectPacket(this.auth);
-    }
-  }
-  /**
-   * Sends a CONNECT packet to initiate the Socket.IO session.
-   *
-   * @param data
-   * @private
-   */
-  _sendConnectPacket(data) {
-    this.packet({
-      type: PacketType.CONNECT,
-      data: this._pid ? Object.assign({ pid: this._pid, offset: this._lastOffset }, data) : data
-    });
-  }
-  /**
-   * Called upon engine or manager `error`.
-   *
-   * @param err
-   * @private
-   */
-  onerror(err) {
-    if (!this.connected) {
-      this.emitReserved("connect_error", err);
-    }
-  }
-  /**
-   * Called upon engine `close`.
-   *
-   * @param reason
-   * @param description
-   * @private
-   */
-  onclose(reason, description) {
-    this.connected = false;
-    delete this.id;
-    this.emitReserved("disconnect", reason, description);
-    this._clearAcks();
-  }
-  /**
-   * Clears the acknowledgement handlers upon disconnection, since the client will never receive an acknowledgement from
-   * the server.
-   *
-   * @private
-   */
-  _clearAcks() {
-    Object.keys(this.acks).forEach((id) => {
-      const isBuffered = this.sendBuffer.some((packet) => String(packet.id) === id);
-      if (!isBuffered) {
-        const ack = this.acks[id];
-        delete this.acks[id];
-        if (ack.withError) {
-          ack.call(this, new Error("socket has been disconnected"));
-        }
-      }
-    });
-  }
-  /**
-   * Called with socket packet.
-   *
-   * @param packet
-   * @private
-   */
-  onpacket(packet) {
-    const sameNamespace = packet.nsp === this.nsp;
-    if (!sameNamespace)
-      return;
-    switch (packet.type) {
-      case PacketType.CONNECT:
-        if (packet.data && packet.data.sid) {
-          this.onconnect(packet.data.sid, packet.data.pid);
-        } else {
-          this.emitReserved("connect_error", new Error("It seems you are trying to reach a Socket.IO server in v2.x with a v3.x client, but they are not compatible (more information here: https://socket.io/docs/v3/migrating-from-2-x-to-3-0/)"));
-        }
-        break;
-      case PacketType.EVENT:
-      case PacketType.BINARY_EVENT:
-        this.onevent(packet);
-        break;
-      case PacketType.ACK:
-      case PacketType.BINARY_ACK:
-        this.onack(packet);
-        break;
-      case PacketType.DISCONNECT:
-        this.ondisconnect();
-        break;
-      case PacketType.CONNECT_ERROR:
-        this.destroy();
-        const err = new Error(packet.data.message);
-        err.data = packet.data.data;
-        this.emitReserved("connect_error", err);
-        break;
-    }
-  }
-  /**
-   * Called upon a server event.
-   *
-   * @param packet
-   * @private
-   */
-  onevent(packet) {
-    const args = packet.data || [];
-    if (null != packet.id) {
-      args.push(this.ack(packet.id));
-    }
-    if (this.connected) {
-      this.emitEvent(args);
-    } else {
-      this.receiveBuffer.push(Object.freeze(args));
-    }
-  }
-  emitEvent(args) {
-    if (this._anyListeners && this._anyListeners.length) {
-      const listeners = this._anyListeners.slice();
-      for (const listener of listeners) {
-        listener.apply(this, args);
-      }
-    }
-    super.emit.apply(this, args);
-    if (this._pid && args.length && typeof args[args.length - 1] === "string") {
-      this._lastOffset = args[args.length - 1];
-    }
-  }
-  /**
-   * Produces an ack callback to emit with an event.
-   *
-   * @private
-   */
-  ack(id) {
-    const self2 = this;
-    let sent = false;
-    return function(...args) {
-      if (sent)
-        return;
-      sent = true;
-      self2.packet({
-        type: PacketType.ACK,
-        id,
-        data: args
-      });
-    };
-  }
-  /**
-   * Called upon a server acknowledgement.
-   *
-   * @param packet
-   * @private
-   */
-  onack(packet) {
-    const ack = this.acks[packet.id];
-    if (typeof ack !== "function") {
-      return;
-    }
-    delete this.acks[packet.id];
-    if (ack.withError) {
-      packet.data.unshift(null);
-    }
-    ack.apply(this, packet.data);
-  }
-  /**
-   * Called upon server connect.
-   *
-   * @private
-   */
-  onconnect(id, pid) {
-    this.id = id;
-    this.recovered = pid && this._pid === pid;
-    this._pid = pid;
-    this.connected = true;
-    this.emitBuffered();
-    this.emitReserved("connect");
-    this._drainQueue(true);
-  }
-  /**
-   * Emit buffered events (received and emitted).
-   *
-   * @private
-   */
-  emitBuffered() {
-    this.receiveBuffer.forEach((args) => this.emitEvent(args));
-    this.receiveBuffer = [];
-    this.sendBuffer.forEach((packet) => {
-      this.notifyOutgoingListeners(packet);
-      this.packet(packet);
-    });
-    this.sendBuffer = [];
-  }
-  /**
-   * Called upon server disconnect.
-   *
-   * @private
-   */
-  ondisconnect() {
-    this.destroy();
-    this.onclose("io server disconnect");
-  }
-  /**
-   * Called upon forced client/server side disconnections,
-   * this method ensures the manager stops tracking us and
-   * that reconnections don't get triggered for this.
-   *
-   * @private
-   */
-  destroy() {
-    if (this.subs) {
-      this.subs.forEach((subDestroy) => subDestroy());
-      this.subs = void 0;
-    }
-    this.io["_destroy"](this);
-  }
-  /**
-   * Disconnects the socket manually. In that case, the socket will not try to reconnect.
-   *
-   * If this is the last active Socket instance of the {@link Manager}, the low-level connection will be closed.
-   *
-   * @example
-   * const socket = io();
-   *
-   * socket.on("disconnect", (reason) => {
-   *   // console.log(reason); prints "io client disconnect"
-   * });
-   *
-   * socket.disconnect();
-   *
-   * @return self
-   */
-  disconnect() {
-    if (this.connected) {
-      this.packet({ type: PacketType.DISCONNECT });
-    }
-    this.destroy();
-    if (this.connected) {
-      this.onclose("io client disconnect");
-    }
-    return this;
-  }
-  /**
-   * Alias for {@link disconnect()}.
-   *
-   * @return self
-   */
-  close() {
-    return this.disconnect();
-  }
-  /**
-   * Sets the compress flag.
-   *
-   * @example
-   * socket.compress(false).emit("hello");
-   *
-   * @param compress - if `true`, compresses the sending data
-   * @return self
-   */
-  compress(compress) {
-    this.flags.compress = compress;
-    return this;
-  }
-  /**
-   * Sets a modifier for a subsequent event emission that the event message will be dropped when this socket is not
-   * ready to send messages.
-   *
-   * @example
-   * socket.volatile.emit("hello"); // the server may or may not receive it
-   *
-   * @returns self
-   */
-  get volatile() {
-    this.flags.volatile = true;
-    return this;
-  }
-  /**
-   * Sets a modifier for a subsequent event emission that the callback will be called with an error when the
-   * given number of milliseconds have elapsed without an acknowledgement from the server:
-   *
-   * @example
-   * socket.timeout(5000).emit("my-event", (err) => {
-   *   if (err) {
-   *     // the server did not acknowledge the event in the given delay
-   *   }
-   * });
-   *
-   * @returns self
-   */
-  timeout(timeout2) {
-    this.flags.timeout = timeout2;
-    return this;
-  }
-  /**
-   * Adds a listener that will be fired when any event is emitted. The event name is passed as the first argument to the
-   * callback.
-   *
-   * @example
-   * socket.onAny((event, ...args) => {
-   *   console.log(`got ${event}`);
-   * });
-   *
-   * @param listener
-   */
-  onAny(listener) {
-    this._anyListeners = this._anyListeners || [];
-    this._anyListeners.push(listener);
-    return this;
-  }
-  /**
-   * Adds a listener that will be fired when any event is emitted. The event name is passed as the first argument to the
-   * callback. The listener is added to the beginning of the listeners array.
-   *
-   * @example
-   * socket.prependAny((event, ...args) => {
-   *   console.log(`got event ${event}`);
-   * });
-   *
-   * @param listener
-   */
-  prependAny(listener) {
-    this._anyListeners = this._anyListeners || [];
-    this._anyListeners.unshift(listener);
-    return this;
-  }
-  /**
-   * Removes the listener that will be fired when any event is emitted.
-   *
-   * @example
-   * const catchAllListener = (event, ...args) => {
-   *   console.log(`got event ${event}`);
-   * }
-   *
-   * socket.onAny(catchAllListener);
-   *
-   * // remove a specific listener
-   * socket.offAny(catchAllListener);
-   *
-   * // or remove all listeners
-   * socket.offAny();
-   *
-   * @param listener
-   */
-  offAny(listener) {
-    if (!this._anyListeners) {
-      return this;
-    }
-    if (listener) {
-      const listeners = this._anyListeners;
-      for (let i2 = 0; i2 < listeners.length; i2++) {
-        if (listener === listeners[i2]) {
-          listeners.splice(i2, 1);
-          return this;
-        }
-      }
-    } else {
-      this._anyListeners = [];
-    }
-    return this;
-  }
-  /**
-   * Returns an array of listeners that are listening for any event that is specified. This array can be manipulated,
-   * e.g. to remove listeners.
-   */
-  listenersAny() {
-    return this._anyListeners || [];
-  }
-  /**
-   * Adds a listener that will be fired when any event is emitted. The event name is passed as the first argument to the
-   * callback.
-   *
-   * Note: acknowledgements sent to the server are not included.
-   *
-   * @example
-   * socket.onAnyOutgoing((event, ...args) => {
-   *   console.log(`sent event ${event}`);
-   * });
-   *
-   * @param listener
-   */
-  onAnyOutgoing(listener) {
-    this._anyOutgoingListeners = this._anyOutgoingListeners || [];
-    this._anyOutgoingListeners.push(listener);
-    return this;
-  }
-  /**
-   * Adds a listener that will be fired when any event is emitted. The event name is passed as the first argument to the
-   * callback. The listener is added to the beginning of the listeners array.
-   *
-   * Note: acknowledgements sent to the server are not included.
-   *
-   * @example
-   * socket.prependAnyOutgoing((event, ...args) => {
-   *   console.log(`sent event ${event}`);
-   * });
-   *
-   * @param listener
-   */
-  prependAnyOutgoing(listener) {
-    this._anyOutgoingListeners = this._anyOutgoingListeners || [];
-    this._anyOutgoingListeners.unshift(listener);
-    return this;
-  }
-  /**
-   * Removes the listener that will be fired when any event is emitted.
-   *
-   * @example
-   * const catchAllListener = (event, ...args) => {
-   *   console.log(`sent event ${event}`);
-   * }
-   *
-   * socket.onAnyOutgoing(catchAllListener);
-   *
-   * // remove a specific listener
-   * socket.offAnyOutgoing(catchAllListener);
-   *
-   * // or remove all listeners
-   * socket.offAnyOutgoing();
-   *
-   * @param [listener] - the catch-all listener (optional)
-   */
-  offAnyOutgoing(listener) {
-    if (!this._anyOutgoingListeners) {
-      return this;
-    }
-    if (listener) {
-      const listeners = this._anyOutgoingListeners;
-      for (let i2 = 0; i2 < listeners.length; i2++) {
-        if (listener === listeners[i2]) {
-          listeners.splice(i2, 1);
-          return this;
-        }
-      }
-    } else {
-      this._anyOutgoingListeners = [];
-    }
-    return this;
-  }
-  /**
-   * Returns an array of listeners that are listening for any event that is specified. This array can be manipulated,
-   * e.g. to remove listeners.
-   */
-  listenersAnyOutgoing() {
-    return this._anyOutgoingListeners || [];
-  }
-  /**
-   * Notify the listeners for each packet sent
-   *
-   * @param packet
-   *
-   * @private
-   */
-  notifyOutgoingListeners(packet) {
-    if (this._anyOutgoingListeners && this._anyOutgoingListeners.length) {
-      const listeners = this._anyOutgoingListeners.slice();
-      for (const listener of listeners) {
-        listener.apply(this, packet.data);
-      }
-    }
-  }
-}
-function Backoff(opts) {
-  opts = opts || {};
-  this.ms = opts.min || 100;
-  this.max = opts.max || 1e4;
-  this.factor = opts.factor || 2;
-  this.jitter = opts.jitter > 0 && opts.jitter <= 1 ? opts.jitter : 0;
-  this.attempts = 0;
-}
-Backoff.prototype.duration = function() {
-  var ms = this.ms * Math.pow(this.factor, this.attempts++);
-  if (this.jitter) {
-    var rand = Math.random();
-    var deviation = Math.floor(rand * this.jitter * ms);
-    ms = (Math.floor(rand * 10) & 1) == 0 ? ms - deviation : ms + deviation;
-  }
-  return Math.min(ms, this.max) | 0;
-};
-Backoff.prototype.reset = function() {
-  this.attempts = 0;
-};
-Backoff.prototype.setMin = function(min) {
-  this.ms = min;
-};
-Backoff.prototype.setMax = function(max) {
-  this.max = max;
-};
-Backoff.prototype.setJitter = function(jitter) {
-  this.jitter = jitter;
-};
-class Manager extends Emitter {
-  constructor(uri, opts) {
-    var _a;
-    super();
-    this.nsps = {};
-    this.subs = [];
-    if (uri && "object" === typeof uri) {
-      opts = uri;
-      uri = void 0;
-    }
-    opts = opts || {};
-    opts.path = opts.path || "/socket.io";
-    this.opts = opts;
-    installTimerFunctions(this, opts);
-    this.reconnection(opts.reconnection !== false);
-    this.reconnectionAttempts(opts.reconnectionAttempts || Infinity);
-    this.reconnectionDelay(opts.reconnectionDelay || 1e3);
-    this.reconnectionDelayMax(opts.reconnectionDelayMax || 5e3);
-    this.randomizationFactor((_a = opts.randomizationFactor) !== null && _a !== void 0 ? _a : 0.5);
-    this.backoff = new Backoff({
-      min: this.reconnectionDelay(),
-      max: this.reconnectionDelayMax(),
-      jitter: this.randomizationFactor()
-    });
-    this.timeout(null == opts.timeout ? 2e4 : opts.timeout);
-    this._readyState = "closed";
-    this.uri = uri;
-    const _parser = opts.parser || parser;
-    this.encoder = new _parser.Encoder();
-    this.decoder = new _parser.Decoder();
-    this._autoConnect = opts.autoConnect !== false;
-    if (this._autoConnect)
-      this.open();
-  }
-  reconnection(v) {
-    if (!arguments.length)
-      return this._reconnection;
-    this._reconnection = !!v;
-    if (!v) {
-      this.skipReconnect = true;
-    }
-    return this;
-  }
-  reconnectionAttempts(v) {
-    if (v === void 0)
-      return this._reconnectionAttempts;
-    this._reconnectionAttempts = v;
-    return this;
-  }
-  reconnectionDelay(v) {
-    var _a;
-    if (v === void 0)
-      return this._reconnectionDelay;
-    this._reconnectionDelay = v;
-    (_a = this.backoff) === null || _a === void 0 ? void 0 : _a.setMin(v);
-    return this;
-  }
-  randomizationFactor(v) {
-    var _a;
-    if (v === void 0)
-      return this._randomizationFactor;
-    this._randomizationFactor = v;
-    (_a = this.backoff) === null || _a === void 0 ? void 0 : _a.setJitter(v);
-    return this;
-  }
-  reconnectionDelayMax(v) {
-    var _a;
-    if (v === void 0)
-      return this._reconnectionDelayMax;
-    this._reconnectionDelayMax = v;
-    (_a = this.backoff) === null || _a === void 0 ? void 0 : _a.setMax(v);
-    return this;
-  }
-  timeout(v) {
-    if (!arguments.length)
-      return this._timeout;
-    this._timeout = v;
-    return this;
-  }
-  /**
-   * Starts trying to reconnect if reconnection is enabled and we have not
-   * started reconnecting yet
-   *
-   * @private
-   */
-  maybeReconnectOnOpen() {
-    if (!this._reconnecting && this._reconnection && this.backoff.attempts === 0) {
-      this.reconnect();
-    }
-  }
-  /**
-   * Sets the current transport `socket`.
-   *
-   * @param {Function} fn - optional, callback
-   * @return self
-   * @public
-   */
-  open(fn) {
-    if (~this._readyState.indexOf("open"))
-      return this;
-    this.engine = new Socket$1(this.uri, this.opts);
-    const socket = this.engine;
-    const self2 = this;
-    this._readyState = "opening";
-    this.skipReconnect = false;
-    const openSubDestroy = on(socket, "open", function() {
-      self2.onopen();
-      fn && fn();
-    });
-    const onError = (err) => {
-      this.cleanup();
-      this._readyState = "closed";
-      this.emitReserved("error", err);
-      if (fn) {
-        fn(err);
-      } else {
-        this.maybeReconnectOnOpen();
-      }
-    };
-    const errorSub = on(socket, "error", onError);
-    if (false !== this._timeout) {
-      const timeout2 = this._timeout;
-      const timer = this.setTimeoutFn(() => {
-        openSubDestroy();
-        onError(new Error("timeout"));
-        socket.close();
-      }, timeout2);
-      if (this.opts.autoUnref) {
-        timer.unref();
-      }
-      this.subs.push(() => {
-        this.clearTimeoutFn(timer);
-      });
-    }
-    this.subs.push(openSubDestroy);
-    this.subs.push(errorSub);
-    return this;
-  }
-  /**
-   * Alias for open()
-   *
-   * @return self
-   * @public
-   */
-  connect(fn) {
-    return this.open(fn);
-  }
-  /**
-   * Called upon transport open.
-   *
-   * @private
-   */
-  onopen() {
-    this.cleanup();
-    this._readyState = "open";
-    this.emitReserved("open");
-    const socket = this.engine;
-    this.subs.push(
-      on(socket, "ping", this.onping.bind(this)),
-      on(socket, "data", this.ondata.bind(this)),
-      on(socket, "error", this.onerror.bind(this)),
-      on(socket, "close", this.onclose.bind(this)),
-      // @ts-ignore
-      on(this.decoder, "decoded", this.ondecoded.bind(this))
     );
   }
   /**
-   * Called upon a ping.
-   *
-   * @private
+   * subscribe and join rooms
+   * @param rooms
    */
-  onping() {
-    this.emitReserved("ping");
+  subscribe_and_join_rooms(rooms, callback, eventname) {
+    this.join_rooms([rooms], (response) => {
+      this.subscribe(eventname ?? rooms, callback);
+    });
   }
   /**
-   * Called with data.
-   *
-   * @private
+   * publish event
    */
-  ondata(data) {
-    try {
-      this.decoder.add(data);
-    } catch (e2) {
-      this.onclose("parse error", e2);
-    }
-  }
-  /**
-   * Called when parser fully decodes a packet.
-   *
-   * @private
-   */
-  ondecoded(packet) {
-    nextTick(() => {
-      this.emitReserved("packet", packet);
-    }, this.setTimeoutFn);
-  }
-  /**
-   * Called upon socket error.
-   *
-   * @private
-   */
-  onerror(err) {
-    this.emitReserved("error", err);
-  }
-  /**
-   * Creates a new socket for the given `nsp`.
-   *
-   * @return {Socket}
-   * @public
-   */
-  socket(nsp, opts) {
-    let socket = this.nsps[nsp];
-    if (!socket) {
-      socket = new Socket2(this, nsp, opts);
-      this.nsps[nsp] = socket;
-    } else if (this._autoConnect && !socket.active) {
-      socket.connect();
-    }
-    return socket;
-  }
-  /**
-   * Called upon a socket close.
-   *
-   * @param socket
-   * @private
-   */
-  _destroy(socket) {
-    const nsps = Object.keys(this.nsps);
-    for (const nsp of nsps) {
-      const socket2 = this.nsps[nsp];
-      if (socket2.active) {
-        return;
-      }
-    }
-    this._close();
-  }
-  /**
-   * Writes a packet.
-   *
-   * @param packet
-   * @private
-   */
-  _packet(packet) {
-    const encodedPackets = this.encoder.encode(packet);
-    for (let i2 = 0; i2 < encodedPackets.length; i2++) {
-      this.engine.write(encodedPackets[i2], packet.options);
-    }
-  }
-  /**
-   * Clean up transport subscriptions and packet buffer.
-   *
-   * @private
-   */
-  cleanup() {
-    this.subs.forEach((subDestroy) => subDestroy());
-    this.subs.length = 0;
-    this.decoder.destroy();
-  }
-  /**
-   * Close the current socket.
-   *
-   * @private
-   */
-  _close() {
-    this.skipReconnect = true;
-    this._reconnecting = false;
-    this.onclose("forced close");
-  }
-  /**
-   * Alias for close()
-   *
-   * @private
-   */
-  disconnect() {
-    return this._close();
-  }
-  /**
-   * Called when:
-   *
-   * - the low-level engine is closed
-   * - the parser encountered a badly formatted packet
-   * - all sockets are disconnected
-   *
-   * @private
-   */
-  onclose(reason, description) {
+  publish(event, ...args) {
     var _a;
-    this.cleanup();
-    (_a = this.engine) === null || _a === void 0 ? void 0 : _a.close();
-    this.backoff.reset();
-    this._readyState = "closed";
-    this.emitReserved("close", reason, description);
-    if (this._reconnection && !this.skipReconnect) {
-      this.reconnect();
+    (_a = this.socket_service) == null ? void 0 : _a.emit(event, ...args);
+  }
+  /**
+   * unsubscribe event
+   */
+  unsubscribe(event) {
+    var _a;
+    const callback = this.listeners.get(event);
+    (_a = this.socket_service) == null ? void 0 : _a.off(event, callback);
+    if (callback) {
+      this.listeners.delete(event);
     }
   }
   /**
-   * Attempt a reconnection.
-   *
-   * @private
+   * clear all socket event
    */
-  reconnect() {
-    if (this._reconnecting || this.skipReconnect)
-      return this;
-    const self2 = this;
-    if (this.backoff.attempts >= this._reconnectionAttempts) {
-      this.backoff.reset();
-      this.emitReserved("reconnect_failed");
-      this._reconnecting = false;
-    } else {
-      const delay = this.backoff.duration();
-      this._reconnecting = true;
-      const timer = this.setTimeoutFn(() => {
-        if (self2.skipReconnect)
-          return;
-        this.emitReserved("reconnect_attempt", self2.backoff.attempts);
-        if (self2.skipReconnect)
-          return;
-        self2.open((err) => {
-          if (err) {
-            self2._reconnecting = false;
-            self2.reconnect();
-            this.emitReserved("reconnect_error", err);
-          } else {
-            self2.onreconnect();
+  /**
+   * Render transcript incremental vào element target (JS thuần).
+   * KHÔNG clear + re-render full list. Mỗi segment render theo id:
+   * - Nếu element id `channel-segment_start` đã tồn tại → cập nhật text
+   * - Nếu chưa tồn tại → tạo wrapper + label + text mới, append vào cuối
+   *
+   * @param targetEl - id của DOM element chứa transcript
+   * @param data - mảng các segment transcript đã được merge
+   * @param style - tùy chọn style cho label và text
+   * @param typewriterMs - delay giữa mỗi từ (default 100ms)
+   */
+  renderTranscript(targetEl, data, style2, typewriterMs = 100) {
+    var _a, _b, _c, _d, _e;
+    const el = document.querySelector(`#${targetEl}`);
+    if (!el) return;
+    for (const item of data) {
+      const segmentId = `${item.channel}-${item.segment_start}`;
+      const existingText = el.querySelector(`#${CSS.escape(segmentId)}`);
+      if (existingText) {
+        existingText.textContent = (item == null ? void 0 : item.text) ?? "";
+        continue;
+      }
+      const wrapper = document.createElement("div");
+      const label = document.createElement("span");
+      label.textContent = `${LabelCallAssistant[item.channel] ?? "unknown"}: `;
+      label.style.fontWeight = ((_a = style2 == null ? void 0 : style2.label) == null ? void 0 : _a.fontWeight) ?? "600";
+      if ((_b = style2 == null ? void 0 : style2.label) == null ? void 0 : _b.color) label.style.color = style2.label.color;
+      if ((_c = style2 == null ? void 0 : style2.label) == null ? void 0 : _c.fontSize) label.style.fontSize = style2.label.fontSize;
+      const text = document.createElement("span");
+      text.id = segmentId;
+      if ((_d = style2 == null ? void 0 : style2.text) == null ? void 0 : _d.color) text.style.color = style2.text.color;
+      if ((_e = style2 == null ? void 0 : style2.text) == null ? void 0 : _e.fontSize) text.style.fontSize = style2.text.fontSize;
+      wrapper.appendChild(label);
+      wrapper.appendChild(text);
+      el.appendChild(wrapper);
+      if (item == null ? void 0 : item.text) {
+        typeWriterSystem({
+          text: item.text,
+          ms: typewriterMs,
+          cb: (word) => {
+            text.textContent += word;
           }
         });
-      }, delay);
-      if (this.opts.autoUnref) {
-        timer.unref();
       }
-      this.subs.push(() => {
-        this.clearTimeoutFn(timer);
+    }
+  }
+  clearAllEvent() {
+    var _a;
+    (_a = this.socket_service) == null ? void 0 : _a.removeAllListeners();
+    this.listeners.clear();
+  }
+  destroy() {
+    this.clearAllEvent();
+    this.socket_service = null;
+  }
+  onRenderAssistant({
+    type,
+    conversationId,
+    delay = 15e3,
+    cb,
+    arrFields = []
+  }) {
+    const fetchAssistant = async (params = {}) => {
+      this.setStatus(StatusRenderAssistant.LOADING);
+      let assistantIdAbly = "";
+      try {
+        const res = await postAIAssistants({
+          type,
+          conversationId,
+          ...params
+        });
+        if (res.data.success) {
+          assistantIdAbly = res.data.taskId;
+          setTimeout(() => {
+            if (this.status === StatusRenderAssistant.LOADING) {
+              this.status = StatusRenderAssistant.INITIAL;
+              this.unsubscribe(getChannelNameAiAsstant(type));
+              return;
+            }
+          }, delay);
+          this.subscribe_and_join_rooms(
+            getChannelNameAiAsstant(type),
+            (message2) => {
+              var _a, _b;
+              if (((_a = message2.data) == null ? void 0 : _a.taskId) === assistantIdAbly) {
+                this.setStatus(StatusRenderAssistant.PROCESSING);
+                if (arrFields == null ? void 0 : arrFields.length) {
+                  const promise = [];
+                  for (let i2 = 0; i2 < arrFields.length; i2++) {
+                    const element = arrFields[i2];
+                    const promiseItem = new Promise((res2) => {
+                      var _a2, _b2, _c, _d;
+                      const value2 = (_b2 = (_a2 = message2.data) == null ? void 0 : _a2.result) == null ? void 0 : _b2[element];
+                      if (typeof value2 === "string") {
+                        typeWriterSystem({
+                          cb: (value22) => value22 && cb(value22, element),
+                          text: value2 ?? "",
+                          ms: 100,
+                          endWrite: () => {
+                            res2(true);
+                          }
+                        });
+                      } else {
+                        cb((_d = (_c = message2.data) == null ? void 0 : _c.result) == null ? void 0 : _d[element], element);
+                        res2(true);
+                      }
+                    });
+                    promise.push(promiseItem);
+                  }
+                  Promise.all(promise).then((values) => {
+                    const some = values.some((value2) => !value2);
+                    if (!some) {
+                      this.setStatus(StatusRenderAssistant.SUCCESS);
+                    } else {
+                      this.setStatus(StatusRenderAssistant.ERROR);
+                      alertSnackbar()({
+                        title: "Có lỗi xảy ra trong quá trình trợ lý ảo tạo",
+                        status: "error"
+                      });
+                    }
+                  }).finally(() => {
+                    var _a2;
+                    (_a2 = this.unsubscribe) == null ? void 0 : _a2.call(
+                      this,
+                      getChannelNameAiAsstant(assistantIdAbly)
+                    );
+                    this.setStatus(StatusRenderAssistant.INITIAL);
+                  });
+                } else {
+                  this.setStatus(StatusRenderAssistant.SUCCESS);
+                  cb((_b = message2.data) == null ? void 0 : _b.result);
+                }
+              } else {
+                this.setStatus(StatusRenderAssistant.INITIAL);
+              }
+            }
+          );
+        } else {
+          this.setStatus(StatusRenderAssistant.INITIAL);
+        }
+      } catch (error) {
+        console.log("error asssistant", error);
+      }
+    };
+    return { fetchAssistant };
+  }
+  /**
+   * Subscribe voice-to-text transcript với auto merge + render.
+   * Mỗi segment socket về → merge vào buffer → append vào element.
+   *
+   * @param options - targetEl (element id), conversationId, style, typewriterMs
+   * @returns { fetchAssistant } để gọi start
+   */
+  onVoiceToText(options) {
+    const { fetchAssistant } = this.onRenderAssistant({
+      conversationId: options.conversationId,
+      type: TypeAssistants.TRANSCRIPT,
+      delay: 15e3,
+      cb: (values) => {
+        this.data = transcriptAssistant(this.data, values);
+        this.renderTranscript(
+          options.targetEl,
+          this.data,
+          options.style,
+          options.typewriterMs
+        );
+      },
+      arrFields: []
+    });
+    return { fetchAssistant };
+  }
+  async fetchHistoryVoiceToText(sessionId) {
+    var _a, _b, _c;
+    try {
+      const infoConversation = await getConversion({ session_id: sessionId });
+      const { fetchAssistant } = this.onRenderAssistant({
+        conversationId: (_a = infoConversation == null ? void 0 : infoConversation.data) == null ? void 0 : _a._id,
+        type: TypeAssistants.TRANSCRIPT,
+        delay: 15e3,
+        cb: (values) => {
+          this.data = transcriptAssistant(this.data, values);
+          client_socket.emit;
+        },
+        arrFields: []
+      });
+      const res = await getHistoryTranscripts({
+        conversationId: (_b = infoConversation == null ? void 0 : infoConversation.data) == null ? void 0 : _b._id
+      });
+      if (((_c = res.data.data) == null ? void 0 : _c.length) && res.data.success) {
+        this.data = res.data.data.map((d) => {
+          d.finish = true;
+          return d;
+        });
+        fetchAssistant();
+        return Promise.resolve({
+          data: res.data.data.map((d) => {
+            d.finish = true;
+            return d;
+          }),
+          success: true,
+          message: "get history voice to text success"
+        });
+      } else {
+        fetchAssistant();
+        return Promise.resolve({
+          data: [],
+          success: true,
+          message: ""
+        });
+      }
+    } catch (error) {
+      return Promise.reject({
+        data: [],
+        success: false,
+        message: "",
+        error
       });
     }
   }
-  /**
-   * Called upon successful reconnect.
-   *
-   * @private
-   */
-  onreconnect() {
-    const attempt = this.backoff.attempts;
-    this._reconnecting = false;
-    this.backoff.reset();
-    this.emitReserved("reconnect", attempt);
-  }
 }
-const cache = {};
-function lookup(uri, opts) {
-  if (typeof uri === "object") {
-    opts = uri;
-    uri = void 0;
+class QueueService {
+  constructor(tenantId, userId) {
+    __publicField(this, "dataSourceQueue", []);
+    __publicField(this, "queueBySessionId", /* @__PURE__ */ new Map());
+    this.tenantId = tenantId;
+    this.userId = userId;
+    this.getAgentByQueue();
   }
-  opts = opts || {};
-  const parsed = url(uri, opts.path || "/socket.io");
-  const source = parsed.source;
-  const id = parsed.id;
-  const path = parsed.path;
-  const sameNamespace = cache[id] && path in cache[id]["nsps"];
-  const newConnection = opts.forceNew || opts["force new connection"] || false === opts.multiplex || sameNamespace;
-  let io;
-  if (newConnection) {
-    io = new Manager(source, opts);
-  } else {
-    if (!cache[id]) {
-      cache[id] = new Manager(source, opts);
+  setQueueBySessionId(sessionId, queueExtension) {
+    this.queueBySessionId.set(
+      sessionId,
+      this.filterQueuesByExtension(queueExtension)
+    );
+  }
+  deleteQueueBySessionId(sessionId) {
+    this.queueBySessionId.delete(sessionId);
+  }
+  getQueueBySessionId(sessionId) {
+    return this.queueBySessionId.get(sessionId);
+  }
+  getDataSourceQueue() {
+    return this.dataSourceQueue;
+  }
+  filterQueuesByExtension(queue_extension) {
+    var _a;
+    if (!((_a = this.dataSourceQueue) == null ? void 0 : _a.length)) return void 0;
+    return this.dataSourceQueue.find(
+      (q) => q.queue_extension === queue_extension
+    );
+  }
+  async getAgentByQueue() {
+    var _a, _b;
+    try {
+      const response = await getGroupsAgents({ tenantId: this.tenantId });
+      if ((_b = (_a = response.data) == null ? void 0 : _a.data) == null ? void 0 : _b.length) {
+        this.dataSourceQueue = response.data.data;
+      } else {
+        this.dataSourceQueue = [];
+      }
+    } catch (error) {
+      this.dataSourceQueue = [];
     }
-    io = cache[id];
   }
-  if (parsed.query && !opts.query) {
-    opts.query = parsed.queryKey;
-  }
-  return io.socket(parsed.path, opts);
 }
-Object.assign(lookup, {
-  Manager,
-  Socket: Socket2,
-  io: lookup,
-  connect: lookup
-});
 const participantType = "SUPERVISOR";
 const chanels = [fb_message, zl_message, phoneContact, "LIVE_CHAT"];
 class Socket_SDK extends Port_Sip {
@@ -88809,7 +92434,7 @@ class Socket_SDK extends Port_Sip {
     cbFouceLogout,
     delegate
   }) {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _A, _B;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _A, _B, _C, _D, _E, _F;
     super();
     __publicField(this, "info");
     __publicField(this, "getMsg");
@@ -88820,6 +92445,8 @@ class Socket_SDK extends Port_Sip {
     __publicField(this, "socket");
     __publicField(this, "is_disconnect_socket", false);
     __publicField(this, "delegate");
+    __publicField(this, "assistant", null);
+    __publicField(this, "queue_service");
     this.info = info;
     this.delegate = delegate || null;
     this.getMsg = getMsg;
@@ -88857,6 +92484,11 @@ class Socket_SDK extends Port_Sip {
       // forceNew: true,
     });
     this.socket = socket;
+    this.assistant = new AIAssistant(socket);
+    this.queue_service = new QueueService(
+      ((_r = info == null ? void 0 : info.tenant) == null ? void 0 : _r.id) || 0,
+      ((_s = info == null ? void 0 : info.user) == null ? void 0 : _s.id) || 0
+    );
     socket.on("connect", () => {
       var _a2, _b2, _c2, _d2, _e2, _f2, _g2;
       this.is_disconnect_socket = false;
@@ -88944,7 +92576,7 @@ class Socket_SDK extends Port_Sip {
       }
     });
     socket.on(
-      `private_transfer_accepted_${(_r = info == null ? void 0 : info.tenant) == null ? void 0 : _r.id}_${(_s = info == null ? void 0 : info.user) == null ? void 0 : _s.id}`,
+      `private_transfer_accepted_${(_t = info == null ? void 0 : info.tenant) == null ? void 0 : _t.id}_${(_u = info == null ? void 0 : info.user) == null ? void 0 : _u.id}`,
       (msg) => {
         this.pushCallEventEmitter(CallEventType.CALL_TRANSFER_ACCEPTED, msg);
         this.main_id = "";
@@ -88954,7 +92586,16 @@ class Socket_SDK extends Port_Sip {
       }
     );
     socket.on(
-      `private_answer_terminated_${(_t = info == null ? void 0 : info.tenant) == null ? void 0 : _t.id}_${(_u = info == null ? void 0 : info.user) == null ? void 0 : _u.id}`,
+      `agent_in_queue_${(_v = this.info.tenant) == null ? void 0 : _v.id}_${(_w = this.info.user) == null ? void 0 : _w.id}`,
+      (msg) => {
+        client_socket.emit(Event_SDK.QueueEvent, {
+          data: msg == null ? void 0 : msg.data,
+          type: msg == null ? void 0 : msg.type
+        });
+      }
+    );
+    socket.on(
+      `private_answer_terminated_${(_x = info == null ? void 0 : info.tenant) == null ? void 0 : _x.id}_${(_y = info == null ? void 0 : info.user) == null ? void 0 : _y.id}`,
       () => {
         this.pushCallEventEmitter(
           CallEventType.CALL_TERMINATED_OR_IVR_MISSED,
@@ -88963,7 +92604,7 @@ class Socket_SDK extends Port_Sip {
       }
     );
     socket.on(
-      `conversation_${(_v = info == null ? void 0 : info.tenant) == null ? void 0 : _v.id}`,
+      `conversation_${(_z = info == null ? void 0 : info.tenant) == null ? void 0 : _z.id}`,
       (msg) => {
         var _a2, _b2, _c2;
         const isSupportedConversationEvent = msg.name === EVENT_ABLY_NAME.ASSIGN_CONVERSATION || msg.name === EVENT_ABLY_NAME.NEW_CONVERSATION || msg.name === EVENT_ABLY_NAME.TRANSFER_CONVERSATION || msg.name === EVENT_ABLY_NAME.READ_CONVERSATION || msg.name === EVENT_ABLY_NAME.MESSAGE_TRANSFERED;
@@ -88973,13 +92614,13 @@ class Socket_SDK extends Port_Sip {
       }
     );
     socket.on(
-      `private_agent_${(_w = info == null ? void 0 : info.tenant) == null ? void 0 : _w.id}_${(_x = info == null ? void 0 : info.user) == null ? void 0 : _x.id}`,
+      `private_agent_${(_A = info == null ? void 0 : info.tenant) == null ? void 0 : _A.id}_${(_B = info == null ? void 0 : info.user) == null ? void 0 : _B.id}`,
       (msg) => {
         cbUserAction && cbUserAction(msg);
       }
     );
     socket.on(
-      `private_agent_call_event_${(_y = info == null ? void 0 : info.tenant) == null ? void 0 : _y.id}_${(_z = info == null ? void 0 : info.user) == null ? void 0 : _z.id}`,
+      `private_agent_call_event_${(_C = info == null ? void 0 : info.tenant) == null ? void 0 : _C.id}_${(_D = info == null ? void 0 : info.user) == null ? void 0 : _D.id}`,
       (msg) => {
         if (!this.searchSessionEstablished()) {
           client_socket.emit(Event_SDK.CallEvent, msg);
@@ -88987,7 +92628,7 @@ class Socket_SDK extends Port_Sip {
       }
     );
     socket.on(
-      `private_platform_${(_A = info == null ? void 0 : info.tenant) == null ? void 0 : _A.id}_${(_B = info == null ? void 0 : info.user) == null ? void 0 : _B.id}`,
+      `private_platform_${(_E = info == null ? void 0 : info.tenant) == null ? void 0 : _E.id}_${(_F = info == null ? void 0 : info.user) == null ? void 0 : _F.id}`,
       (msg) => {
         this.pushCallEventEmitter(CallEventType.CALL_CROSS_PLATFORM, {
           platform: msg.platform,
@@ -89065,6 +92706,22 @@ class Socket_SDK extends Port_Sip {
       }
     );
   }
+  socketChangeAgentStatusOnQueue(data, type) {
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i;
+    (_i = this.socket) == null ? void 0 : _i.emit(
+      send_message,
+      {
+        rooms: [`private_${(_b = (_a = this.info) == null ? void 0 : _a.tenant) == null ? void 0 : _b.id}_${(_d = (_c = this.info) == null ? void 0 : _c.user) == null ? void 0 : _d.id}`],
+        event: `agent_in_queue_${(_f = (_e = this.info) == null ? void 0 : _e.tenant) == null ? void 0 : _f.id}_${(_h = (_g = this.info) == null ? void 0 : _g.user) == null ? void 0 : _h.id}`,
+        data: {
+          data,
+          type
+        }
+      },
+      () => {
+      }
+    );
+  }
   accept_ably(requests) {
     var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l;
     const sessionId = this.getSessionMain();
@@ -89097,6 +92754,7 @@ class Socket_SDK extends Port_Sip {
         (sessionId2, state, callId, dynamic = {}) => {
           var _a2, _b2, _c2, _d2, _e2, _f2, _g2, _h2, _i2, _j2, _k2, _l2, _m, _n, _o, _p, _q, _r, _s, _t;
           if (requests == null ? void 0 : requests.enableVideo) {
+            this.startTranscriptIntegration(sessionId2);
             this.sendCamera(sessionId2, true);
             const payload = {
               answered: true,
@@ -89148,8 +92806,7 @@ class Socket_SDK extends Port_Sip {
         },
         () => {
           this.socketAnswerTerminated();
-        },
-        (requests == null ? void 0 : requests.enableVideo) ?? false
+        }
       );
     } else {
       alertSnackbar()({
@@ -89278,7 +92935,7 @@ class Socket_SDK extends Port_Sip {
     return list_event.some((i2) => i2 === event);
   }
   pickCall(message2) {
-    var _a, _b, _c, _d;
+    var _a, _b, _c, _d, _e;
     if (message2.state === EVENT_ABLY_NAME.MESSAGE_TRANSFERED || message2.state === EVENT_ABLY_NAME.NEW_CONVERSATION || message2.state === EVENT_ABLY_NAME.ASSIGN_CONVERSATION || message2.state === EVENT_ABLY_NAME.TRANSFER_CONVERSATION || message2.state === EVENT_ABLY_NAME.START_CONVERSATION) {
       if (!SIP_SDK.sessionIds.includes(message2 == null ? void 0 : message2.sessionId) && ((_b = (_a = this.info) == null ? void 0 : _a.user) == null ? void 0 : _b.id) === message2.agentId && existChannelCall(message2.channel)) {
         SIP_SDK.sessionIds.push(message2.sessionId);
@@ -89323,6 +92980,12 @@ class Socket_SDK extends Port_Sip {
         });
       }
       if (message2.state === EVENT_ABLY_NAME.ANSWER_CALL) {
+        if (message2 == null ? void 0 : message2.extraInfo) {
+          const { type } = this.parseExtraInfo((message2 == null ? void 0 : message2.extraInfo) ?? "");
+          if (type === CALL_TYPE.VIDEO && message2.direction === DIRECTION.OUTBOUND) {
+            this.startTranscriptIntegration(message2 == null ? void 0 : message2.sessionId);
+          }
+        }
         this.pushCallEventEmitter(CallEventType.CALL_ANSWERED, {
           senderId: message2 == null ? void 0 : message2.ani,
           applicationId: message2 == null ? void 0 : message2.dnis,
@@ -89345,7 +93008,7 @@ class Socket_SDK extends Port_Sip {
         });
       }
       if (message2.state === EVENT_ABLY_NAME.REJECT_CALL) {
-        console.log("REJECT_CALL", message2);
+        (_e = this.queue_service) == null ? void 0 : _e.deleteQueueBySessionId(message2 == null ? void 0 : message2.sessionId);
         this.pushCallEventEmitter(CallEventType.CALL_REJECTED, {
           senderId: message2 == null ? void 0 : message2.ani,
           applicationId: message2 == null ? void 0 : message2.dnis,
@@ -89389,11 +93052,14 @@ class Socket_SDK extends Port_Sip {
     return last;
   }
   getChannelCallEvent(message2) {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _A, _B, _C, _D, _E, _F, _G, _H, _I;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _A, _B, _C, _D, _E, _F, _G, _H, _I, _J, _K, _L, _M, _N, _O, _P;
+    if (message2.state === EVENT_ABLY_NAME.QUEUE) {
+      (_a = this.queue_service) == null ? void 0 : _a.setQueueBySessionId(message2.sessionId, message2.dnis);
+    }
     this.pickCall(message2);
     if (message2.state && this.checkEvent(message2.state) && existChannelCall(message2.channel)) {
-      if (message2.agentId === ((_b = (_a = this.info) == null ? void 0 : _a.user) == null ? void 0 : _b.id)) {
-        const check = (_c = this.msgs) == null ? void 0 : _c.findIndex(
+      if (message2.agentId === ((_c = (_b = this.info) == null ? void 0 : _b.user) == null ? void 0 : _c.id)) {
+        const check = (_d = this.msgs) == null ? void 0 : _d.findIndex(
           (i2) => (i2 == null ? void 0 : i2.sessionId) === message2.sessionId
         );
         if (check >= 0) {
@@ -89402,7 +93068,7 @@ class Socket_SDK extends Port_Sip {
           this.msgs = [...this.msgs, message2];
         }
       }
-      if (((_d = SIP_SDK.sessionIds) == null ? void 0 : _d.length) && SIP_SDK.sessionIds.includes(message2.sessionId)) {
+      if (((_e = SIP_SDK.sessionIds) == null ? void 0 : _e.length) && SIP_SDK.sessionIds.includes(message2.sessionId)) {
         this.getMsg(message2);
         this.msg_channel = message2;
       }
@@ -89413,7 +93079,7 @@ class Socket_SDK extends Port_Sip {
       }
     }
     if (message2.state === EVENT_ABLY_NAME.OFFER_CALL) {
-      if (((_f = (_e = this.info) == null ? void 0 : _e.user) == null ? void 0 : _f.id) === message2.agentId) {
+      if (((_g = (_f = this.info) == null ? void 0 : _f.user) == null ? void 0 : _g.id) === message2.agentId) {
         this.main_id = message2.sessionId;
         this.pushCallEventEmitter(CallEventType.CALL_INCOMING, {
           senderId: message2 == null ? void 0 : message2.ani,
@@ -89422,13 +93088,14 @@ class Socket_SDK extends Port_Sip {
           hangupBy: null,
           channel: message2 == null ? void 0 : message2.channel,
           direction: message2 == null ? void 0 : message2.direction,
-          extraInfo: (message2 == null ? void 0 : message2.extraInfo) ?? ""
+          extraInfo: (message2 == null ? void 0 : message2.extraInfo) ?? "",
+          queue: ((_h = this.queue_service) == null ? void 0 : _h.getQueueBySessionId(message2 == null ? void 0 : message2.sessionId)) || {}
         });
         this.SesId = message2.sessionId;
       }
     }
     if (message2.state === EVENT_ABLY_NAME.REJECT_CALL) {
-      if (((_h = (_g = this.info) == null ? void 0 : _g.user) == null ? void 0 : _h.id) === message2.agentId) {
+      if (((_j = (_i = this.info) == null ? void 0 : _i.user) == null ? void 0 : _j.id) === message2.agentId) {
         this.clearMainId(message2.sessionId ?? "");
         SIP_SDK.sessionIds = SIP_SDK.sessionIds.filter(
           (s2) => s2 !== message2.sessionId
@@ -89436,7 +93103,7 @@ class Socket_SDK extends Port_Sip {
         if (this.SesId === message2.sessionId) {
           this.SesId = "";
         }
-      } else if (((_j = (_i = this.info) == null ? void 0 : _i.user) == null ? void 0 : _j.id) !== message2.agentId && SIP_SDK.sessionIds.includes(message2.sessionId) && (message2.direction === DIRECTION.INTERNAL || message2.direction === DIRECTION.ATTENDED_TRANSFER)) {
+      } else if (((_l = (_k = this.info) == null ? void 0 : _k.user) == null ? void 0 : _l.id) !== message2.agentId && SIP_SDK.sessionIds.includes(message2.sessionId) && (message2.direction === DIRECTION.INTERNAL || message2.direction === DIRECTION.ATTENDED_TRANSFER)) {
         this.clearMainId(message2.sessionId ?? "");
         this.pushCallEventEmitter(CallEventType.CALL_REJECTED, {
           senderId: message2 == null ? void 0 : message2.ani,
@@ -89450,10 +93117,10 @@ class Socket_SDK extends Port_Sip {
       }
     }
     if (message2.state === EVENT_ABLY_NAME.TRANSFER_ACCEPTED) {
-      if (message2.agentId === ((_l = (_k = this.info) == null ? void 0 : _k.user) == null ? void 0 : _l.id)) {
+      if (message2.agentId === ((_n = (_m = this.info) == null ? void 0 : _m.user) == null ? void 0 : _n.id)) {
         this.main_id = message2.sessionId;
       }
-      if (message2.agentId === ((_n = (_m = this.info) == null ? void 0 : _m.user) == null ? void 0 : _n.id) && !SIP_SDK.sessionIds.includes(message2.sessionId)) {
+      if (message2.agentId === ((_p = (_o = this.info) == null ? void 0 : _o.user) == null ? void 0 : _p.id) && !SIP_SDK.sessionIds.includes(message2.sessionId)) {
         SIP_SDK.sessionIds.push(message2.sessionId);
         this.SesId = "";
       }
@@ -89468,10 +93135,11 @@ class Socket_SDK extends Port_Sip {
           direction: message2 == null ? void 0 : message2.direction,
           extraInfo: (message2 == null ? void 0 : message2.extraInfo) ?? ""
         });
-        if (message2.agentId === ((_p = (_o = this.info) == null ? void 0 : _o.user) == null ? void 0 : _p.id)) {
-          const check = (_q = this.msgs) == null ? void 0 : _q.findIndex(
+        if (message2.agentId === ((_r = (_q = this.info) == null ? void 0 : _q.user) == null ? void 0 : _r.id)) {
+          const check = (_s = this.msgs) == null ? void 0 : _s.findIndex(
             (i2) => (i2 == null ? void 0 : i2.sessionId) === message2.sessionId
           );
+          (_t = this.transcriptIntegration) == null ? void 0 : _t.destroy();
           if (check >= 0) {
             this.msgs[check] = message2;
           } else {
@@ -89531,10 +93199,18 @@ class Socket_SDK extends Port_Sip {
               this.clearData();
               this.data.set(this.main_id, sessionId);
               this.data.set(sessionId, this.main_id);
+              (_u = this.transcriptIntegration) == null ? void 0 : _u.destroy();
+              setTimeout(() => {
+                this.startTranscriptIntegration(_id);
+              }, 1e3);
             } else if (typeof _id === "number") {
               this.clearData();
               this.data.set(this.main_id, _id);
               this.data.set(_id, this.main_id);
+              (_v = this.transcriptIntegration) == null ? void 0 : _v.destroy();
+              setTimeout(() => {
+                this.startTranscriptIntegration(this.main_id);
+              }, 1e3);
             }
             SIP_SDK.sessionIds = [message2.sessionId];
             if (_id) {
@@ -89551,7 +93227,8 @@ class Socket_SDK extends Port_Sip {
       }
     }
     if (message2.state === EVENT_ABLY_NAME.ANSWER_CALL) {
-      if (message2.agentId !== ((_s = (_r = this.info) == null ? void 0 : _r.user) == null ? void 0 : _s.id) && message2.sessionId === this.main_id && message2.direction === DIRECTION.INTERNAL) {
+      (_w = this.queue_service) == null ? void 0 : _w.deleteQueueBySessionId(message2.sessionId);
+      if (message2.agentId !== ((_y = (_x = this.info) == null ? void 0 : _x.user) == null ? void 0 : _y.id) && message2.sessionId === this.main_id && message2.direction === DIRECTION.INTERNAL) {
         this.SesId = message2.sessionId;
         const existDirection = this.msgs.some(
           (i2) => (i2 == null ? void 0 : i2.sessionId) === message2.sessionId
@@ -89571,7 +93248,7 @@ class Socket_SDK extends Port_Sip {
       }
     }
     if (message2.state === EVENT_ABLY_NAME.TRANSFER_FAILED) {
-      if (((_u = (_t = this.info) == null ? void 0 : _t.user) == null ? void 0 : _u.id) !== message2.agentId && SIP_SDK.sessionIds.includes(message2.sessionId)) {
+      if (((_A = (_z = this.info) == null ? void 0 : _z.user) == null ? void 0 : _A.id) !== message2.agentId && SIP_SDK.sessionIds.includes(message2.sessionId)) {
         SIP_SDK.sessionIds = SIP_SDK.sessionIds.filter(
           (s2) => s2 !== message2.sessionId
         );
@@ -89594,6 +93271,7 @@ class Socket_SDK extends Port_Sip {
       });
     }
     if (message2.state === EVENT_ABLY_NAME.END_CALL) {
+      (_B = this.queue_service) == null ? void 0 : _B.deleteQueueBySessionId(message2.sessionId);
       this.clearMainId(message2.sessionId ?? "");
       if (SIP_SDK.sessionIds.includes(message2.sessionId)) {
         this.msgs = this.msgs.filter((i2) => i2.sessionId !== message2.sessionId);
@@ -89605,8 +93283,8 @@ class Socket_SDK extends Port_Sip {
           {},
           {
             isLogClient: false,
-            tenantId: (_w = (_v = this == null ? void 0 : this.info) == null ? void 0 : _v.tenant) == null ? void 0 : _w.id,
-            agentId: (_y = (_x = this == null ? void 0 : this.info) == null ? void 0 : _x.user) == null ? void 0 : _y.id,
+            tenantId: (_D = (_C = this == null ? void 0 : this.info) == null ? void 0 : _C.tenant) == null ? void 0 : _D.id,
+            agentId: (_F = (_E = this == null ? void 0 : this.info) == null ? void 0 : _E.user) == null ? void 0 : _F.id,
             sessionId: message2 == null ? void 0 : message2.sessionId
           }
         );
@@ -89629,8 +93307,8 @@ class Socket_SDK extends Port_Sip {
           {},
           {
             isLogClient: false,
-            tenantId: (_A = (_z = this == null ? void 0 : this.info) == null ? void 0 : _z.tenant) == null ? void 0 : _A.id,
-            agentId: (_C = (_B = this == null ? void 0 : this.info) == null ? void 0 : _B.user) == null ? void 0 : _C.id,
+            tenantId: (_H = (_G = this == null ? void 0 : this.info) == null ? void 0 : _G.tenant) == null ? void 0 : _H.id,
+            agentId: (_J = (_I = this == null ? void 0 : this.info) == null ? void 0 : _I.user) == null ? void 0 : _J.id,
             sessionId: message2 == null ? void 0 : message2.sessionId
           }
         );
@@ -89645,15 +93323,15 @@ class Socket_SDK extends Port_Sip {
           statusCode: message2 == null ? void 0 : message2.statusCode
         });
         this.SesId = "";
-      } else if (message2.agentId === ((_E = (_D = this.info) == null ? void 0 : _D.user) == null ? void 0 : _E.id) && this.SesId !== message2.sessionId) {
+      } else if (message2.agentId === ((_L = (_K = this.info) == null ? void 0 : _K.user) == null ? void 0 : _L.id) && this.SesId !== message2.sessionId) {
         if (!this.push_hang_up.includes(message2.sessionId)) {
           traceLog(
             "hangup_3",
             {},
             {
               isLogClient: false,
-              tenantId: (_G = (_F = this == null ? void 0 : this.info) == null ? void 0 : _F.tenant) == null ? void 0 : _G.id,
-              agentId: (_I = (_H = this == null ? void 0 : this.info) == null ? void 0 : _H.user) == null ? void 0 : _I.id,
+              tenantId: (_N = (_M = this == null ? void 0 : this.info) == null ? void 0 : _M.tenant) == null ? void 0 : _N.id,
+              agentId: (_P = (_O = this == null ? void 0 : this.info) == null ? void 0 : _O.user) == null ? void 0 : _P.id,
               sessionId: message2 == null ? void 0 : message2.sessionId
             }
           );
@@ -89741,6 +93419,40 @@ class Socket_SDK extends Port_Sip {
       return Promise.reject({
         success: false,
         message: (error == null ? void 0 : error.message) ?? "unknown error"
+      });
+    }
+  }
+  startTranscript() {
+    this.assistant = new AIAssistant(this.socket);
+    this.assistant.fetchHistoryVoiceToText(this.main_id);
+  }
+  async historyVideoToText() {
+    var _a, _b;
+    try {
+      const infoConversation = await getConversion({
+        session_id: this.main_id
+      });
+      const res = await getHistoryTranscripts({
+        conversationId: (_a = infoConversation == null ? void 0 : infoConversation.data) == null ? void 0 : _a._id
+      });
+      if (((_b = res.data.data) == null ? void 0 : _b.length) && res.data.success) {
+        return Promise.resolve({
+          data: res.data.data.map((d) => {
+            d.finish = true;
+            return d;
+          }),
+          success: true,
+          message: "get history voice to text success"
+        });
+      } else {
+        throw Error("get history voice to text error");
+      }
+    } catch (error) {
+      return Promise.reject({
+        success: false,
+        message: "get history voice to text error",
+        data: [],
+        error
       });
     }
   }
@@ -90378,12 +94090,16 @@ class BubbleSDK {
         );
         this.socket.mute_call(sessionId, true);
       } else {
-        traceLog("mute_sdk tab", {}, {
-          isLogClient: true,
-          isLogServer: false,
-          tenantId: (_g = (_f = this.info) == null ? void 0 : _f.tenant) == null ? void 0 : _g.id,
-          agentId: (_i = (_h = this.info) == null ? void 0 : _h.user) == null ? void 0 : _i.id
-        });
+        traceLog(
+          "mute_sdk tab",
+          {},
+          {
+            isLogClient: true,
+            isLogServer: false,
+            tenantId: (_g = (_f = this.info) == null ? void 0 : _f.tenant) == null ? void 0 : _g.id,
+            agentId: (_i = (_h = this.info) == null ? void 0 : _h.user) == null ? void 0 : _i.id
+          }
+        );
         this.userActionType(USER_ACTION.MUTE);
       }
     }
@@ -90440,7 +94156,7 @@ class BubbleSDK {
           agentId: (_d = (_c = this.info) == null ? void 0 : _c.user) == null ? void 0 : _d.id
         }
       );
-      if (find) this.socket.sendCamera(sessionId, true);
+      if (find) this.socket.sendCameraManual(sessionId, true);
     }
   }
   cameraOff_sdk() {
@@ -90459,7 +94175,7 @@ class BubbleSDK {
           agentId: (_d = (_c = this.info) == null ? void 0 : _c.user) == null ? void 0 : _d.id
         }
       );
-      if (find) this.socket.sendCamera(sessionId, false);
+      if (find) this.socket.sendCameraManual(sessionId, false);
     }
   }
   updateVideo_sdk() {
@@ -90583,14 +94299,27 @@ class BubbleSDK {
     }
   }
   async getAgentQueues_sdk() {
-    var _a, _b, _c, _d, _e;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k;
     try {
       const response = await getAgentQueues({
         tenantId: (_b = (_a = this.info) == null ? void 0 : _a.tenant) == null ? void 0 : _b.id,
         agentId: (_d = (_c = this.info) == null ? void 0 : _c.user) == null ? void 0 : _d.id
       });
+      traceLog(
+        "getAgentQueues_sdk",
+        {
+          response: ((_e = response.data) == null ? void 0 : _e.data) ?? [],
+          data: (_f = this.socket) == null ? void 0 : _f.getDataStringify()
+        },
+        {
+          isLogClient: false,
+          isLogServer: true,
+          tenantId: (_h = (_g = this.info) == null ? void 0 : _g.tenant) == null ? void 0 : _h.id,
+          agentId: (_j = (_i = this.info) == null ? void 0 : _i.user) == null ? void 0 : _j.id
+        }
+      );
       return Promise.resolve({
-        data: ((_e = response.data) == null ? void 0 : _e.data) ?? [],
+        data: ((_k = response.data) == null ? void 0 : _k.data) ?? [],
         success: true,
         message: "get list agent queues success"
       });
@@ -90603,17 +94332,39 @@ class BubbleSDK {
     }
   }
   async getGroupAgents_sdk() {
-    var _a, _b, _c;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l;
     try {
       const response = await getGroupsAgents({
         tenantId: (_b = (_a = this == null ? void 0 : this.info) == null ? void 0 : _a.tenant) == null ? void 0 : _b.id
       });
+      traceLog(
+        "getGroupAgents_sdk success",
+        {
+          response: ((_c = response.data) == null ? void 0 : _c.data) ?? []
+        },
+        {
+          isLogClient: false,
+          isLogServer: true,
+          tenantId: (_e = (_d = this.info) == null ? void 0 : _d.tenant) == null ? void 0 : _e.id,
+          agentId: (_g = (_f = this.info) == null ? void 0 : _f.user) == null ? void 0 : _g.id
+        }
+      );
       return Promise.resolve({
-        data: ((_c = response.data) == null ? void 0 : _c.data) ?? [],
+        data: ((_h = response.data) == null ? void 0 : _h.data) ?? [],
         success: true,
         message: "get list agent queues success"
       });
     } catch (error) {
+      traceLog(
+        "getGroupAgents_sdk error",
+        {},
+        {
+          isLogClient: false,
+          isLogServer: true,
+          tenantId: (_j = (_i = this.info) == null ? void 0 : _i.tenant) == null ? void 0 : _j.id,
+          agentId: (_l = (_k = this.info) == null ? void 0 : _k.user) == null ? void 0 : _l.id
+        }
+      );
       return Promise.reject({
         data: [],
         success: false,
@@ -90622,15 +94373,40 @@ class BubbleSDK {
     }
   }
   async getAgentQueuesById_sdk(queueId) {
-    var _a, _b;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k;
     try {
       const response = await getQueueAgent(queueId);
+      traceLog(
+        "getAgentQueuesById_sdk success",
+        {
+          response: ((_a = response.data) == null ? void 0 : _a.data) ?? [],
+          queueId
+        },
+        {
+          isLogClient: false,
+          isLogServer: true,
+          tenantId: (_c = (_b = this.info) == null ? void 0 : _b.tenant) == null ? void 0 : _c.id,
+          agentId: (_e = (_d = this.info) == null ? void 0 : _d.user) == null ? void 0 : _e.id
+        }
+      );
       return Promise.resolve({
-        data: ((_a = response.data) == null ? void 0 : _a.data) ?? [],
-        success: ((_b = response.data) == null ? void 0 : _b.success) ?? false,
+        data: ((_f = response.data) == null ? void 0 : _f.data) ?? [],
+        success: ((_g = response.data) == null ? void 0 : _g.success) ?? false,
         message: "get list agent queues success"
       });
     } catch (error) {
+      traceLog(
+        "getAgentQueuesById_sdk error",
+        {
+          queueId
+        },
+        {
+          isLogClient: false,
+          isLogServer: true,
+          tenantId: (_i = (_h = this.info) == null ? void 0 : _h.tenant) == null ? void 0 : _i.id,
+          agentId: (_k = (_j = this.info) == null ? void 0 : _j.user) == null ? void 0 : _k.id
+        }
+      );
       return Promise.reject({
         data: [],
         success: false,
@@ -90639,18 +94415,43 @@ class BubbleSDK {
     }
   }
   async getAgentByExtension_sdk(queueExtension) {
-    var _a, _b, _c, _d;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m;
     try {
       const response = await getAgentsByExtension({
         tenantId: (_b = (_a = this == null ? void 0 : this.info) == null ? void 0 : _a.tenant) == null ? void 0 : _b.id,
         queueExtension
       });
+      traceLog(
+        "getAgentByExtension_sdk success",
+        {
+          response: ((_c = response.data) == null ? void 0 : _c.data) ?? [],
+          queueExtension
+        },
+        {
+          isLogClient: false,
+          isLogServer: true,
+          tenantId: (_e = (_d = this.info) == null ? void 0 : _d.tenant) == null ? void 0 : _e.id,
+          agentId: (_g = (_f = this.info) == null ? void 0 : _f.user) == null ? void 0 : _g.id
+        }
+      );
       return Promise.resolve({
-        data: ((_c = response.data) == null ? void 0 : _c.data) ?? [],
-        success: ((_d = response.data) == null ? void 0 : _d.success) ?? false,
+        data: ((_h = response.data) == null ? void 0 : _h.data) ?? [],
+        success: ((_i = response.data) == null ? void 0 : _i.success) ?? false,
         message: "get agent by extension success"
       });
     } catch (error) {
+      traceLog(
+        "getAgentByExtension_sdk error",
+        {
+          queueExtension
+        },
+        {
+          isLogClient: false,
+          isLogServer: true,
+          tenantId: (_k = (_j = this.info) == null ? void 0 : _j.tenant) == null ? void 0 : _k.id,
+          agentId: (_m = (_l = this.info) == null ? void 0 : _l.user) == null ? void 0 : _m.id
+        }
+      );
       return Promise.reject({
         data: [],
         success: false,
@@ -90659,7 +94460,7 @@ class BubbleSDK {
     }
   }
   async putAgentQueues_sdk(queueId, enable) {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q;
     try {
       const response = await putAgentQueues({
         tenant_id: (_b = (_a = this.info) == null ? void 0 : _a.tenant) == null ? void 0 : _b.id,
@@ -90669,28 +94470,39 @@ class BubbleSDK {
       });
       traceLog(
         "putAgentQueues_sdk",
-        { queueId, enable, response: response.data.data },
+        {
+          queueId,
+          enable,
+          response: (_e = response.data) == null ? void 0 : _e.data,
+          message: response.data
+        },
         {
           isLogServer: true,
           isLogClient: false,
-          tenantId: (_f = (_e = this.info) == null ? void 0 : _e.tenant) == null ? void 0 : _f.id,
-          agentId: (_h = (_g = this.info) == null ? void 0 : _g.user) == null ? void 0 : _h.id
+          tenantId: (_g = (_f = this.info) == null ? void 0 : _f.tenant) == null ? void 0 : _g.id,
+          agentId: (_i = (_h = this.info) == null ? void 0 : _h.user) == null ? void 0 : _i.id
         }
       );
+      if ((_j = response.data) == null ? void 0 : _j.data) {
+        (_l = this.socket) == null ? void 0 : _l.socketChangeAgentStatusOnQueue(
+          (_k = response.data) == null ? void 0 : _k.data,
+          QUEUE_EVENT.CHANGE_STATUS_QUEUE
+        );
+      }
       return Promise.resolve({
-        data: ((_i = response.data) == null ? void 0 : _i.data) ?? [],
+        data: ((_m = response.data) == null ? void 0 : _m.data) ?? {},
         success: true,
         message: `Agent is ${enable ? "added" : "removed"} to queue ${queueId}`
       });
     } catch (error) {
       traceLog(
-        "putAgentQueues_sdk",
+        "putAgentQueues_sdk error",
         { queueId, enable, error },
         {
           isLogServer: true,
           isLogClient: false,
-          tenantId: (_k = (_j = this.info) == null ? void 0 : _j.tenant) == null ? void 0 : _k.id,
-          agentId: (_m = (_l = this.info) == null ? void 0 : _l.user) == null ? void 0 : _m.id
+          tenantId: (_o = (_n = this.info) == null ? void 0 : _n.tenant) == null ? void 0 : _o.id,
+          agentId: (_q = (_p = this.info) == null ? void 0 : _p.user) == null ? void 0 : _q.id
         }
       );
       return Promise.reject({
@@ -90863,7 +94675,9 @@ class BubbleSDK {
     traceLog(
       "makeCallInternal_sdk",
       {
-        destination
+        destination,
+        extraInfo,
+        enableVideo
       },
       {
         tenantId: (_b = (_a = this == null ? void 0 : this.info) == null ? void 0 : _a.tenant) == null ? void 0 : _b.id,
@@ -90903,7 +94717,8 @@ class BubbleSDK {
           "makeCallInternal_sdk call api",
           {
             destination,
-            response: res == null ? void 0 : res.data
+            response: res == null ? void 0 : res.data,
+            extraInfo: JSON.stringify(values)
           },
           {
             tenantId: (_p = (_o = this == null ? void 0 : this.info) == null ? void 0 : _o.tenant) == null ? void 0 : _p.id,
@@ -91136,7 +94951,32 @@ class BubbleSDK {
       });
     });
   }
-  sendBackgroundBlur_sdk(options, enable = false) {
+  sendBackgroundBlur_sdk(enable = false, imageId) {
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i;
+    traceLog(
+      "sendBackgroundBlur_sdk",
+      {
+        enable,
+        imageId
+      },
+      {
+        sessionId: (_a = this.socket) == null ? void 0 : _a.main_id,
+        tenantId: (_c = (_b = this == null ? void 0 : this.info) == null ? void 0 : _b.tenant) == null ? void 0 : _c.id,
+        agentId: (_e = (_d = this.info) == null ? void 0 : _d.user) == null ? void 0 : _e.id,
+        isLogServer: true,
+        isLogClient: false
+      }
+    );
+    if (!this.socket)
+      return Promise.reject({
+        success: false,
+        message: "socket disconnect or undefined"
+      });
+    if (!enable) {
+      return (_g = this.socket) == null ? void 0 : _g.offblackground((_f = this.socket) == null ? void 0 : _f.main_id);
+    } else {
+      return (_i = this.socket) == null ? void 0 : _i.blurBackground((_h = this.socket) == null ? void 0 : _h.main_id, imageId);
+    }
   }
   joinVideo_sdk(extension, delegate) {
     if (this.socket) {
@@ -91195,6 +95035,16 @@ class BubbleSDK {
       });
     }
   }
+  historyVoiceToText_sdk() {
+    var _a;
+    if (!this.socket)
+      return Promise.reject({
+        success: false,
+        data: [],
+        message: "socket not found"
+      });
+    return (_a = this.socket) == null ? void 0 : _a.historyVideoToText();
+  }
 }
 var config_url = {
   base_url: CONFIG_URL,
@@ -91207,6 +95057,11 @@ var config_key = {
 var config_port = {
   sip: ""
 };
+var config_video_call = {
+  enable_transcript: false,
+  enable_media_pipe: false
+};
+var config_url_image = [];
 const DEFAULT_OPTIONS = {
   targetElementId: "omi-sdk-container",
   mode: "bubble",
@@ -91221,6 +95076,7 @@ class OmiSDK extends BubbleSDK {
    * @param options SDK options
    */
   constructor(options) {
+    var _a;
     super();
     __publicField(this, "options");
     __publicField(this, "container", null);
@@ -91249,6 +95105,12 @@ class OmiSDK extends BubbleSDK {
       store.dispatch(agent_logout());
     }
     if (options == null ? void 0 : options.requestDelegate) this.request = options.requestDelegate;
+    if (options == null ? void 0 : options.enableTranscript)
+      config_video_call.enable_transcript = options.enableTranscript;
+    if (options == null ? void 0 : options.enableMediapipe)
+      config_video_call.enable_media_pipe = options.enableMediapipe;
+    if ((_a = options == null ? void 0 : options.backgroundImages) == null ? void 0 : _a.length)
+      config_url_image = options.backgroundImages;
   }
   login(values) {
     return this.login_sdk(values);
@@ -91370,13 +95232,11 @@ class OmiSDK extends BubbleSDK {
   switchVideo() {
     this.updateCall_sdk();
   }
-  sendBackgroundBlur(options, enable = false) {
-    this.sendBackgroundBlur_sdk(options, enable);
+  sendBackgroundBlur(enable = false, imageId) {
+    return this.sendBackgroundBlur_sdk(enable, imageId);
   }
   joinVideoCall(extension, delegate) {
     this.joinVideo_sdk(extension, delegate);
-  }
-  startBackgroundBlur() {
   }
   getStateSession(sessionId) {
     return this.sessionState_sdk(sessionId);
@@ -91387,11 +95247,15 @@ class OmiSDK extends BubbleSDK {
   async captureRemoteSnapshot(options) {
     return this.captureRemoteSnapshot_sdk(options);
   }
+  historyTranscript() {
+    return this.historyVoiceToText_sdk();
+  }
   /**
    * Initializes the SDK
    * @param options SDK options
    */
   init(options) {
+    var _a;
     if (options == null ? void 0 : options.forceNew) {
       store.dispatch(agent_logout());
     }
@@ -91405,6 +95269,12 @@ class OmiSDK extends BubbleSDK {
       options == null ? void 0 : options.remoteVideoId
     );
     if (options == null ? void 0 : options.requestDelegate) this.request = options.requestDelegate;
+    if (options == null ? void 0 : options.enableTranscript)
+      config_video_call.enable_transcript = config_video_call.enable_transcript || options.enableTranscript;
+    if (options == null ? void 0 : options.enableMediapipe)
+      config_video_call.enable_media_pipe = config_video_call.enable_media_pipe || options.enableMediapipe;
+    if ((_a = options == null ? void 0 : options.backgroundImages) == null ? void 0 : _a.length)
+      config_url_image = options.backgroundImages;
     if (this.initialized) {
       this.logger.warn("SDK is already initialized");
       return;
@@ -91416,8 +95286,8 @@ class OmiSDK extends BubbleSDK {
       this.clear_sdk();
     });
     client_socket.on(EVT_EMITTER.UN_REGISTER, () => {
-      var _a, _b, _c;
-      (_a = this.socket) == null ? void 0 : _a.disconnect_sdk();
+      var _a2, _b, _c;
+      (_a2 = this.socket) == null ? void 0 : _a2.disconnect_sdk();
       (_c = (_b = this.socket) == null ? void 0 : _b.socket) == null ? void 0 : _c.disconnect();
     });
     if (options == null ? void 0 : options.requestDelegate) this.request = options == null ? void 0 : options.requestDelegate;
@@ -91433,8 +95303,6 @@ class OmiSDK extends BubbleSDK {
         targetElement = createElement("div", { id: targetId });
         document.body.appendChild(targetElement);
       }
-      setTimeout(() => {
-      }, 1e3);
       this.container = createElement("div", {
         class: SDK_NAMESPACE,
         "data-version": SDK_VERSION,
@@ -91448,14 +95316,14 @@ class OmiSDK extends BubbleSDK {
       this.initialized = true;
       this.logger.info("SDK initialized successfully");
       setTimeout(() => {
-        var _a, _b, _c, _d;
+        var _a2, _b, _c, _d;
         this.eventEmitter.emit("AppEvent", {
           name: "ready",
           type: AppEventType$1.READY,
           message: "SDK initialized successfully",
           timestamp: Date.now()
         });
-        if (!(options == null ? void 0 : options.forceNew) && ((_b = (_a = store == null ? void 0 : store.getState()) == null ? void 0 : _a.auth) == null ? void 0 : _b.accessToken)) {
+        if (!(options == null ? void 0 : options.forceNew) && ((_b = (_a2 = store == null ? void 0 : store.getState()) == null ? void 0 : _a2.auth) == null ? void 0 : _b.accessToken)) {
           this.eventEmitter.emit(Event_SDK.AppEvent, {
             type: AppEventType$1.AUTO_CONNECT,
             message: AppEventType$1.AUTO_CONNECT
@@ -91712,6 +95580,7 @@ class GuestSwitchBoard {
     __publicField(this, "usingFront", false);
     __publicField(this, "count", 0);
     __publicField(this, "iceReset", 0);
+    __publicField(this, "socket_transcript", null);
     this.count = 0;
     this.connectSwitchboard({
       server,
@@ -91796,12 +95665,12 @@ class GuestSwitchBoard {
     const sdk = new PortSipSdk(
       {
         onRegisterSuccess: () => {
-          var _a, _b;
+          var _a, _b, _c;
           client_socket.emit(Event_SDK.AppEvent, {
             type: AppEventType$1.CONNECTED,
             message: AppEventType$1.CONNECTED
           });
-          sdk == null ? void 0 : sdk.setVideoResolution(
+          (_c = this.port_sip_sdk) == null ? void 0 : _c.setVideoResolution(
             ((_a = SCREEN_RESOLUTION.get("FULL_HD")) == null ? void 0 : _a.width.ideal) || 2560,
             ((_b = SCREEN_RESOLUTION.get("FULL_HD")) == null ? void 0 : _b.height.ideal) ?? 1440
           );
@@ -91971,7 +95840,7 @@ class GuestSwitchBoard {
         onRecvDtmfTone: (id, tone) => {
         },
         onRecvMessage: async (id, message2, contentType) => {
-          var _a, _b, _c, _d, _e;
+          var _a, _b, _c, _d, _e, _f, _g, _h, _i;
           console.log("onRecvMessage", id, message2, contentType);
           try {
             const values = JSON.parse(message2);
@@ -91991,7 +95860,21 @@ class GuestSwitchBoard {
                 await this.port_sip_sdk.updateCall(id, true, true);
                 await ((_d = this.port_sip_sdk) == null ? void 0 : _d.sendVideo(id, true));
                 this.ext_agent = values == null ? void 0 : values.extension;
-                (_e = requestDelegate == null ? void 0 : requestDelegate.onAccept) == null ? void 0 : _e.call(requestDelegate, sessionId, {});
+                this.onTranscriptSocket(
+                  ((_f = (_e = values == null ? void 0 : values.payload) == null ? void 0 : _e.agentInfo) == null ? void 0 : _f.agentId) ?? 0,
+                  ((_h = (_g = values == null ? void 0 : values.payload) == null ? void 0 : _g.agentInfo) == null ? void 0 : _h.tenantId) ?? 0,
+                  sessionId,
+                  (response) => {
+                    var _a2;
+                    (_a2 = requestDelegate == null ? void 0 : requestDelegate.onTranscript) == null ? void 0 : _a2.call(
+                      requestDelegate,
+                      sessionId,
+                      response,
+                      TypeAssistants.TRANSCRIPT
+                    );
+                  }
+                );
+                (_i = requestDelegate == null ? void 0 : requestDelegate.onAccept) == null ? void 0 : _i.call(requestDelegate, sessionId, {});
               } catch (error) {
                 console.log("error enableVideo", error);
               }
@@ -92018,15 +95901,9 @@ class GuestSwitchBoard {
         },
         onVoiceMailReceived: (count) => {
         },
-        onSendOutOfDialogMessageSuccess: (ext2, { msgServerID, msgRawString, rawStringIsJSON }) => {
-          console.log("Out-of-dialog message sent", ext2, {
-            msgServerID,
-            msgRawString,
-            rawStringIsJSON
-          });
+        onSendOutOfDialogMessageSuccess: (ext2) => {
         },
         onAudioDeviceChanged: (deviceId) => {
-          console.log("Audio device changed", deviceId);
         }
       },
       mediaElement
@@ -92108,7 +95985,7 @@ class GuestSwitchBoard {
     this.data.clear();
   }
   disconnectSwitchBoard_sdk() {
-    var _a, _b;
+    var _a, _b, _c;
     (_b = (_a = this.port_sip_sdk) == null ? void 0 : _a.userAgent) == null ? void 0 : _b.stop().then((res) => {
       console.log("res", res);
     }).catch((e2) => {
@@ -92116,26 +95993,35 @@ class GuestSwitchBoard {
     });
     this.clearData();
     this.port_sip_sdk = void 0;
+    (_c = this.socket_transcript) == null ? void 0 : _c.disconnect();
   }
-  clearSessionStreams(id) {
-    var _a, _b, _c;
-    const session2 = (_a = this.port_sip_sdk) == null ? void 0 : _a.sessions.get(id);
-    const pc = (_c = (_b = session2 == null ? void 0 : session2.session) == null ? void 0 : _b.sessionDescriptionHandler) == null ? void 0 : _c.peerConnection;
-    if (pc) {
-      pc.getSenders().forEach((sender) => {
-        if (sender.track) {
-          sender.track.stop();
-        }
-      });
-      pc.close();
-    }
-  }
-  setVolume(value2) {
-    var _a, _b;
-    const videoId = Array.isArray((_a = this.mediaElement) == null ? void 0 : _a.remoteVideoID) ? this.mediaElement.remoteVideoID[0] : ((_b = this.mediaElement) == null ? void 0 : _b.remoteVideoID) ?? "";
-    const remoteVideo = document.getElementById(videoId);
-    if (remoteVideo) {
-      remoteVideo.volume = Math.max(0, Math.min(1, value2));
+  clearSessionStreams(callId) {
+    var _a, _b, _c, _d;
+    try {
+      const session2 = (_a = this.port_sip_sdk) == null ? void 0 : _a.sessions.get(callId);
+      if (!session2) return;
+      const pc = (_c = (_b = session2.session) == null ? void 0 : _b.sessionDescriptionHandler) == null ? void 0 : _c.peerConnection;
+      if (pc) {
+        pc.getSenders().forEach((sender) => {
+          var _a2;
+          (_a2 = sender.track) == null ? void 0 : _a2.stop();
+        });
+        pc.getReceivers().forEach((receiver) => {
+          var _a2;
+          (_a2 = receiver.track) == null ? void 0 : _a2.stop();
+        });
+        pc.close();
+      }
+      const video = document.getElementById(
+        ((_d = this.mediaElement) == null ? void 0 : _d.localVideoID) ?? ""
+      );
+      if (video == null ? void 0 : video.srcObject) {
+        video.srcObject.getTracks().forEach((t2) => t2.stop());
+        video.srcObject = null;
+      }
+      console.log(`Cleared streams for callId: ${callId}`);
+    } catch (error) {
+      console.error("Error clearing session streams:", error);
     }
   }
   getDataSessionId(key) {
@@ -92344,6 +96230,9 @@ class GuestSwitchBoard {
         const video = document.getElementById(
           ((_a = this.mediaElement) == null ? void 0 : _a.localVideoID) ?? ""
         );
+        if (video.srcObject) {
+          video.srcObject.getTracks().forEach((t2) => t2.stop());
+        }
         const callId = this.getSessionMain();
         const session2 = (_b = this.port_sip_sdk) == null ? void 0 : _b.sessions.get(callId);
         if (!session2) throw new Error("session does not exist");
@@ -92354,7 +96243,7 @@ class GuestSwitchBoard {
             height: { ideal: 1080 },
             width: { ideal: 1920 }
           },
-          audio: true
+          audio: false
         });
         video.srcObject = newStream;
         this.usingFront = !this.usingFront;
@@ -92363,13 +96252,8 @@ class GuestSwitchBoard {
           var _a2;
           return ((_a2 = s2.track) == null ? void 0 : _a2.kind) === "video";
         });
-        const senderAudio = pc.getSenders().find((s2) => {
-          var _a2;
-          return ((_a2 = s2.track) == null ? void 0 : _a2.kind) === "audio";
-        });
         if (sender && newTrack) {
           await sender.replaceTrack(newTrack);
-          await (senderAudio == null ? void 0 : senderAudio.replaceTrack(newStream.getAudioTracks()[0]));
           return Promise.resolve({
             success: true,
             message: "switchCamera success"
@@ -92682,7 +96566,7 @@ class GuestSwitchBoard {
           advanced: [advancedItem]
           // hoặc constraint khác
         },
-        audio: true
+        audio: false
       });
       const newTrack = newStream.getVideoTracks()[0];
       if (sender && newTrack) {
@@ -92703,18 +96587,12 @@ class GuestSwitchBoard {
     }
   }
   async changeResolutionVideo(resolution, facingMode2) {
-    var _a, _b, _c, _d;
+    var _a, _b, _c;
     try {
       const callId = this.getSessionMain();
       const session2 = (_a = this.port_sip_sdk) == null ? void 0 : _a.sessions.get(callId);
       if (!session2) throw new Error("session does not exist");
-      const video = document.getElementById(
-        ((_b = this.mediaElement) == null ? void 0 : _b.localVideoID) ?? ""
-      );
-      if (video.srcObject) {
-        video.srcObject.getTracks().forEach((t2) => t2.stop());
-      }
-      const pc = (_d = (_c = session2.session) == null ? void 0 : _c.sessionDescriptionHandler) == null ? void 0 : _d.peerConnection;
+      const pc = (_c = (_b = session2.session) == null ? void 0 : _b.sessionDescriptionHandler) == null ? void 0 : _c.peerConnection;
       const sender = pc.getSenders().find((s2) => {
         var _a2;
         return ((_a2 = s2.track) == null ? void 0 : _a2.kind) === "video";
@@ -92726,9 +96604,9 @@ class GuestSwitchBoard {
             width: { ideal: 1920 }
           },
           facingMode: facingMode2
-        }
+        },
+        audio: false
       });
-      video.srcObject = newStream;
       const newTrack = newStream.getVideoTracks()[0];
       if (sender && newTrack) {
         await sender.replaceTrack(newTrack);
@@ -92746,6 +96624,27 @@ class GuestSwitchBoard {
         description: error
       });
     }
+  }
+  onTranscriptSocket(agentId, tenantId, sessionId, callback) {
+    const { socket } = connnectTranscript(agentId, tenantId);
+    socket.on("connect", () => {
+      console.log("onTranscriptSocket");
+      this.socket_transcript = socket;
+      socket.emit(
+        "agent_join_rooms",
+        { rooms: [`transcript_${sessionId}`] },
+        (response) => {
+          console.log("onTranscriptSocket Joined room:", response);
+        }
+      );
+    });
+    socket.on("disconnect", () => {
+      console.log("onTranscriptSocket Socket disconnected");
+    });
+    socket.on("transcript_response", (response) => {
+      console.log("onTranscriptSocket Transcript response guest:", response);
+      callback(response);
+    });
   }
 }
 class GuestService extends GuestSocket {
@@ -92800,7 +96699,6 @@ class GuestService extends GuestSocket {
    */
   async init(options) {
     var _a;
-    console.log("GuestService init called with options:", this.instance);
     if (!this.instance.base_url || !this.instance.api_key) {
       return Promise.reject(new Error("Base URL or API key is missing"));
     }
@@ -92848,7 +96746,7 @@ class GuestService extends GuestSocket {
    * @returns {SdkResponse}
    */
   async makeCall(phone, option) {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q;
     traceLog(
       "Guest makeCall called with phone:",
       { phone },
@@ -92888,7 +96786,8 @@ class GuestService extends GuestSocket {
           },
           onConnection: (_n = option == null ? void 0 : option.requestDelegate) == null ? void 0 : _n.onConnection,
           onConnectedSuccessfully: (_o = option == null ? void 0 : option.requestDelegate) == null ? void 0 : _o.onConnectedSuccessfully,
-          onAccept: (_p = option == null ? void 0 : option.requestDelegate) == null ? void 0 : _p.onAccept
+          onAccept: (_p = option == null ? void 0 : option.requestDelegate) == null ? void 0 : _p.onAccept,
+          onTranscript: (_q = option == null ? void 0 : option.requestDelegate) == null ? void 0 : _q.onTranscript
         },
         phone
       });
@@ -93122,10 +97021,6 @@ class GuestService extends GuestSocket {
       return [];
     }
     return this.sip.getResolutionOptions();
-  }
-  setVolume(value2) {
-    if (!this.sip) return;
-    this.sip.setVolume(value2);
   }
 }
 class OmiGuestSDK extends GuestService {

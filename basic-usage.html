@@ -1,392 +1,744 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="vi">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>OmiSDK - Basic Usage Example</title>
+    <title>OmiSDK - Ví dụ cơ bản</title>
     <style>
       :root {
-        --bg-page: #f6f8fa;
-        --text-color: #0f172a;
-        --card-bg: #ffffff;
-        --card-border: #e5e7eb;
-        --muted: #667085;
-        --primary: #2563eb;
-        --primary-hover: #1d4ed8;
-        --ring: #93c5fd;
+        --bg: #0f1218;
+        --panel: #171b22;
+        --panel-elev: #1e2430;
+        --text: #e6ebf2;
+        --muted: #a5afbd;
+        --primary: #4caf50;
+        --primary-600: #43a047;
+        --secondary: #2196f3;
+        --danger: #ef5350;
+        --warning: #ffb300;
+        --border: rgba(255, 255, 255, 0.08);
+        --radius: 12px;
+        --radius-sm: 8px;
+        --shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+        --shadow-soft: 0 2px 12px rgba(0, 0, 0, 0.25);
+        --gap: 16px;
       }
 
       * {
         box-sizing: border-box;
       }
 
+      html,
+      body {
+        height: 100%;
+      }
+
       body {
         margin: 0;
-        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
-          Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, Apple Color Emoji,
-          Segoe UI Emoji;
-        background: var(--bg-page);
-        color: var(--text-color);
+        padding: 24px;
+        font-family:
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          Segoe UI,
+          Roboto,
+          Helvetica,
+          Arial,
+          "Apple Color Emoji",
+          "Segoe UI Emoji";
+        color: var(--text);
+        background:
+          radial-gradient(
+            1200px 800px at 10% -10%,
+            #1b2130 0%,
+            transparent 70%
+          ),
+          radial-gradient(1000px 700px at 110% 0%, #1b2130 0%, transparent 60%),
+          var(--bg);
       }
 
       h1 {
-        margin: 0 0 16px 0;
-        font-size: 24px;
+        margin: 0 0 20px;
+        font-size: 28px;
+        font-weight: 700;
+        letter-spacing: 0.2px;
+        text-align: center;
       }
 
       h2 {
-        margin: 0 0 12px 0;
-        font-size: 18px;
-      }
-
-      .container {
-        max-width: 1200px;
-        padding: 24px;
-        margin: 0 auto;
-      }
-
-      .grid {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 16px;
-      }
-
-      @media (min-width: 900px) {
-        .grid {
-          grid-template-columns: 1fr 1fr;
-        }
-      }
-
-      .card {
-        background: var(--card-bg);
-        border: 1px solid var(--card-border);
-        border-radius: 12px;
-        padding: 16px;
-        box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
-      }
-
-      .input-fields .form-row {
-        display: grid;
-        grid-template-columns: 180px 1fr;
-        align-items: center;
-        gap: 8px;
-        margin-bottom: 10px;
-      }
-
-      label {
+        margin: 0 0 12px;
+        font-size: 16px;
+        font-weight: 600;
         color: var(--muted);
-        font-size: 14px;
       }
 
-      input[type="text"] {
+      .example-container {
         width: 100%;
-        border: 1px solid #d0d5dd;
-        border-radius: 8px;
-        padding: 10px 12px;
-        outline: none;
-        transition: box-shadow 0.15s ease, border-color 0.15s ease;
-        background: #fff;
-        color: var(--text-color);
-      }
-
-      input[type="text"]:focus {
-        border-color: var(--ring);
-        box-shadow: 0 0 0 4px rgba(147, 197, 253, 0.35);
-      }
-
-      .button-grid {
+        margin: 0;
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: var(--gap);
+      }
+
+      .panels {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--gap);
+      }
+
+      .panel {
+        background: linear-gradient(
+          180deg,
+          var(--panel) 0%,
+          var(--panel-elev) 100%
+        );
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 16px;
+        box-shadow: var(--shadow);
+      }
+
+      .panel-controls {
+        grid-column: span 2;
+      }
+
+      .inline-actions {
+        margin-top: 12px;
+        display: flex;
+        flex-wrap: wrap;
         gap: 10px;
       }
 
+      .control-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 12px;
+      }
+
       .btn-call {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        height: 44px;
-        padding: 0 12px;
-        border-radius: 10px;
-        border: 1px solid transparent;
-        background: var(--primary);
-        color: #fff;
+        appearance: none;
+        border: 1px solid var(--border);
+        background: linear-gradient(180deg, #223042 0%, #1b2532 100%);
+        color: var(--text);
+        padding: 10px 12px;
+        border-radius: var(--radius-sm);
+        min-height: 44px;
+        font-size: 14px;
         font-weight: 600;
         letter-spacing: 0.2px;
         cursor: pointer;
-        transition: background 0.15s ease, transform 0.05s ease;
-        text-align: center;
-        word-break: break-word;
+        transition:
+          transform 0.08s ease,
+          box-shadow 0.2s ease,
+          border-color 0.2s ease;
+        box-shadow: var(--shadow-soft);
       }
 
       .btn-call:hover {
-        background: var(--primary-hover);
+        transform: translateY(-1px);
+        border-color: rgba(255, 255, 255, 0.18);
       }
 
       .btn-call:active {
-        transform: translateY(1px);
+        transform: translateY(0);
       }
 
-      .console {
-        background: #0b1221;
-        color: #e5e7eb;
-        border-radius: 8px;
-        height: 220px;
-        overflow: auto;
-        padding: 12px;
-        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-          "Liberation Mono", "Courier New", monospace;
-        font-size: 12px;
-        border: 1px solid #1f2937;
+      .btn-primary {
+        background: linear-gradient(
+          180deg,
+          var(--primary) 0%,
+          var(--primary-600) 100%
+        );
+        border-color: transparent;
+        color: #0b1208;
+      }
+
+      .btn-danger {
+        background: linear-gradient(180deg, var(--danger) 0%, #d84340 100%);
+        border-color: transparent;
+        color: #120909;
+      }
+
+      .btn-secondary {
+        background: linear-gradient(180deg, var(--secondary) 0%, #1e88e5 100%);
+        border-color: transparent;
+        color: #081018;
       }
 
       .video-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 10px;
+        /* grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); */
+        gap: 12px;
       }
 
-      video {
+      .video-grid video {
         width: 100%;
+        height: auto;
         aspect-ratio: 16 / 9;
-        background: #111827;
-        border-radius: 8px;
+        background: #0b0f14;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        object-fit: cover;
+        box-shadow: var(--shadow-soft);
+      }
+
+      .canvas-box canvas {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 16 / 9;
+        background: #0b0f14;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        box-shadow: var(--shadow-soft);
+      }
+
+      .console {
+        background: #0b0f14;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        font-family:
+          ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          "Liberation Mono", "Courier New", monospace;
+        font-size: 12px;
+        padding: 12px;
+        max-height: 260px;
+        overflow: auto;
+        box-shadow: var(--shadow-soft);
+      }
+
+      .console-entry {
+        padding: 6px 0;
+        border-bottom: 1px dashed rgba(255, 255, 255, 0.06);
+      }
+
+      .console-entry:last-child {
+        border-bottom: none;
+      }
+
+      .timestamp {
+        color: var(--muted);
+      }
+
+      .hidden {
+        display: none;
+      }
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        border: 0;
+      }
+
+      /* Snapshot Gallery Styles */
+      .snapshot-gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 12px;
+        margin-top: 12px;
+      }
+
+      .snapshot-item {
+        background: var(--panel-elev);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        overflow: hidden;
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease;
+      }
+
+      .snapshot-item:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow);
+      }
+
+      .snapshot-item img {
+        width: 100%;
+        aspect-ratio: 16/9;
+        object-fit: cover;
         display: block;
       }
 
-      /* Fixed height for SDK container */
-      #sdk-container {
-        height: 250px;
-        width: 400px;
+      .snapshot-info {
+        padding: 8px;
+        font-size: 11px;
+        color: var(--muted);
+      }
+
+      .snapshot-info p {
+        margin: 2px 0;
+      }
+
+      .snapshot-actions {
+        display: flex;
+        gap: 6px;
+        padding: 8px;
+      }
+
+      .snapshot-actions button {
+        flex: 1;
+        padding: 6px;
+        font-size: 11px;
+        min-height: auto;
+      }
+
+      .snapshot-options {
+        background: var(--panel-elev);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 12px;
+        margin-bottom: 12px;
+      }
+
+      .snapshot-options h3 {
+        margin: 0 0 8px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text);
+      }
+
+      .options-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+      }
+
+      .option-group {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .option-group label {
+        font-size: 11px;
+        font-weight: 600;
+        margin-bottom: 4px;
+        color: var(--muted);
+      }
+
+      .option-group select,
+      .option-group input {
+        padding: 6px 8px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        background: var(--bg);
+        color: var(--text);
+        font-size: 12px;
+      }
+
+      .btn-warning {
+        background: linear-gradient(180deg, var(--warning) 0%, #f9a825 100%);
+        border-color: transparent;
+        color: #1a1308;
+      }
+
+      /* Chat Panel */
+      .panel-chat {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .chat-messages {
+        flex: 1;
+        min-height: 300px;
+        max-height: 420px;
         overflow-y: auto;
-        overflow-x: auto;
+        background: #0b0f14;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .chat-bubble {
+        max-width: 75%;
+        padding: 10px 14px;
+        border-radius: 16px;
+        font-size: 13px;
+        line-height: 1.45;
+        word-break: break-word;
+        position: relative;
+      }
+
+      .chat-bubble .chat-meta {
+        font-size: 10px;
+        margin-top: 4px;
+        opacity: 0.6;
+      }
+
+      .chat-bubble.incoming {
+        align-self: flex-start;
+        background: var(--panel-elev);
+        border: 1px solid var(--border);
+        border-bottom-left-radius: 4px;
+        color: var(--text);
+      }
+
+      .chat-bubble.outgoing {
+        align-self: flex-end;
+        background: linear-gradient(
+          135deg,
+          var(--primary) 0%,
+          var(--primary-600) 100%
+        );
+        border-bottom-right-radius: 4px;
+        color: #0b1208;
+      }
+
+      .chat-bubble .chat-sender {
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 3px;
+        opacity: 0.7;
+      }
+
+      .chat-input-row {
+        display: flex;
+        gap: 8px;
+        margin-top: 10px;
+      }
+
+      .chat-input {
+        flex: 1;
+        padding: 10px 14px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        background: var(--bg);
+        color: var(--text);
+        font-size: 13px;
+        outline: none;
+        transition: border-color 0.2s ease;
+      }
+
+      .chat-input:focus {
+        border-color: var(--primary);
+      }
+
+      .chat-image {
+        max-width: 100%;
+        max-height: 220px;
+        border-radius: 8px;
+        margin: 4px 0;
+        cursor: pointer;
+        transition: opacity 0.2s;
+        display: block;
+      }
+
+      .chat-image:hover {
+        opacity: 0.85;
+      }
+
+      .chat-file {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 12px;
+        margin: 4px 0;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        color: var(--secondary);
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 500;
+        transition: background 0.2s;
+      }
+
+      .chat-file:hover {
+        background: rgba(255, 255, 255, 0.14);
+      }
+
+      .chat-file-size {
+        color: var(--muted);
+        font-weight: 400;
+      }
+
+      .chat-bubble.outgoing .chat-file {
+        background: rgba(0, 0, 0, 0.1);
+        border-color: rgba(0, 0, 0, 0.15);
+        color: #0b1208;
+      }
+
+      .chat-bubble.outgoing .chat-file:hover {
+        background: rgba(0, 0, 0, 0.18);
+      }
+
+      .chat-file-hidden {
+        display: none;
+      }
+
+      .chat-file-label {
+        cursor: pointer;
+        text-align: center;
+        white-space: nowrap;
+      }
+
+      .chat-file-info {
+        flex: 1;
+        font-size: 12px;
+        color: var(--muted);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        line-height: 44px;
+      }
+
+      .chat-empty {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: var(--muted);
+        font-size: 13px;
+        opacity: 0.5;
       }
     </style>
-    <link rel="stylesheet" href="./css/style.css" />
+    <link rel="stylesheet" href="/dist/style.css" />
   </head>
-
   <body>
-    <div class="container">
-      <h1>OmiSDK - Basic Usage Example</h1>
-
-      <div class="grid">
-        <section class="card">
-          <h2>SDK Container</h2>
+    <h1>OmiSDK - Ví dụ cơ bản</h1>
+    <div class="example-container">
+      <div class="panels">
+        <section class="panel">
+          <h2>Vùng SDK</h2>
           <div id="sdk-container"></div>
-        </section>
-
-        <section class="card">
-          <h2>Thông tin cuộc gọi</h2>
-          <div class="input-fields">
-            <div class="form-row">
-              <label for="phone-number">Số điện thoại</label>
-              <input
-                type="text"
-                id="phone-number"
-                placeholder="Nhập số điện thoại"
-                value="0988712192"
-              />
-            </div>
-            <div class="form-row">
-              <label for="call-center-number">Số tổng đài</label>
-              <input
-                type="text"
-                id="call-center-number"
-                placeholder="Nhập số tổng đài"
-                value="19006675"
-              />
-            </div>
-            <div class="form-row">
-              <label for="internal-extension">Số máy nhánh nội bộ</label>
-              <input
-                type="text"
-                id="internal-extension"
-                placeholder="Nhập số máy nhánh"
-                value="10004"
-              />
-            </div>
-            <div class="form-row">
-              <label for="transfer-destination">QUEUE</label>
-              <input
-                type="text"
-                id="transfer-destination"
-                placeholder="Nhập điểm đến"
-                value="30001"
-              />
-            </div>
-          </div>
-        </section>
-
-        <section class="card">
-          <h2>Transfer Custom</h2>
-          <div class="input-fields">
-            <div class="form-row">
-              <label for="transfer-destination-custom"
-                >TRANSFER destination</label
-              >
-              <input
-                type="text"
-                id="transfer-destination-custom"
-                placeholder="Nhập điểm đến"
-                value=""
-              />
-            </div>
-            <div class="form-row">
-              <label for="transfer-destinationType-custom"
-                >TRANSFER destinationType</label
-              >
-              <input
-                type="text"
-                id="transfer-destinationType-custom"
-                placeholder="Nhập điểm đến"
-                value="QUEUE"
-              />
-            </div>
-            <div class="form-row">
-              <label for="transfer-transferType-custom"
-                >TRANSFER transferType</label
-              >
-              <input
-                type="text"
-                id="transfer-transferType-custom"
-                placeholder="Nhập điểm đến"
-                value="ATTENDED_TRANSFER"
-              />
-            </div>
-          </div>
-        </section>
-
-        <section class="card">
-          <h2>Login</h2>
-          <div class="input-fields">
-            <div class="form-row">
-              <label for="tenantId">Không gian làm việc</label>
-              <input
-                type="text"
-                id="tenantId"
-                placeholder="Nhập không gian"
-                value="4"
-              />
-            </div>
-            <div class="form-row">
-              <label for="account">Tên tài khoản</label>
-              <input
-                type="text"
-                id="account"
-                placeholder="Nhập tài khoản"
-                value="hoangnt"
-              />
-            </div>
-            <div class="form-row">
-              <label for="password">Mật khẩu</label>
-              <input
-                type="text"
-                id="password"
-                placeholder="Nhập mật khẩu"
-                value=""
-              />
-            </div>
-          </div>
-        </section>
-
-        <section class="card" style="grid-column: 1 / -1">
-          <h2>Điều khiển cuộc gọi</h2>
-          <div class="button-grid">
-            <button class="btn-call" id="accept">Nhận cuộc gọi</button>
-            <button class="btn-call" id="accept-video">
-              Nhận cuộc gọi video
+          <div class="inline-actions">
+            <button class="btn-call btn-primary" id="show-bubble">
+              Hiện bong bóng
             </button>
-            <button class="btn-call" id="reject">Hủy</button>
-            <button class="btn-call" id="mute">mute</button>
-            <button class="btn-call" id="un mute">un mute</button>
-            <button class="btn-call" id="hold">hold</button>
-            <button class="btn-call" id="un_hold">un hold</button>
-            <button class="btn-call" id="make">gọi ra</button>
-            <button class="btn-call" id="hangup">kết thúc cuộc gọi</button>
+            <button class="btn-call" id="hide-bubble">Ẩn bong bóng</button>
+            <button class="btn-call btn-secondary" id="toggle-mode">
+              Chuyển chế độ
+            </button>
+          </div>
+        </section>
+
+        <section class="panel panel-controls">
+          <h2>Điều khiển</h2>
+          <div class="control-grid">
+            <button class="btn-call btn-primary" id="accept">
+              Nhận cuộc gọi
+            </button>
+            <button class="btn-call btn-danger" id="reject">Hủy</button>
+            <button class="btn-call" id="mute">Tắt mic</button>
+            <button class="btn-call" id="un mute">Bật mic</button>
+            <button class="btn-call" id="hold">Giữ máy</button>
+            <button class="btn-call" id="un_hold">Bỏ giữ máy</button>
+            <button class="btn-call" id="make">Gọi ra</button>
+            <button class="btn-call btn-danger" id="hangup">
+              Kết thúc cuộc gọi
+            </button>
+            <button class="btn-call" id="cameraOn">Bật camera</button>
+            <button class="btn-call" id="cameraOff">Tắt camera</button>
+            <button class="btn-call" id="list_agent">Danh sách agent</button>
             <button class="btn-call" id="change_agent">
-              change agent status
+              Đổi trạng thái agent
             </button>
-            <button class="btn-call" id="logout">logout</button>
-            <button class="btn-call" id="login-call">login-call</button>
-            <button class="btn-call" id="makeInternal">
-              gọi cho agent với agent
+            <button class="btn-call btn-secondary" id="login">Đăng nhập</button>
+            <button class="btn-call" id="acceptTransfer">
+              Chấp nhận chuyển cuộc gọi
             </button>
-            <button class="btn-call" id="TRANSFER-CUSTOM">
-              TRANSFER CUSTOM
-            </button>
-            <button class="btn-call" id="login">accept Transfer</button>
+            <button class="btn-call" id="current">Trạng thái hiện tại</button>
+            <button class="btn-call" id="makeInternal">Gọi nội bộ</button>
             <button class="btn-call" id="acceptRefuseTransfer">
-              accept Refuse Transfer
+              Từ chối chuyển cuộc gọi
             </button>
-            <button class="btn-call" id="transfer">transfer</button>
-            <button class="btn-call" id="blur">blur</button>
-            <button class="btn-call" id="unblur">unblur</button>
+            <button class="btn-call" id="transfer">Chuyển cuộc gọi</button>
+            <button class="btn-call" id="getLog">Xem log</button>
+            <button class="btn-call" id="getGroupAgents">Nhóm agent</button>
+            <button class="btn-call" id="getAgentQueuesById">
+              Hàng đợi theo ID
+            </button>
+            <button class="btn-call" id="getAgentByExtension">
+              Agent theo máy nhánh
+            </button>
+            <button class="btn-call" id="closeSession">Đóng phiên</button>
+            <button class="btn-call" id="logout">Đăng xuất</button>
+
+            <button class="btn-call" id="updateVideo">Cập nhật video</button>
+            <button class="btn-call" id="startBackgroundBlur">
+              Bắt đầu làm mờ nền
+            </button>
+            <button class="btn-call" id="sendBackgroundBlur">Gửi nền mờ</button>
+            <button class="btn-call" id="sendBackgroundBlur-1">
+              Gửi nền mờ 1
+            </button>
+            <button class="btn-call" id="unSendBackgroundBlur">
+              Hủy gửi nền mờ
+            </button>
+            <button class="btn-call" id="joinConference">
+              Tham gia cuộc họp
+            </button>
+            <button class="btn-call" id="accpetJoin">fake join</button>
+            <button class="btn-call btn-warning" id="captureSnapshot">
+              📸 Chụp ảnh Remote
+            </button>
+            <button class="btn-call btn-primary" id="startVoiceToText">
+              Bắt đầu Transcript
+            </button>
           </div>
         </section>
 
-        <section class="card" style="grid-column: 1 / -1">
+        <div id="transcript" style="color: white">
+          <h1>transcript</h1>
+        </div>
+
+        <section class="panel">
           <h2>Video</h2>
-          <div class="">
-            <div id="local-container" style="position: relative">
-              <!-- <canvas id="outputCanvas" width="640" height="480"></canvas> -->
-              <video
-                id="video1"
-                title="1"
-                muted
-                style="transform: scaleX(-1, 1)"
-              ></video>
-              <video
-                id="local"
-                title="local video"
-                muted
-                style="
-                  position: absolute;
-                  top: 0;
-                  right: 0;
-                  width: 160px;
-                  height: 160px;
-                  border: 1px solid white;
-                  transform: scale(-1, 1);
-                "
-              ></video>
-            </div>
-            <div>
-              <video
-                id="screen"
-                title="screen"
-                muted
-                style="display: none"
-              ></video>
-              <video id="video2" title="2" muted style="display: none"></video>
-              <video id="video3" title="3" muted style="display: none"></video>
-              <video id="video4" title="4" muted style="display: none"></video>
-              <video id="video5" title="5" muted style="display: none"></video>
-              <video id="video6" title="6" muted style="display: none"></video>
-              <video id="video7" title="7" muted style="display: none"></video>
-            </div>
+          <div class="video-grid">
+            <video
+              id="local"
+              title="video cục bộ"
+              muted
+              autoplay
+              playsinline
+              onloadedmetadata="
+                (res) => {
+                  console.log('Video đã tải xong!', res);
+                  console.log('Video đã tải xong!');
+                }
+              "
+            ></video>
+            <video
+              id="mpt-el-local-video-1"
+              title="video cục bộ"
+              muted
+              autoplay
+              playsinline
+              onloadedmetadata="
+                (res) => {
+                  console.log('Video đã tải xong!', res);
+                  console.log('Video đã tải xong!');
+                }
+              "
+            ></video>
+            <video
+              id="video1"
+              title="1"
+              muted
+              autoplay
+              playsinline
+              onerror="console.log('video1 error')"
+              onloadedmetadata="
+                (res) => {
+                  console.log('Video đã tải xong!', res);
+                  console.log('Video đã tải xong!');
+                }
+              "
+            ></video>
+            <video id="screen" title="màn hình" muted autoplay></video>
+            <video id="video2" title="2" muted autoplay></video>
+            <video id="video3" title="3" muted autoplay></video>
+            <video id="video4" title="4" muted autoplay></video>
+            <video id="video5" title="5" muted autoplay></video>
+            <video id="video6" title="6" muted autoplay></video>
+            <video id="video7" title="7" muted autoplay></video>
+          </div>
+          <!-- <canvas id="outputCanvas" width="640" height="480"></canvas> -->
+        </section>
+
+        <section class="panel">
+          <h2>Canvas</h2>
+          <div class="canvas-box">
+            <canvas id="previewCanvas" width="640" height="360"></canvas>
           </div>
         </section>
 
-        <section class="card" style="grid-column: 1 / -1">
-          <h2>Console Output</h2>
+        <section class="panel">
+          <h2>📸 Ảnh đã chụp (<span id="snapshotCount">0</span>)</h2>
+          <div class="snapshot-options">
+            <h3>⚙️ Tùy chọn chụp ảnh</h3>
+            <div class="options-row">
+              <div class="option-group">
+                <label for="snapshotFormat">Định dạng:</label>
+                <select id="snapshotFormat">
+                  <option value="png">PNG</option>
+                  <option value="jpeg" selected>JPEG</option>
+                  <option value="webp">WebP</option>
+                </select>
+              </div>
+              <div class="option-group">
+                <label for="snapshotQuality">Chất lượng (0-1):</label>
+                <input
+                  type="number"
+                  id="snapshotQuality"
+                  min="0"
+                  max="1"
+                  step="0.05"
+                  value="0.85"
+                />
+              </div>
+              <div class="option-group">
+                <label for="snapshotOutput">Kiểu đầu ra:</label>
+                <select id="snapshotOutput">
+                  <option value="base64" selected>Base64</option>
+                  <option value="blob">Blob</option>
+                  <option value="dataURL">Data URL</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div id="snapshotGallery" class="snapshot-gallery"></div>
+        </section>
+
+        <section class="panel panel-chat">
+          <h2>💬 Chat</h2>
+          <div id="chatMessages" class="chat-messages"></div>
+          <div class="chat-input-row">
+            <input
+              type="text"
+              id="chatInput"
+              class="chat-input"
+              placeholder="Nhập tin nhắn..."
+            />
+            <button class="btn-call btn-primary" id="chatSend">Gửi</button>
+          </div>
+          <div class="chat-input-row">
+            <label class="btn-call chat-file-label" for="chatFileInput"
+              >📎 Chọn file</label
+            >
+            <input
+              type="file"
+              id="chatFileInput"
+              multiple
+              class="chat-file-hidden"
+            />
+            <span id="chatFileInfo" class="chat-file-info">Chưa chọn file</span>
+            <button class="btn-call btn-secondary" id="chatFileSend">
+              Gửi file
+            </button>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Ghi log</h2>
           <div id="console" class="console"></div>
         </section>
       </div>
 
-      <audio id="audio1"></audio>
-      <audio id="audio2"></audio>
-      <audio id="audio3"></audio>
-      <audio id="audio4"></audio>
-      <audio id="audio5"></audio>
-      <audio id="audio6"></audio>
-      <audio id="audio7"></audio>
+      <div class="sr-only">
+        <audio id="audio1"></audio>
+        <audio id="audio2"></audio>
+        <audio id="audio3"></audio>
+        <audio id="audio4"></audio>
+        <audio id="audio5"></audio>
+        <audio id="audio6"></audio>
+        <audio id="audio7"></audio>
+      </div>
     </div>
 
     <script type="module">
       console.log("module load!", new Date());
-      const autoConnected = localStorage.getItem("autoConnected");
 
       // For this example, we're importing from the local build
       import { OmiSDK } from "./omisdk.es.js";
+      const autoConnected = localStorage.getItem("autoConnected");
       window.addEventListener("load", (ev) => {
         console.log("document on load!", new Date());
         // In a real application, you would import from the package
@@ -421,15 +773,30 @@
         sdk.init({
           targetElementId: "sdk-container",
           mode: "bubble",
+          enableMediapipe: true,
+          enableTranscript: true,
+          backgroundImages: [
+            {
+              id: 1,
+              url: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1920",
+            },
+            {
+              id: 2,
+              url: "https://m.yodycdn.com/blog/hinh-nen-thien-nhien-4k-yody-vn-39.jpg",
+            },
+            {
+              id: 3,
+              url: "https://cuaxepnhuagiare.com/wp-content/uploads/2020/09/cach-bai-tri-nha-ve-sinh-duoi-gam-cau-thang.jpg.webp",
+            },
+          ],
           theme: {
             primaryColor: "#4CAF50",
             secondaryColor: "#2196F3",
             borderRadius: "8px",
             bubblePosition: "bottom-right",
           },
-          debug: true,
           forceNew: autoConnected,
-          // baseUrl: window.location.origin,
+          debug: true,
           baseUrl: "https://crm-dev-v2.metechvn.com",
           localVideoId: "local",
           remoteVideoId: [
@@ -448,54 +815,75 @@
             "audio5",
             "audio6",
           ],
+          delegate: {
+            onAccept: (sessionId) => {
+              console.log("onAccept", sessionId);
+            },
+            onHangup: (sessionId) => {
+              console.log("onHangup", sessionId);
+            },
+          },
         });
+
+        // setTimeout(() => {
+        //   Login();
+        // }, 3000);
 
         function AccpetCall() {
           sdk.answerCall({
+            requestDelegate: {
+              onAccept: (sessionId, record) => {
+                console.log("requestDelegate", sessionId, record);
+              },
+            },
             enableVideo: true,
           });
-          console.log("Đã nhận cuộc gọi");
         }
         function Login() {
-          sdk.login({
-            username: "hoangnt",
-            password: "123456aA@",
-            tenantId: 8,
-          });
-          console.log("Đã nhận login");
+          sdk.loginWithToken(
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjQiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiaG9hbmdudCIsIkFzcE5ldC5JZGVudGl0eS5TZWN1cml0eVN0YW1wIjoiTTZKNUc2T1ZRSU1XM0NDQ0o2SkhDUlFFNkdCN1NZRUMiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBZG1pbiIsImh0dHA6Ly93d3cuYXNwbmV0Ym9pbGVycGxhdGUuY29tL2lkZW50aXR5L2NsYWltcy90ZW5hbnRJZCI6IjQiLCJzdWIiOiI0IiwianRpIjoiMGVkZjQyMGItOWFhYy00OGYyLTg1ZDgtOWM0OGYwOTBlM2QyIiwiaWF0IjoxNzU5MTM4NDU3LCJuYmYiOjE3NTkxMzg0NTcsImV4cCI6MTc1OTIyNDg1NywiaXNzIjoiQWRtaW4iLCJhdWQiOiJBZG1pbiJ9.A9ERryHDU-8ibqpMfc6YxQOeEkTxEpxAtPZ3bVBUQbI",
+          );
         }
         function makeCall() {
-          const phoneNumber =
-            document.getElementById("phone-number").value || "0988712192";
-          const callCenterNumber =
-            document.getElementById("call-center-number").value || "18006601";
-
-          sdk.makeCall(phoneNumber, {
-            did: callCenterNumber,
-          });
-          console.log("Đã nhận makeCall");
+          sdk
+            .makeCall("0238412345", {
+              did: "18006601",
+              extraInfo: "Nguyen tien hoang Tester",
+            })
+            .then((res) => {
+              console.log("res", res);
+            })
+            .catch((err) => {
+              console.log("err", err);
+            });
         }
         function hangUp() {
-          sdk.hangup().then((res) => {
-            console.log("res", res);
-          });
-          console.log("Đã nhận hangUp");
+          sdk
+            .hangup({
+              onAccept: (sessionId, record) => {
+                console.log("requestDelegate", sessionId, record);
+              },
+            })
+            .then((res) => {
+              console.log("res", res);
+            });
         }
         function hold() {
           sdk.hold();
-          console.log("Đã nhận hold");
         }
         function un_hold() {
           sdk.unhold();
-          console.log("Đã nhận un_hold");
         }
         document.getElementById("mute").addEventListener("click", () => {
           sdk.mute();
-          console.log("Đã nhận mute");
         });
+        document
+          .getElementById("startBackgroundBlur")
+          .addEventListener("click", () => {
+            sdk.startBackgroundBlur();
+          });
         document.getElementById("un mute").addEventListener("click", () => {
           sdk.unmute();
-          console.log("Đã nhận unmute");
         });
         document.getElementById("hangup").addEventListener("click", () => {
           hangUp();
@@ -503,16 +891,8 @@
         document.getElementById("accept").addEventListener("click", () => {
           AccpetCall();
         });
-        document
-          .getElementById("accept-video")
-          .addEventListener("click", () => {
-            sdk.answerCall({
-              enableVideo: true,
-            });
-          });
         document.getElementById("reject").addEventListener("click", () => {
           sdk.rejectCall();
-          console.log("Đã nhận rejectCall");
         });
         document.getElementById("hold").addEventListener("click", () => {
           hold();
@@ -523,81 +903,221 @@
         document.getElementById("make").addEventListener("click", () => {
           makeCall();
         });
+
         document.getElementById("logout").addEventListener("click", () => {
           sdk.logout();
-          console.log("Đã nhận logout");
         });
-        document.getElementById("blur").addEventListener("click", () => {
-          console.log("blur clicked");
-          sdk.sendBackgroundBlur(
-            {
-              name: "Tổng đài viên",
-              mode: "blur",
-            },
-            true
-          );
+        document.getElementById("current").addEventListener("click", () => {
+          sdk.getCurrentStatus();
         });
-        document.getElementById("unblur").addEventListener("click", () => {
-          console.log("unblur clicked");
-          sdk.sendBackgroundBlur(
-            {
-              name: "Tổng đài viên",
-              mode: "none",
-            },
-            true
-          );
+        document.getElementById("getLog").addEventListener("click", () => {
+          sdk.getLog();
         });
+        document
+          .getElementById("closeSession")
+          .addEventListener("click", () => {
+            sdk.closeSession();
+          });
         document
           .getElementById("makeInternal")
           .addEventListener("click", () => {
-            const internalExtension =
-              document.getElementById("internal-extension").value || "10004";
-            sdk.makeCallSip(internalExtension);
-            console.log("Đã nhận makeCallInternal");
+            sdk.makeCallInternal("12004", "hello", true);
           });
         document.getElementById("transfer").addEventListener("click", () => {
-          const destination =
-            document.getElementById("transfer-destination").value || "30001";
-          sdk.transfer(destination, "QUEUE", "ATTENDED_TRANSFER");
-          console.log("Đã nhận transfer");
+          sdk.transfer("30001", "QUEUE", "ATTENDED_TRANSFER");
         });
-
-        document
-          .getElementById("TRANSFER-CUSTOM")
-          .addEventListener("click", () => {
-            const destination = document.getElementById(
-              "transfer-destination-custom"
-            ).value;
-            const destinationType = document.getElementById(
-              "transfer-destinationType-custom"
-            ).value;
-            const transferType = document.getElementById(
-              "transfer-transferType-custom"
-            ).value;
-            sdk.transfer(destination, destinationType, transferType);
-            console.log("Đã nhận TRANSFER-CUSTOM");
-          });
         document.getElementById("login").addEventListener("click", () => {
-          sdk.acceptTransfer();
-          console.log("Đã nhận acceptTransfer");
+          Login();
         });
-        document.getElementById("login-call").addEventListener("click", () => {
-          const id = document.getElementById("tenantId").value;
-          const acc = document.getElementById("account").value;
-          const password = document.getElementById("password").value;
-          sdk.login({
-            username: acc,
-            password: password,
-            tenantId: Number(id),
+        document
+          .getElementById("getGroupAgents")
+          .addEventListener("click", () => {
+            sdk.getAgentQueues();
           });
-          console.log("Đã nhận login-call");
-        });
+        document
+          .getElementById("getAgentQueuesById")
+          .addEventListener("click", () => {
+            sdk.getAgentQueuesById("1f094398-fa1d-4000-97ee-409a6da4e0fd");
+          });
+        document
+          .getElementById("acceptTransfer")
+          .addEventListener("click", () => {
+            sdk.acceptTransfer();
+          });
+        document
+          .getElementById("getAgentByExtension")
+          .addEventListener("click", () => {
+            sdk.getAgentByExtension("30011");
+          });
         document
           .getElementById("acceptRefuseTransfer")
           .addEventListener("click", () => {
             sdk.refuseTransfer();
-            console.log("refuseTransfer");
+            console.log("acceptRefuseTransfer");
           });
+        document.getElementById("cameraOn").addEventListener("click", () => {
+          console.log("cameraOn");
+
+          sdk.cameraOn();
+        });
+        document.getElementById("cameraOff").addEventListener("click", () => {
+          console.log("cameraOn");
+
+          sdk.cameraOff();
+        });
+        document.getElementById("updateVideo").addEventListener("click", () => {
+          sdk.putMessage();
+        });
+        document
+          .getElementById("joinConference")
+          .addEventListener("click", () => {
+            sdk.joinVideoCall("10999", {
+              onSuccess: (extension) => {
+                console.log("joinConference onSuccess", extension);
+              },
+              onFailure: (extension) => {
+                console.log("joinConference onFailure", extension);
+              },
+            });
+          });
+        document.getElementById("accpetJoin").addEventListener("click", () => {
+          // sdk.submitFake("10999", "1998");
+        });
+
+        document
+          .getElementById("sendBackgroundBlur")
+          .addEventListener("click", () => {
+            sdk.sendBackgroundBlur(true, 1);
+          });
+        document
+          .getElementById("sendBackgroundBlur-1")
+          .addEventListener("click", () => {
+            sdk.sendBackgroundBlur(true, 2);
+          });
+        document
+          .getElementById("unSendBackgroundBlur")
+          .addEventListener("click", () => {
+            sdk.sendBackgroundBlur(false);
+          });
+
+        document
+          .getElementById("startVoiceToText")
+          .addEventListener("click", () => {
+            logToConsole("Bắt đầu transcript...");
+            sdk.startVoiceToText();
+          });
+
+        // ============ SNAPSHOT FUNCTIONALITY ============
+        let snapshotCount = 0;
+
+        // Capture snapshot button handler
+        document
+          .getElementById("captureSnapshot")
+          .addEventListener("click", async () => {
+            logToConsole("Đang chụp ảnh remote video...");
+
+            // const format = document.getElementById("snapshotFormat").value;
+            // const quality = parseFloat(
+            //   document.getElementById("snapshotQuality").value
+            // );
+            // const outputType = document.getElementById("snapshotOutput").value;
+
+            try {
+              const result = await sdk.captureRemoteSnapshot({
+                format: "png",
+                quality: 1,
+                remoteVideoId: "video1", // Capture from video1 element
+              });
+
+              if (result.success) {
+                snapshotCount++;
+                logToConsole(
+                  `✅ Chụp ảnh thành công! (#${snapshotCount}) - ${result.metadata.width}x${result.metadata.height}`,
+                );
+
+                // Update count display
+                document.getElementById("snapshotCount").textContent =
+                  snapshotCount;
+
+                // Display snapshot in gallery
+                displaySnapshot(result, "jpeg", "base64");
+              } else {
+                logToConsole(`❌ Chụp ảnh thất bại: ${result.error}`);
+              }
+
+              console.log("Snapshot result:", result);
+            } catch (error) {
+              logToConsole(`❌ Lỗi khi chụp ảnh: ${error.message}`);
+              console.error("Capture error:", error);
+            }
+          });
+
+        // Display snapshot in gallery
+        function displaySnapshot(result, format, outputType) {
+          const gallery = document.getElementById("snapshotGallery");
+          const item = document.createElement("div");
+          item.className = "snapshot-item";
+
+          console.log("result", result);
+
+          // Create image src based on output type
+          let imgSrc = "";
+          imgSrc = result.data[0]?.link;
+
+          // Format timestamp
+          const date = new Date(result.timestamp);
+          const timeStr = date.toLocaleTimeString("vi-VN");
+
+          // Create snapshot item HTML
+          item.innerHTML = `
+            <img src="${imgSrc}" alt="Snapshot ${snapshotCount}">
+            <div class="snapshot-info">
+              <p><strong>Ảnh #${snapshotCount}</strong></p>
+              <p>⏰ ${timeStr}</p>
+              <p>📐 ${result.metadata.width}x${result.metadata.height}</p>
+              <p>📄 ${format.toUpperCase()}</p>
+            </div>
+            <div class="snapshot-actions">
+              <button class="btn-call btn-secondary" onclick="downloadSnapshot('${imgSrc}', 'snapshot_${snapshotCount}.${format}')">
+                ⬇️ Tải
+              </button>
+              <button class="btn-call btn-danger" onclick="this.closest('.snapshot-item').remove(); updateSnapshotCount();">
+                🗑️ Xóa
+              </button>
+            </div>
+          `;
+
+          // Insert at the beginning of gallery
+          gallery.insertBefore(item, gallery.firstChild);
+
+          // If blob, remember to revoke URL later to free memory
+          if (outputType === "blob") {
+            setTimeout(() => {
+              URL.revokeObjectURL(imgSrc);
+            }, 60000); // Revoke after 1 minute
+          }
+        }
+
+        // Download snapshot function (global)
+        window.downloadSnapshot = function (dataUrl, filename) {
+          const link = document.createElement("a");
+          link.href = dataUrl;
+          link.download = filename;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          logToConsole(`📥 Đã tải xuống: ${filename}`);
+        };
+
+        // Update snapshot count after deletion
+        window.updateSnapshotCount = function () {
+          const gallery = document.getElementById("snapshotGallery");
+          const currentCount =
+            gallery.querySelectorAll(".snapshot-item").length;
+          document.getElementById("snapshotCount").textContent = currentCount;
+          logToConsole(`🗑️ Đã xóa ảnh. Còn lại: ${currentCount} ảnh`);
+        };
+        // ============ END SNAPSHOT FUNCTIONALITY ============
 
         // function makeCall() {
         //   sdk.makeCall();
@@ -608,28 +1128,293 @@
 
         // Set up event listeners
         sdk.on("CallEvent", (event) => {
-          console.log("CallEvent received:", event);
-          const container = document.getElementById("sdk-container");
-          const p = document.createElement("p");
-          p.textContent = JSON.stringify(event);
-          container.appendChild(p);
+          console.log("CallEvent received:", event, new Date().getTime());
+        });
+
+        sdk.on("AssistantEvent", (event) => {
+          console.log("AssistantEvent received:", event);
         });
 
         sdk.on("AppEvent", (event) => {
           console.log("AppEvent received:", event);
-          const container = document.getElementById("sdk-container");
-          const p = document.createElement("p");
-          p.textContent = JSON.stringify(event);
-          container.appendChild(p);
+          if (event.type === "connected") {
+            // setTimeout(() => {
+            sdk.changeAgentStatus(1001).then(() => {});
+            // }, 3000);
+          }
         });
-        // sdk.on("AgentStatusEvent", (event) => {
-        //   console.log("AgentStatusEvent received:", event);
-        // });
-        // sdk.on("InteractionEvent", (event) => {
-        //   console.log("InteractionEvent received:", event);
-        // });
+
+        sdk.on("AgentStatusEvent", (event) => {
+          console.log(
+            "AgentStatusEvent received:",
+            event,
+            new Date().getTime(),
+          );
+        });
+        // ============ CHAT FUNCTIONALITY ============
+        const chatMessages = document.getElementById("chatMessages");
+        const chatInput = document.getElementById("chatInput");
+        const chatSend = document.getElementById("chatSend");
+
+        chatMessages.innerHTML =
+          '<div class="chat-empty">Chưa có tin nhắn</div>';
+
+        function appendChatBubble({
+          text,
+          sender,
+          type,
+          time,
+          messageType,
+          attachments,
+        }) {
+          const empty = chatMessages.querySelector(".chat-empty");
+          if (empty) empty.remove();
+
+          const bubble = document.createElement("div");
+          bubble.className = `chat-bubble ${type}`;
+
+          if (sender) {
+            const senderEl = document.createElement("div");
+            senderEl.className = "chat-sender";
+            senderEl.textContent = sender;
+            bubble.appendChild(senderEl);
+          }
+
+          function getAttUrl(att) {
+            return att.link || att.url || att.buffer || "";
+          }
+
+          if (messageType === "IMAGE" && attachments?.length) {
+            attachments.forEach((att) => {
+              const url = getAttUrl(att);
+              if (!url) return;
+              const img = document.createElement("img");
+              img.src = url;
+              img.className = "chat-image";
+              img.alt = att.fileName || "image";
+              img.onclick = () => window.open(url, "_blank");
+              bubble.appendChild(img);
+            });
+            if (text) {
+              const caption = document.createElement("div");
+              caption.textContent = text;
+              bubble.appendChild(caption);
+            }
+          } else if (messageType === "FILE" && attachments?.length) {
+            attachments.forEach((att) => {
+              const url = getAttUrl(att);
+              const link = document.createElement("a");
+              link.href = url || "#";
+              link.target = "_blank";
+              link.className = "chat-file";
+              link.innerHTML =
+                `📎 ${att.fileName || "file"}` +
+                (att.size
+                  ? ` <span class="chat-file-size">(${(att.size / 1024).toFixed(1)} KB)</span>`
+                  : "");
+              bubble.appendChild(link);
+            });
+            if (text) {
+              const caption = document.createElement("div");
+              caption.textContent = text;
+              bubble.appendChild(caption);
+            }
+          } else if (messageType === "MEDIA" && attachments?.length) {
+            attachments.forEach((att) => {
+              const url = getAttUrl(att);
+              const mimeType = att.type || "";
+              if (mimeType.startsWith("image")) {
+                const img = document.createElement("img");
+                img.src = url;
+                img.className = "chat-image";
+                img.alt = att.fileName || "media";
+                img.onclick = () => window.open(url, "_blank");
+                bubble.appendChild(img);
+              } else {
+                const link = document.createElement("a");
+                link.href = url || "#";
+                link.target = "_blank";
+                link.className = "chat-file";
+                link.textContent = `📎 ${att.fileName || "file"}`;
+                bubble.appendChild(link);
+              }
+            });
+            if (text) {
+              const caption = document.createElement("div");
+              caption.textContent = text;
+              bubble.appendChild(caption);
+            }
+          } else {
+            const content = document.createElement("div");
+            content.textContent = text;
+            bubble.appendChild(content);
+          }
+
+          const meta = document.createElement("div");
+          meta.className = "chat-meta";
+          meta.textContent = time || new Date().toLocaleTimeString();
+          bubble.appendChild(meta);
+
+          chatMessages.appendChild(bubble);
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        sdk.on("InteractionEvent", (event) => {
+          console.log("InteractionEvent received:", event);
+          logToConsole(
+            `[InteractionEvent] ${event.type}: ${JSON.stringify(event)}`,
+          );
+
+          const from = event.messageFrom || "unknown";
+          const text = event.text || "";
+          const time = event.receivedTime
+            ? new Date(event.receivedTime).toLocaleTimeString()
+            : "";
+          const messageType = event.messageType || "TEXT";
+          const attachments = event.attachments || [];
+
+          if (!text && !attachments.length) return;
+
+          const bubbleType = from === "CUSTOMER" ? "incoming" : "outgoing";
+
+          appendChatBubble({
+            text,
+            sender: from,
+            type: bubbleType,
+            time,
+            messageType,
+            attachments,
+          });
+        });
+
+        // ── Send text ──
+        chatSend.addEventListener("click", () => {
+          const text = chatInput.value.trim();
+          if (!text) return;
+          sdk.sendMessage(text, "TEXT", []);
+          // appendChatBubble({ text, sender: "AGENT", type: "outgoing", time: "", messageType: "TEXT", attachments: [] });
+          chatInput.value = "";
+        });
+
+        chatInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") chatSend.click();
+        });
+
+        // ── Send file ──
+        const chatFileInput = document.getElementById("chatFileInput");
+        const chatFileInfo = document.getElementById("chatFileInfo");
+        const chatFileSend = document.getElementById("chatFileSend");
+        const MAX_FILE_SIZE = 5 * 1024 * 1024;
+        const MAX_TOTAL_SIZE = 15 * 1024 * 1024;
+
+        chatFileInput.addEventListener("change", () => {
+          const files = chatFileInput.files;
+          if (!files || files.length === 0) {
+            chatFileInfo.textContent = "Chưa chọn file";
+            return;
+          }
+          const names = Array.from(files)
+            .map((f) => f.name)
+            .join(", ");
+          chatFileInfo.textContent = `${files.length} file: ${names}`;
+        });
+
+        function arrayBufferToBase64(buffer, mimeType) {
+          let binary = "";
+          const bytes = new Uint8Array(buffer);
+          for (let i = 0; i < bytes.byteLength; i++) {
+            binary += String.fromCharCode(bytes[i]);
+          }
+          return `data:${mimeType};base64,${btoa(binary)}`;
+        }
+
+        chatFileSend.addEventListener("click", () => {
+          const files = chatFileInput.files;
+          if (!files || files.length === 0) {
+            chatFileInfo.textContent = "Chưa chọn file";
+            return;
+          }
+
+          const fileList = [];
+          let totalSize = 0;
+          let processed = 0;
+          const validFiles = [];
+
+          Array.from(files).forEach((file) => {
+            if (file.size > MAX_FILE_SIZE) {
+              logToConsole(`⚠️ ${file.name} vượt quá 5MB, bỏ qua`);
+              return;
+            }
+            totalSize += file.size;
+            if (totalSize > MAX_TOTAL_SIZE) {
+              totalSize -= file.size;
+              logToConsole(`⚠️ Tổng file vượt quá 15MB, bỏ qua ${file.name}`);
+              return;
+            }
+            validFiles.push(file);
+          });
+
+          if (validFiles.length === 0) {
+            chatFileInfo.textContent = "Không có file hợp lệ";
+            return;
+          }
+
+          validFiles.forEach((file, i) => {
+            const reader = new FileReader();
+            reader.readAsArrayBuffer(file);
+            reader.onloadend = () => {
+              if (reader.result instanceof ArrayBuffer) {
+                const base64 = arrayBufferToBase64(reader.result, file.type);
+                const isImage = file.type.startsWith("image");
+                const msgType = "FILE";
+                const base64Data = base64.split(",")[1];
+                fileList.push({
+                  id: i,
+                  url: "",
+                  buffer: base64Data,
+                  type: file.type,
+                  fileName: file.name,
+                  size: file.size,
+                });
+
+                processed++;
+                if (processed === validFiles.length) {
+                  sdk.sendMessage("", msgType, fileList);
+                  // appendChatBubble({
+                  //   text: "",
+                  //   sender: "AGENT",
+                  //   type: "outgoing",
+                  //   time: "",
+                  //   messageType: msgType,
+                  //   attachments: fileList,
+                  // });
+                  chatFileInput.value = "";
+                  chatFileInfo.textContent = `Đã gửi ${fileList.length} file`;
+                  logToConsole(`📤 Đã gửi ${fileList.length} file`);
+                }
+              }
+            };
+          });
+        });
+        // ============ END CHAT FUNCTIONALITY ============
 
         // Set up UI controls
+        document.getElementById("show-bubble").addEventListener("click", () => {
+          sdk.showBubble().then(() => {
+            logToConsole("Bubble shown via API call");
+          });
+        });
+
+        document.getElementById("hide-bubble").addEventListener("click", () => {
+          sdk.hideBubble().then(() => {
+            logToConsole("Bubble hidden via API call");
+          });
+        });
+        document.getElementById("list_agent").addEventListener("click", () => {
+          sdk.getAgentStatus().then((res) => {
+            logToConsole("getAgentStatus", res);
+          });
+        });
         document
           .getElementById("change_agent")
           .addEventListener("click", () => {
@@ -637,6 +1422,17 @@
               logToConsole("Bubble hidden via API call");
             });
           });
+
+        document.getElementById("toggle-mode").addEventListener("click", () => {
+          const currentMode = sdk.getOptions().mode;
+          const newMode = currentMode === "bubble" ? "none" : "bubble";
+
+          sdk.updateOptions({
+            mode: newMode,
+          });
+
+          logToConsole(`Mode changed to: ${newMode}`);
+        });
       });
 
       // Example of making a call after 3 seconds
