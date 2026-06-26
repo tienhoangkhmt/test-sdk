@@ -840,9 +840,11 @@
           });
         }
         function Login() {
-          sdk.loginWithToken(
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjQiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiaG9hbmdudCIsIkFzcE5ldC5JZGVudGl0eS5TZWN1cml0eVN0YW1wIjoiTTZKNUc2T1ZRSU1XM0NDQ0o2SkhDUlFFNkdCN1NZRUMiLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBZG1pbiIsImh0dHA6Ly93d3cuYXNwbmV0Ym9pbGVycGxhdGUuY29tL2lkZW50aXR5L2NsYWltcy90ZW5hbnRJZCI6IjQiLCJzdWIiOiI0IiwianRpIjoiMGVkZjQyMGItOWFhYy00OGYyLTg1ZDgtOWM0OGYwOTBlM2QyIiwiaWF0IjoxNzU5MTM4NDU3LCJuYmYiOjE3NTkxMzg0NTcsImV4cCI6MTc1OTIyNDg1NywiaXNzIjoiQWRtaW4iLCJhdWQiOiJBZG1pbiJ9.A9ERryHDU-8ibqpMfc6YxQOeEkTxEpxAtPZ3bVBUQbI",
-          );
+          sdk.loginWithToken({
+            tenantId: 4,
+            username: "hoangnt",
+            password: "123456aA@",
+          });
         }
         function makeCall() {
           sdk
@@ -1070,22 +1072,22 @@
 
           // Create snapshot item HTML
           item.innerHTML = `
-            <img src="${imgSrc}" alt="Snapshot ${snapshotCount}">
-            <div class="snapshot-info">
-              <p><strong>Ảnh #${snapshotCount}</strong></p>
-              <p>⏰ ${timeStr}</p>
-              <p>📐 ${result.metadata.width}x${result.metadata.height}</p>
-              <p>📄 ${format.toUpperCase()}</p>
-            </div>
-            <div class="snapshot-actions">
-              <button class="btn-call btn-secondary" onclick="downloadSnapshot('${imgSrc}', 'snapshot_${snapshotCount}.${format}')">
-                ⬇️ Tải
-              </button>
-              <button class="btn-call btn-danger" onclick="this.closest('.snapshot-item').remove(); updateSnapshotCount();">
-                🗑️ Xóa
-              </button>
-            </div>
-          `;
+                  <img src="${imgSrc}" alt="Snapshot ${snapshotCount}">
+                  <div class="snapshot-info">
+                    <p><strong>Ảnh #${snapshotCount}</strong></p>
+                    <p>⏰ ${timeStr}</p>
+                    <p>📐 ${result.metadata.width}x${result.metadata.height}</p>
+                    <p>📄 ${format.toUpperCase()}</p>
+                  </div>
+                  <div class="snapshot-actions">
+                    <button class="btn-call btn-secondary" onclick="downloadSnapshot('${imgSrc}', 'snapshot_${snapshotCount}.${format}')">
+                      ⬇️ Tải
+                    </button>
+                    <button class="btn-call btn-danger" onclick="this.closest('.snapshot-item').remove(); updateSnapshotCount();">
+                      🗑️ Xóa
+                    </button>
+                  </div>
+                `;
 
           // Insert at the beginning of gallery
           gallery.insertBefore(item, gallery.firstChild);
