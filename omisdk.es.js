@@ -99888,6 +99888,14 @@ class GuestSwitchBoard {
   async muteSip(enableMute) {
     var _a2;
     try {
+      traceLog(
+        "muteSip",
+        { enableMute, sessionId: this.getSessionMain() },
+        {
+          isLogServer: true,
+          isLogClient: true
+        }
+      );
       const callId = this.getSessionMain();
       await ((_a2 = this.port_sip_sdk) == null ? void 0 : _a2.mute(callId, enableMute));
       return Promise.resolve({ success: true, message: "Muted" });
@@ -99941,6 +99949,14 @@ class GuestSwitchBoard {
       ((_a2 = this.mediaElement) == null ? void 0 : _a2.localVideoID) ?? ""
     );
     const stream = el.srcObject;
+    traceLog(
+      "sendCamera client",
+      { enableVideo, sessionId: this.getSessionMain() },
+      {
+        isLogServer: true,
+        isLogClient: false
+      }
+    );
     stream.getTracks().forEach((track) => {
       if (track.kind === "video") {
         track.enabled = enableVideo;
