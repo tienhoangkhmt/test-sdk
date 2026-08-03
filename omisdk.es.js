@@ -96593,7 +96593,6 @@ class Socket_SDK extends Port_Sip {
           var _a3, _b2, _c3, _d2, _e3, _f2, _g2, _h2, _i3, _j2, _k2, _l2, _m, _n2, _o2, _p, _q, _r2, _s2, _t2;
           if (requests == null ? void 0 : requests.enableVideo) {
             this.startTranscriptIntegration(sessionId2);
-            this.sendCamera(sessionId2, true);
             const payload = {
               answered: true,
               isInternal: (record == null ? void 0 : record.dnis) === ((_b2 = (_a3 = this.info) == null ? void 0 : _a3.user) == null ? void 0 : _b2.extension) ? true : false,
@@ -100176,6 +100175,8 @@ class GuestSwitchBoard {
       id,
       false
     );
+    localStorage.removeItem("token");
+    localStorage.removeItem("tenantId");
   }
   async captureStream(id, sessionId, remoteVideoId, userId, tenantId) {
     var _a2, _b, _c2, _d, _e2, _f, _g, _h, _i2, _j;
@@ -100304,6 +100305,8 @@ class GuestSwitchBoard {
             id,
             false
           );
+          localStorage.removeItem("token");
+          localStorage.removeItem("tenantId");
         } else {
           this.pushMsgCaptureSnapshot(id, "Capture snapshot failed");
         }
