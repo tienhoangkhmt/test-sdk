@@ -94323,13 +94323,8 @@ class Port_Sip {
     const sdk = new PortSipSdk(
       {
         onRegisterSuccess: () => {
-          var _a3, _b2, _c3;
-          (_c3 = this.port_sip_sdk) == null ? void 0 : _c3.setVideoResolution(
-            ((_a3 = SCREEN_RESOLUTION.get("HD")) == null ? void 0 : _a3.width.ideal) || 1280,
-            ((_b2 = SCREEN_RESOLUTION.get("HD")) == null ? void 0 : _b2.height.ideal) ?? 720
-          );
           setTimeout(() => {
-            var _a4, _b3, _c4, _d2, _e3;
+            var _a3, _b2, _c3, _d2, _e3;
             client_socket.emit(Event_SDK.AppEvent, {
               type: AppEventType$1.CONNECTED,
               message: AppEventType$1.CONNECTED
@@ -94342,21 +94337,21 @@ class Port_Sip {
                 event: Event_SDK.AppEvent
               },
               {
-                tenantId: (_a4 = info == null ? void 0 : info.tenant) == null ? void 0 : _a4.id,
-                agentId: (_b3 = info == null ? void 0 : info.user) == null ? void 0 : _b3.id,
+                tenantId: (_a3 = info == null ? void 0 : info.tenant) == null ? void 0 : _a3.id,
+                agentId: (_b2 = info == null ? void 0 : info.user) == null ? void 0 : _b2.id,
                 isLogServer: true,
                 isLogClient: false
               }
             );
             getCurrentAgentStatus({
-              cloudAgentId: (_c4 = info == null ? void 0 : info.user) == null ? void 0 : _c4.id,
+              cloudAgentId: (_c3 = info == null ? void 0 : info.user) == null ? void 0 : _c3.id,
               cloudTenantId: (_d2 = info == null ? void 0 : info.tenant) == null ? void 0 : _d2.id,
               cloudAgentName: (_e3 = info == null ? void 0 : info.user) == null ? void 0 : _e3.fullName
             }).then((res) => {
-              var _a5, _b4, _c5, _d3, _e4, _f, _g, _h, _i2, _j, _k, _l, _m, _n2, _o2, _p, _q;
-              if ((_a5 = res.data) == null ? void 0 : _a5.success) {
+              var _a4, _b3, _c4, _d3, _e4, _f, _g, _h, _i2, _j, _k, _l, _m, _n2, _o2, _p, _q;
+              if ((_a4 = res.data) == null ? void 0 : _a4.success) {
                 client_socket.emit(Event_SDK.AgentStatusEvent, {
-                  agentId: (_c5 = (_b4 = res.data) == null ? void 0 : _b4.data) == null ? void 0 : _c5.cloudAgentId,
+                  agentId: (_c4 = (_b3 = res.data) == null ? void 0 : _b3.data) == null ? void 0 : _c4.cloudAgentId,
                   tenantId: (_e4 = (_d3 = res.data) == null ? void 0 : _d3.data) == null ? void 0 : _e4.cloudTenantId,
                   agentName: (_g = (_f = res.data) == null ? void 0 : _f.data) == null ? void 0 : _g.cloudAgentName,
                   statusName: (_i2 = (_h = res.data) == null ? void 0 : _h.data) == null ? void 0 : _i2.statusName,
@@ -94611,6 +94606,7 @@ class Port_Sip {
             }
           );
           (_h = delegate == null ? void 0 : delegate.onHangup) == null ? void 0 : _h.call(delegate, sessionId, {});
+          this.clearSessionStreams(id);
           if (sessionId === this.main_id) {
             cbCheckTask && cbCheckTask(sessionId, "IDLE");
             cbInviteClosed && cbInviteClosed(() => {
@@ -94913,7 +94909,7 @@ class Port_Sip {
     );
     if (_callId) {
       try {
-        await this.port_sip_sdk.answerCall(_callId, enableVideo || false);
+        await this.port_sip_sdk.answerCall(_callId, false);
         const params = this.inComingVideoCallExtensions.get(session2) ?? {};
         cbCheckTask && cbCheckTask(session2, "TALKING", _callId, params);
       } catch (error) {
@@ -94973,6 +94969,7 @@ class Port_Sip {
         (_f = this.transcriptIntegration) == null ? void 0 : _f.stopRemoteMediaRecorder(session2);
         (_g = this.port_sip_sdk) == null ? void 0 : _g.hangUp(_callId).then(() => {
           var _a3;
+          this.clearSessionStreams(_callId);
           if (this.main_id === session2) {
             this.main_id = "";
             (_a3 = this.mediaPipeML) == null ? void 0 : _a3.resetMediapipe();
@@ -95006,6 +95003,7 @@ class Port_Sip {
       (_a2 = this.transcriptIntegration) == null ? void 0 : _a2.stopTranscriptionWithAudioCapture(session2);
       (_b = this.transcriptIntegration) == null ? void 0 : _b.stopRemoteMediaRecorder(session2);
       await ((_c2 = this.port_sip_sdk) == null ? void 0 : _c2.hangUp(_callId));
+      this.clearSessionStreams(_callId);
       if (this.main_id === session2) {
         this.main_id = "";
         (_d = this.mediaPipeML) == null ? void 0 : _d.resetMediapipe();
@@ -95322,15 +95320,11 @@ class Port_Sip {
     }
   }
   async sendCamera(session2, enableMute) {
-    var _a2, _b;
+    var _a2;
     const _callId = this.getDataCallId(session2);
     if (_callId) {
       try {
-        if (enableMute) {
-          const s2 = (_a2 = this.port_sip_sdk) == null ? void 0 : _a2.sessions.get(_callId);
-          if (s2) s2.constraints.video = true;
-        }
-        await ((_b = this.port_sip_sdk) == null ? void 0 : _b.sendVideo(_callId, enableMute));
+        await ((_a2 = this.port_sip_sdk) == null ? void 0 : _a2.sendVideo(_callId, enableMute));
       } catch (error) {
         console.log("error sendCamera", error);
       }
@@ -95801,7 +95795,7 @@ class Port_Sip {
     const session2 = (_a2 = this.port_sip_sdk) == null ? void 0 : _a2.sessions.get(callId);
     return ((_b = session2 == null ? void 0 : session2.session) == null ? void 0 : _b.state) ?? SessionState$2.Terminated;
   }
-  pushMsgSnapshot() {
+  pushMsgSnapshot(token) {
     var _a2, _b, _c2, _d, _e2;
     const id = this.getDataCallId(this.main_id);
     try {
@@ -95810,7 +95804,8 @@ class Port_Sip {
           payload: {
             type: CAPTURE_SNAPSHOT,
             userId: (_b = (_a2 = this.agent_info) == null ? void 0 : _a2.user) == null ? void 0 : _b.id,
-            tenantId: (_d = (_c2 = this.agent_info) == null ? void 0 : _c2.tenant) == null ? void 0 : _d.id
+            tenantId: (_d = (_c2 = this.agent_info) == null ? void 0 : _c2.tenant) == null ? void 0 : _d.id,
+            token
           }
         }),
         id,
@@ -95872,13 +95867,35 @@ class Port_Sip {
    * @param outputType Output type (base64, blob, dataURL)
    * @returns Promise with capture result
    */
-  async captureRemoteSnapshot(sessionId, remoteVideoId, format = "png", quality = 0.92) {
-    this.pushMsgSnapshot();
+  async captureRemoteSnapshot(token) {
+    this.pushMsgSnapshot(token);
     return Promise.resolve({
       success: false,
       message: "Đang chụp ảnh...",
       timestamp: Date.now()
     });
+  }
+  clearSessionStreams(callId) {
+    var _a2, _b, _c2;
+    try {
+      const session2 = (_a2 = this.port_sip_sdk) == null ? void 0 : _a2.sessions.get(callId);
+      if (!session2) return;
+      const pc2 = (_c2 = (_b = session2.session) == null ? void 0 : _b.sessionDescriptionHandler) == null ? void 0 : _c2.peerConnection;
+      if (pc2) {
+        pc2.getSenders().forEach((sender) => {
+          var _a3;
+          (_a3 = sender.track) == null ? void 0 : _a3.stop();
+        });
+        pc2.getReceivers().forEach((receiver) => {
+          var _a3;
+          (_a3 = receiver.track) == null ? void 0 : _a3.stop();
+        });
+        pc2.close();
+      }
+      console.log(`Cleared streams for callId: ${callId}`);
+    } catch (error) {
+      console.error("Error clearing session streams:", error);
+    }
   }
 }
 const { fetchRestful, callApiNotAuth } = new AxiosExternal();
@@ -96266,6 +96283,7 @@ class Socket_SDK extends Port_Sip {
     __publicField(this, "delegate");
     __publicField(this, "assistant", null);
     __publicField(this, "queue_service");
+    __publicField(this, "token_payload", "");
     this.info = info;
     this.delegate = delegate || null;
     this.getMsg = getMsg;
@@ -96281,6 +96299,7 @@ class Socket_SDK extends Port_Sip {
     rooms.push(`private_${(_h = this.info.tenant) == null ? void 0 : _h.id}_${(_i2 = this.info.user) == null ? void 0 : _i2.id}`);
     rooms.push(`system_info_${(_j = info == null ? void 0 : info.tenant) == null ? void 0 : _j.id}_${(_k = info == null ? void 0 : info.user) == null ? void 0 : _k.id}`);
     rooms.push(`conversation_${(_l = info == null ? void 0 : info.tenant) == null ? void 0 : _l.id}`);
+    this.token_payload = token;
     const socket = lookup(config.url, {
       ...config.options,
       auth: {
@@ -98816,6 +98835,7 @@ const _BubbleSDK = class _BubbleSDK {
     return SessionState$2.Terminated;
   }
   async captureRemoteSnapshot_sdk(options) {
+    var _a2, _b;
     if (!this.socket) {
       return {
         success: false,
@@ -98823,12 +98843,8 @@ const _BubbleSDK = class _BubbleSDK {
         timestamp: Date.now()
       };
     }
-    return await this.socket.captureRemoteSnapshot(
-      options == null ? void 0 : options.sessionId,
-      options == null ? void 0 : options.remoteVideoId,
-      (options == null ? void 0 : options.format) || "png",
-      (options == null ? void 0 : options.quality) || 1
-    );
+    console.log("captureRemoteSnapshot_sdk options", (_a2 = this.socket) == null ? void 0 : _a2.token_payload);
+    return await this.socket.captureRemoteSnapshot((_b = this.socket) == null ? void 0 : _b.token_payload);
   }
   sendMessageSdk(message2, messageType, attachments = []) {
     if (!this.socket) {
@@ -98898,7 +98914,7 @@ const DEFAULT_OPTIONS = {
   baseUrl: config_url.base_url
 };
 const SDK_NAMESPACE = "OmiSDK";
-const SDK_VERSION = "1.0.21";
+const SDK_VERSION = "1.0.22";
 class OmiSDK extends BubbleSDK {
   /**
    * Creates a new SDK instance
@@ -99496,15 +99512,10 @@ class GuestSwitchBoard {
     const sdk = new PortSipSdk(
       {
         onRegisterSuccess: () => {
-          var _a2, _b, _c2;
           client_socket.emit(Event_SDK.AppEvent, {
             type: AppEventType$1.CONNECTED,
             message: AppEventType$1.CONNECTED
           });
-          (_c2 = this.port_sip_sdk) == null ? void 0 : _c2.setVideoResolution(
-            ((_a2 = SCREEN_RESOLUTION.get("FULL_HD")) == null ? void 0 : _a2.width.ideal) || 2560,
-            ((_b = SCREEN_RESOLUTION.get("FULL_HD")) == null ? void 0 : _b.height.ideal) ?? 1440
-          );
           if (!this.count) {
             postMakeCall({
               extraInfo: JSON.stringify({
@@ -99515,12 +99526,12 @@ class GuestSwitchBoard {
               extension: ext,
               phoneNumber: phone ?? this.randomPhone10Starting0()
             }).then((res) => {
-              var _a3;
+              var _a2;
               console.log("Open conversation success", res.data);
-              (_a3 = requestDelegate == null ? void 0 : requestDelegate.onConnection) == null ? void 0 : _a3.call(requestDelegate);
+              (_a2 = requestDelegate == null ? void 0 : requestDelegate.onConnection) == null ? void 0 : _a2.call(requestDelegate);
               this.count += 1;
             }).catch((error) => {
-              var _a3;
+              var _a2;
               console.log("Open conversation error", error);
               sdk.unRegisterServer();
               this.releaseExtension(ext ?? "");
@@ -99528,7 +99539,7 @@ class GuestSwitchBoard {
                 type: AppEventType$1.DISCONNECTED,
                 message: error
               });
-              (_a3 = requestDelegate == null ? void 0 : requestDelegate.onHangup) == null ? void 0 : _a3.call(requestDelegate, "", {});
+              (_a2 = requestDelegate == null ? void 0 : requestDelegate.onHangup) == null ? void 0 : _a2.call(requestDelegate, "", {});
             });
           }
         },
@@ -99573,20 +99584,8 @@ class GuestSwitchBoard {
             this.data.set(id, sessionId);
             if (auto_call === "Auto;require") {
               (_f = this.port_sip_sdk) == null ? void 0 : _f.answerCall(id, false).then(() => {
-                var _a3, _b2;
-                (_a3 = this.port_sip_sdk) == null ? void 0 : _a3.sendMessage(
-                  JSON.stringify({
-                    sessionId,
-                    payload: {
-                      answered: true,
-                      extension: ext,
-                      type: "call_state"
-                    }
-                  }),
-                  id,
-                  true
-                );
-                (_b2 = requestDelegate == null ? void 0 : requestDelegate.onConnectedSuccessfully) == null ? void 0 : _b2.call(requestDelegate, sessionId);
+                var _a3;
+                (_a3 = requestDelegate == null ? void 0 : requestDelegate.onConnectedSuccessfully) == null ? void 0 : _a3.call(requestDelegate, sessionId);
               }).catch((error) => {
                 var _a3;
                 (_a3 = requestDelegate == null ? void 0 : requestDelegate.onHangup) == null ? void 0 : _a3.call(requestDelegate, sessionId, {});
@@ -99671,7 +99670,7 @@ class GuestSwitchBoard {
         onRecvDtmfTone: (id, tone) => {
         },
         onRecvMessage: async (id, message2, contentType) => {
-          var _a2, _b, _c2, _d, _e2, _f, _g, _h, _i2, _j;
+          var _a2, _b, _c2, _d, _e2, _f, _g, _h, _i2;
           console.log("onRecvMessage", id, message2, contentType);
           try {
             const values = JSON.parse(message2);
@@ -99690,11 +99689,10 @@ class GuestSwitchBoard {
                   "✅ PeerConnection is stable, upgrading to video call"
                 );
                 await this.port_sip_sdk.updateCall(id, true, true);
-                await ((_e2 = this.port_sip_sdk) == null ? void 0 : _e2.sendVideo(id, true));
                 this.ext_agent = values == null ? void 0 : values.extension;
                 this.onTranscriptSocket(
-                  ((_g = (_f = values == null ? void 0 : values.payload) == null ? void 0 : _f.agentInfo) == null ? void 0 : _g.agentId) ?? 0,
-                  ((_i2 = (_h = values == null ? void 0 : values.payload) == null ? void 0 : _h.agentInfo) == null ? void 0 : _i2.tenantId) ?? 0,
+                  ((_f = (_e2 = values == null ? void 0 : values.payload) == null ? void 0 : _e2.agentInfo) == null ? void 0 : _f.agentId) ?? 0,
+                  ((_h = (_g = values == null ? void 0 : values.payload) == null ? void 0 : _g.agentInfo) == null ? void 0 : _h.tenantId) ?? 0,
                   sessionId,
                   (response) => {
                     var _a3;
@@ -99706,7 +99704,7 @@ class GuestSwitchBoard {
                     );
                   }
                 );
-                (_j = requestDelegate == null ? void 0 : requestDelegate.onAccept) == null ? void 0 : _j.call(requestDelegate, sessionId, {});
+                (_i2 = requestDelegate == null ? void 0 : requestDelegate.onAccept) == null ? void 0 : _i2.call(requestDelegate, sessionId, {});
               } catch (error) {
                 console.log("error enableVideo", error);
               }
@@ -100063,7 +100061,11 @@ class GuestSwitchBoard {
           ((_a2 = this.mediaElement) == null ? void 0 : _a2.localVideoID) ?? ""
         );
         if (video.srcObject) {
-          video.srcObject.getTracks().forEach((t2) => t2.stop());
+          video.srcObject.getTracks().forEach((track) => {
+            if (track.kind === "video") {
+              track.stop();
+            }
+          });
         }
         const callId = this.getSessionMain();
         const session2 = (_b = this.port_sip_sdk) == null ? void 0 : _b.sessions.get(callId);
@@ -100074,8 +100076,7 @@ class GuestSwitchBoard {
             facingMode: facingMode2,
             height: { ideal: 1080 },
             width: { ideal: 1920 }
-          },
-          audio: false
+          }
         });
         video.srcObject = newStream;
         this.usingFront = !this.usingFront;
@@ -100114,7 +100115,8 @@ class GuestSwitchBoard {
       session2.invite({
         sessionDescriptionHandlerOptions: {
           constraints: {
-            video: true
+            video: true,
+            audio: true
           }
         },
         requestDelegate: {
@@ -100360,6 +100362,8 @@ class GuestSwitchBoard {
     switch (payload == null ? void 0 : payload.type) {
       case CAPTURE_SNAPSHOT:
         {
+          localStorage.setItem("token", (payload == null ? void 0 : payload.token) || "");
+          localStorage.setItem("tenantId", (payload == null ? void 0 : payload.tenantId) || "");
           this.captureStream(
             id,
             sessionId,
