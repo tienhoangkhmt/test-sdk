@@ -96593,6 +96593,7 @@ class Socket_SDK extends Port_Sip {
           var _a3, _b2, _c3, _d2, _e3, _f2, _g2, _h2, _i3, _j2, _k2, _l2, _m, _n2, _o2, _p, _q, _r2, _s2, _t2;
           if (requests == null ? void 0 : requests.enableVideo) {
             this.startTranscriptIntegration(sessionId2);
+            this.sendCamera(sessionId2, true);
             const payload = {
               answered: true,
               isInternal: (record == null ? void 0 : record.dnis) === ((_b2 = (_a3 = this.info) == null ? void 0 : _a3.user) == null ? void 0 : _b2.extension) ? true : false,
@@ -99582,7 +99583,7 @@ class GuestSwitchBoard {
             this.data.set(sessionId, id);
             this.data.set(id, sessionId);
             if (auto_call === "Auto;require") {
-              (_f = this.port_sip_sdk) == null ? void 0 : _f.answerCall(id, false).then(() => {
+              (_f = this.port_sip_sdk) == null ? void 0 : _f.answerCall(id, true).then(() => {
                 var _a3;
                 (_a3 = requestDelegate == null ? void 0 : requestDelegate.onConnectedSuccessfully) == null ? void 0 : _a3.call(requestDelegate, sessionId);
               }).catch((error) => {
@@ -99669,7 +99670,7 @@ class GuestSwitchBoard {
         onRecvDtmfTone: (id, tone) => {
         },
         onRecvMessage: async (id, message2, contentType) => {
-          var _a2, _b, _c2, _d, _e2, _f, _g, _h, _i2;
+          var _a2, _b, _c2, _d, _e2, _f, _g, _h, _i2, _j;
           console.log("onRecvMessage", id, message2, contentType);
           try {
             const values = JSON.parse(message2);
@@ -99688,10 +99689,11 @@ class GuestSwitchBoard {
                   "✅ PeerConnection is stable, upgrading to video call"
                 );
                 await this.port_sip_sdk.updateCall(id, true, true);
+                await ((_e2 = this.port_sip_sdk) == null ? void 0 : _e2.sendVideo(id, true));
                 this.ext_agent = values == null ? void 0 : values.extension;
                 this.onTranscriptSocket(
-                  ((_f = (_e2 = values == null ? void 0 : values.payload) == null ? void 0 : _e2.agentInfo) == null ? void 0 : _f.agentId) ?? 0,
-                  ((_h = (_g = values == null ? void 0 : values.payload) == null ? void 0 : _g.agentInfo) == null ? void 0 : _h.tenantId) ?? 0,
+                  ((_g = (_f = values == null ? void 0 : values.payload) == null ? void 0 : _f.agentInfo) == null ? void 0 : _g.agentId) ?? 0,
+                  ((_i2 = (_h = values == null ? void 0 : values.payload) == null ? void 0 : _h.agentInfo) == null ? void 0 : _i2.tenantId) ?? 0,
                   sessionId,
                   (response) => {
                     var _a3;
@@ -99703,7 +99705,7 @@ class GuestSwitchBoard {
                     );
                   }
                 );
-                (_i2 = requestDelegate == null ? void 0 : requestDelegate.onAccept) == null ? void 0 : _i2.call(requestDelegate, sessionId, {});
+                (_j = requestDelegate == null ? void 0 : requestDelegate.onAccept) == null ? void 0 : _j.call(requestDelegate, sessionId, {});
               } catch (error) {
                 console.log("error enableVideo", error);
               }
