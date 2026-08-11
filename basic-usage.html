@@ -525,6 +525,9 @@
             <button class="btn-call btn-primary" id="accept">
               Nhận cuộc gọi
             </button>
+            <button class="btn-call btn-primary" id="kt">
+              kiểm tra
+            </button>
             <button class="btn-call btn-danger" id="reject">Hủy</button>
             <button class="btn-call" id="mute">Tắt mic</button>
             <button class="btn-call" id="un mute">Bật mic</button>
@@ -985,6 +988,12 @@
         document.getElementById("accpetJoin").addEventListener("click", () => {
           // sdk.submitFake("10999", "1998");
         });
+
+        document
+          .getElementById("kt")
+          .addEventListener("click", () => {
+            sdk.kt();
+          });
 
         document
           .getElementById("sendBackgroundBlur")

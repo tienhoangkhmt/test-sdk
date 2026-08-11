@@ -122,7 +122,8 @@ var LogLevel = /* @__PURE__ */ ((LogLevel2) => {
 const DEFAULT_CONFIG = {
   enabled: false,
   level: "info",
-  prefix: "[OmiSDK]"
+  prefix: "[OmiSDK]",
+  maxBuffer: 500
 };
 let Logger$3 = class Logger {
   /**
@@ -131,6 +132,7 @@ let Logger$3 = class Logger {
    */
   constructor(config = {}) {
     __publicField(this, "config");
+    __publicField(this, "logs", []);
     this.config = { ...DEFAULT_CONFIG, ...config };
   }
   /**
@@ -185,6 +187,18 @@ let Logger$3 = class Logger {
     const messageLevelIndex = logLevels.indexOf(level);
     if (messageLevelIndex < configLevelIndex) return;
     const formattedMessage = `${this.config.prefix} ${message2}`;
+    const entry = {
+      timestamp: Date.now(),
+      level,
+      prefix: this.config.prefix,
+      message: message2,
+      args
+    };
+    this.logs.push(entry);
+    const max = this.config.maxBuffer ?? DEFAULT_CONFIG.maxBuffer;
+    if (this.logs.length > max) {
+      this.logs.splice(0, this.logs.length - max);
+    }
     switch (level) {
       case "debug":
         console.debug(formattedMessage, ...args);
@@ -199,6 +213,19 @@ let Logger$3 = class Logger {
         console.error(formattedMessage, ...args);
         break;
     }
+  }
+  /**
+   * Returns all stored log entries
+   * @returns Array of log entries
+   */
+  getLogs() {
+    return [...this.logs];
+  }
+  /**
+   * Clears the in-memory log buffer
+   */
+  clearLogs() {
+    this.logs = [];
   }
 };
 const DEFAULT_THEME = {
@@ -33267,6 +33294,7 @@ const CALL_TYPE = {
   VOICE: "VOICE"
 };
 const CAPTURE_SNAPSHOT = "CAPTURE_SNAPSHOT";
+const MESSAGE_SDK = "MESSAGE_SDK";
 const CAPTURE_SNAPSHOT_RESPONSE = {
   SUCCESS: "SUCCESS_CAPTURE_SNAPSHOT",
   ERROR: "ERROR_CAPTURE_SNAPSHOT"
@@ -53719,15 +53747,6 @@ const FooterLayout = () => {
   return /* @__PURE__ */ jsxRuntimeExports.jsx(jsxRuntimeExports.Fragment, {});
 };
 const FooterLayout$1 = reactExports.memo(FooterLayout);
-const handleAudio = async (cb) => {
-  try {
-    await navigator.mediaDevices.getUserMedia({ audio: true });
-    cb && cb();
-  } catch (error) {
-    emitAppEvent(AppEventType$1.PERMISSION_DENIED);
-    switchErrorAudio(error);
-  }
-};
 const ErrorBoundaryContext = reactExports.createContext(null);
 const initialState = {
   didCatch: false,
@@ -53849,7 +53868,6 @@ const AuthLayout = () => {
           setLoading(false);
         });
       });
-      handleAudio();
     }
     return () => {
       client_socket.emit(EVT_EMITTER.UN_REGISTER);
@@ -86943,7 +86961,7 @@ class PortSipSdk {
       ), s3 = "string" == typeof t3 ? t3 : null == t3 ? void 0 : t3.id;
       let o3 = null;
       try {
-        o3 = document.querySelector(`#${s3}`);
+        console.log("setupRemoteMedia audio element id:", s3), o3 = document.querySelector(`#${s3}`);
       } catch (e3) {
         console.error(e3);
       }
@@ -94890,14 +94908,15 @@ class Port_Sip {
     );
   }
   async answer(session2, cbCheckTask, cbFails, enableVideo = false) {
-    var _a2, _b, _c2, _d, _e2, _f, _g, _h, _i2, _j;
+    var _a2, _b, _c2, _d, _e2, _f, _g, _h, _i2, _j, _k;
     this.userAction = false;
     const _callId = this.getDataCallId(session2);
     traceLog(
       "answer sip function",
       {
         sessionId: session2,
-        data: this.getDataStringify()
+        data: this.getDataStringify(),
+        enableVideo
       },
       {
         isLogClient: false,
@@ -94909,11 +94928,12 @@ class Port_Sip {
     );
     if (_callId) {
       try {
-        await this.port_sip_sdk.answerCall(_callId, false);
+        await this.port_sip_sdk.answerCall(_callId, enableVideo);
         const params = this.inComingVideoCallExtensions.get(session2) ?? {};
         cbCheckTask && cbCheckTask(session2, "TALKING", _callId, params);
+        if (enableVideo) await ((_e2 = this.port_sip_sdk) == null ? void 0 : _e2.sendVideo(_callId, true));
       } catch (error) {
-        const s2 = (_f = (_e2 = this.port_sip_sdk.sessions.get(_callId)) == null ? void 0 : _e2.session) == null ? void 0 : _f.state;
+        const s2 = (_g = (_f = this.port_sip_sdk.sessions.get(_callId)) == null ? void 0 : _f.session) == null ? void 0 : _g.state;
         const text = s2 === SessionState$2.Established ? "Vui lòng không nhấc máy nhiều lần!" : "Cuộc gọi đã kết thúc, không tồn tại hoặc đã vào IVR nhỡ.";
         alertSnackbar()({
           status: "error",
@@ -94932,8 +94952,8 @@ class Port_Sip {
           {
             isLogClient: false,
             isLogServer: true,
-            tenantId: (_h = (_g = this.agent_info) == null ? void 0 : _g.tenant) == null ? void 0 : _h.id,
-            agentId: (_j = (_i2 = this.agent_info) == null ? void 0 : _i2.user) == null ? void 0 : _j.id,
+            tenantId: (_i2 = (_h = this.agent_info) == null ? void 0 : _h.tenant) == null ? void 0 : _i2.id,
+            agentId: (_k = (_j = this.agent_info) == null ? void 0 : _j.user) == null ? void 0 : _k.id,
             sessionId: session2
           }
         );
@@ -95815,6 +95835,24 @@ class Port_Sip {
       console.log("error push msg", error);
     }
   }
+  pushMsgCustom(payload) {
+    var _a2;
+    const id = this.getDataCallId(this.main_id);
+    try {
+      (_a2 = this.port_sip_sdk) == null ? void 0 : _a2.sendMessage(
+        JSON.stringify({
+          payload: {
+            type: MESSAGE_SDK,
+            data: payload
+          }
+        }),
+        id,
+        false
+      );
+    } catch (error) {
+      console.log("error push msg", error);
+    }
+  }
   async offblackground(sessionId) {
     var _a2, _b, _c2, _d;
     try {
@@ -95895,6 +95933,31 @@ class Port_Sip {
       console.log(`Cleared streams for callId: ${callId}`);
     } catch (error) {
       console.error("Error clearing session streams:", error);
+    }
+  }
+  async checkLogPC() {
+    var _a2, _b, _c2, _d;
+    try {
+      const callId = this.getDataCallId(this.main_id);
+      const session2 = (_a2 = this.port_sip_sdk) == null ? void 0 : _a2.sessions.get(callId);
+      if (!session2) throw new Error("session does not exist");
+      const pc2 = (_c2 = (_b = session2.session) == null ? void 0 : _b.sessionDescriptionHandler) == null ? void 0 : _c2.peerConnection;
+      console.log("sender log", pc2.getSenders());
+      console.log("pc.iceConnectionState", pc2.iceConnectionState);
+      console.log("pc.signalingState", pc2.signalingState);
+      console.log("pc.connectionState", pc2.connectionState);
+      const senderVideo = pc2.getSenders().find((s2) => {
+        var _a3;
+        return ((_a3 = s2.track) == null ? void 0 : _a3.kind) === "video";
+      });
+      const senderAudio = pc2.getSenders().find((s2) => {
+        var _a3;
+        return ((_a3 = s2.track) == null ? void 0 : _a3.kind) === "audio";
+      });
+      console.log("get senders", senderAudio, senderVideo);
+      (_d = this.port_sip_sdk) == null ? void 0 : _d.setupRemoteMedia(callId, true);
+    } catch (error) {
+      console.log("checkLogPC", error);
     }
   }
 }
@@ -96593,7 +96656,6 @@ class Socket_SDK extends Port_Sip {
           var _a3, _b2, _c3, _d2, _e3, _f2, _g2, _h2, _i3, _j2, _k2, _l2, _m, _n2, _o2, _p, _q, _r2, _s2, _t2;
           if (requests == null ? void 0 : requests.enableVideo) {
             this.startTranscriptIntegration(sessionId2);
-            this.sendCamera(sessionId2, true);
             const payload = {
               answered: true,
               isInternal: (record == null ? void 0 : record.dnis) === ((_b2 = (_a3 = this.info) == null ? void 0 : _a3.user) == null ? void 0 : _b2.extension) ? true : false,
@@ -98835,7 +98897,7 @@ const _BubbleSDK = class _BubbleSDK {
     return SessionState$2.Terminated;
   }
   async captureRemoteSnapshot_sdk(options) {
-    var _a2, _b;
+    var _a2;
     if (!this.socket) {
       return {
         success: false,
@@ -98843,8 +98905,7 @@ const _BubbleSDK = class _BubbleSDK {
         timestamp: Date.now()
       };
     }
-    console.log("captureRemoteSnapshot_sdk options", (_a2 = this.socket) == null ? void 0 : _a2.token_payload);
-    return await this.socket.captureRemoteSnapshot((_b = this.socket) == null ? void 0 : _b.token_payload);
+    return await this.socket.captureRemoteSnapshot((_a2 = this.socket) == null ? void 0 : _a2.token_payload);
   }
   sendMessageSdk(message2, messageType, attachments = []) {
     if (!this.socket) {
@@ -98886,6 +98947,19 @@ const _BubbleSDK = class _BubbleSDK {
         message: "socket not found"
       });
     return (_a2 = this.socket) == null ? void 0 : _a2.historyVideoToText();
+  }
+  customPushMessageSdk(payload) {
+    if (!this.socket) {
+      return Promise.reject({
+        success: false,
+        message: "Socket not initialized"
+      });
+    }
+    return this.socket.pushMsgCustom(payload);
+  }
+  checkSessionEstablished() {
+    var _a2;
+    (_a2 = this.socket) == null ? void 0 : _a2.checkLogPC();
   }
 };
 __publicField(_BubbleSDK, "configuration", null);
@@ -99087,6 +99161,9 @@ class OmiSDK extends BubbleSDK {
   getStateSession(sessionId) {
     return this.sessionState_sdk(sessionId);
   }
+  customPushMessage(payload) {
+    this.customPushMessageSdk(payload);
+  }
   sendMessage(message2, messageType, attachments = []) {
     return this.sendMessageSdk(message2, messageType, attachments);
   }
@@ -99287,6 +99364,23 @@ class OmiSDK extends BubbleSDK {
       }
     }
   }
+  kt() {
+    console.log("Checking session established");
+    this.checkSessionEstablished();
+  }
+  /**
+   * Returns all stored log entries from the SDK logger
+   * @returns Array of log entries
+   */
+  getLog() {
+    return this.logger.getLogs();
+  }
+  /**
+   * Clears the stored log buffer
+   */
+  clearLog() {
+    this.logger.clearLogs();
+  }
 }
 class GuestSocket {
   constructor() {
@@ -99428,6 +99522,7 @@ class GuestSwitchBoard {
     __publicField(this, "count", 0);
     __publicField(this, "iceReset", 0);
     __publicField(this, "socket_transcript", null);
+    __publicField(this, "delegate");
     this.count = 0;
     this.connectSwitchboard({
       server,
@@ -99509,6 +99604,7 @@ class GuestSwitchBoard {
   }) {
     this.mediaElement = mediaElement;
     this.ext = ext;
+    this.delegate = requestDelegate;
     const sdk = new PortSipSdk(
       {
         onRegisterSuccess: () => {
@@ -99583,7 +99679,7 @@ class GuestSwitchBoard {
             this.data.set(sessionId, id);
             this.data.set(id, sessionId);
             if (auto_call === "Auto;require") {
-              (_f = this.port_sip_sdk) == null ? void 0 : _f.answerCall(id, true).then(() => {
+              (_f = this.port_sip_sdk) == null ? void 0 : _f.answerCall(id, false).then(() => {
                 var _a3;
                 (_a3 = requestDelegate == null ? void 0 : requestDelegate.onConnectedSuccessfully) == null ? void 0 : _a3.call(requestDelegate, sessionId);
               }).catch((error) => {
@@ -99671,10 +99767,8 @@ class GuestSwitchBoard {
         },
         onRecvMessage: async (id, message2, contentType) => {
           var _a2, _b, _c2, _d, _e2, _f, _g, _h, _i2, _j;
-          console.log("onRecvMessage", id, message2, contentType);
           try {
             const values = JSON.parse(message2);
-            console.log("onRecvMessage", values);
             if (((_a2 = values == null ? void 0 : values.payload) == null ? void 0 : _a2.answered) && isVideo) {
               const sessionId = this.getDataSessionId(id);
               const session2 = (_b = this.port_sip_sdk) == null ? void 0 : _b.sessions.get(id);
@@ -100182,8 +100276,9 @@ class GuestSwitchBoard {
     });
   }
   pushMsgCaptureSnapshot(id, reason) {
-    var _a2;
-    (_a2 = this.port_sip_sdk) == null ? void 0 : _a2.sendMessage(
+    var _a2, _b, _c2;
+    (_b = (_a2 = this.delegate) == null ? void 0 : _a2.onCaptureSnapshot) == null ? void 0 : _b.call(_a2, this.getDataSessionId(id), "FAILED");
+    (_c2 = this.port_sip_sdk) == null ? void 0 : _c2.sendMessage(
       JSON.stringify({
         type: CAPTURE_SNAPSHOT_RESPONSE.ERROR,
         data: null,
@@ -100197,7 +100292,8 @@ class GuestSwitchBoard {
     localStorage.removeItem("tenantId");
   }
   async captureStream(id, sessionId, remoteVideoId, userId, tenantId) {
-    var _a2, _b, _c2, _d, _e2, _f, _g, _h, _i2, _j;
+    var _a2, _b, _c2, _d, _e2, _f, _g, _h, _i2, _j, _k, _l, _m, _n2;
+    (_b = (_a2 = this.delegate) == null ? void 0 : _a2.onCaptureSnapshot) == null ? void 0 : _b.call(_a2, this.getDataSessionId(id), "STARTED");
     try {
       const targetSessionId = sessionId || this.getDataSessionId(id);
       if (!targetSessionId) {
@@ -100253,7 +100349,7 @@ class GuestSwitchBoard {
       const nativeWidth = videoElement.videoWidth;
       const nativeHeight = videoElement.videoHeight;
       let dataURL;
-      const videoTrack = (_b = (_a2 = videoElement.srcObject) == null ? void 0 : _a2.getVideoTracks()) == null ? void 0 : _b[0];
+      const videoTrack = (_d = (_c2 = videoElement.srcObject) == null ? void 0 : _c2.getVideoTracks()) == null ? void 0 : _d[0];
       if (videoTrack && typeof ImageCapture !== "undefined") {
         try {
           const capture = new ImageCapture(videoTrack);
@@ -100291,7 +100387,7 @@ class GuestSwitchBoard {
         dataURL = canvas.toDataURL(mimeType, 1);
       }
       const response = await getConversion({ session_id: targetSessionId });
-      if ((_c2 = response == null ? void 0 : response.data) == null ? void 0 : _c2._id) {
+      if ((_e2 = response == null ? void 0 : response.data) == null ? void 0 : _e2._id) {
         const base64Data = dataURL.split(",")[1];
         const responseApi = await postSendSession({
           cloudAgentId: userId ?? 0,
@@ -100299,7 +100395,7 @@ class GuestSwitchBoard {
           cloudTenantId: tenantId ?? 0,
           intentName: "capture_snapshot",
           text: "",
-          channel: (_d = response.data) == null ? void 0 : _d.channel,
+          channel: (_f = response.data) == null ? void 0 : _f.channel,
           attachments: [
             {
               fileName: `snapshot_${Date.now()}.${format}`,
@@ -100310,18 +100406,23 @@ class GuestSwitchBoard {
             }
           ],
           suggestionId: "",
-          conversationId: (_e2 = response == null ? void 0 : response.data) == null ? void 0 : _e2._id,
+          conversationId: (_g = response == null ? void 0 : response.data) == null ? void 0 : _g._id,
           messageType: "FILE"
         });
-        if ((_f = responseApi.data) == null ? void 0 : _f.success) {
-          (_h = this.port_sip_sdk) == null ? void 0 : _h.sendMessage(
+        if ((_h = responseApi.data) == null ? void 0 : _h.success) {
+          (_j = this.port_sip_sdk) == null ? void 0 : _j.sendMessage(
             JSON.stringify({
               type: CAPTURE_SNAPSHOT_RESPONSE.SUCCESS,
-              data: (_g = responseApi.data.data) == null ? void 0 : _g.attachment,
+              data: (_i2 = responseApi.data.data) == null ? void 0 : _i2.attachment,
               sessionId: targetSessionId
             }),
             id,
             false
+          );
+          (_l = (_k = this.delegate) == null ? void 0 : _k.onCaptureSnapshot) == null ? void 0 : _l.call(
+            _k,
+            this.getDataSessionId(id),
+            "SUCCESS"
           );
           localStorage.removeItem("token");
           localStorage.removeItem("tenantId");
@@ -100347,7 +100448,7 @@ class GuestSwitchBoard {
         );
         return {
           success: true,
-          data: (_j = (_i2 = responseApi.data) == null ? void 0 : _i2.data) == null ? void 0 : _j.attachment,
+          data: (_n2 = (_m = responseApi.data) == null ? void 0 : _m.data) == null ? void 0 : _n2.attachment,
           timestamp: Date.now()
         };
       } else {
@@ -100380,6 +100481,7 @@ class GuestSwitchBoard {
     }
   }
   switchMsgTypeSip(payload, id, sessionId) {
+    var _a2, _b;
     switch (payload == null ? void 0 : payload.type) {
       case CAPTURE_SNAPSHOT:
         {
@@ -100394,6 +100496,10 @@ class GuestSwitchBoard {
           );
         }
         break;
+      case MESSAGE_SDK: {
+        (_b = (_a2 = this.delegate) == null ? void 0 : _a2.onMessage) == null ? void 0 : _b.call(_a2, payload == null ? void 0 : payload.data);
+        break;
+      }
     }
   }
   async senderTrackVideo(zoom = 1, torch = false, facingMode2 = "user") {
@@ -100603,7 +100709,7 @@ class GuestService extends GuestSocket {
    * @returns {SdkResponse}
    */
   async makeCall(phone, option) {
-    var _a2, _b, _c2, _d, _e2, _f, _g, _h, _i2, _j, _k, _l, _m, _n2, _o2, _p, _q, _r2;
+    var _a2, _b, _c2, _d, _e2, _f, _g, _h, _i2, _j, _k, _l, _m, _n2, _o2, _p, _q, _r2, _s2, _t2;
     traceLog(
       "Guest makeCall called with phone:",
       { phone },
@@ -100645,7 +100751,9 @@ class GuestService extends GuestSocket {
           onConnectedSuccessfully: (_o2 = option == null ? void 0 : option.requestDelegate) == null ? void 0 : _o2.onConnectedSuccessfully,
           onAccept: (_p = option == null ? void 0 : option.requestDelegate) == null ? void 0 : _p.onAccept,
           onTranscript: (_q = option == null ? void 0 : option.requestDelegate) == null ? void 0 : _q.onTranscript,
-          onInfo: (_r2 = option == null ? void 0 : option.requestDelegate) == null ? void 0 : _r2.onInfo
+          onInfo: (_r2 = option == null ? void 0 : option.requestDelegate) == null ? void 0 : _r2.onInfo,
+          onCaptureSnapshot: (_s2 = option == null ? void 0 : option.requestDelegate) == null ? void 0 : _s2.onCaptureSnapshot,
+          onMessage: (_t2 = option == null ? void 0 : option.requestDelegate) == null ? void 0 : _t2.onMessage
         },
         phone
       });
