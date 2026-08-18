@@ -1,0 +1,512 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Guest - OmiSDK - Basic Usage Example</title>
+    <style>
+      .btn-call {
+        width: 80px;
+        height: 50px;
+        background-color: #4caf50;
+        color: #fff;
+      }
+      /* video {
+        width: 300px;
+        height: 300px;
+      } */
+    </style>
+  </head>
+  <body>
+    <h1>Guest - OmiSDK - Basic Usage Example</h1>
+    <label>
+      AppId:
+      <input type="text" id="appIdInput" placeholder="Enter appId" />
+    </label>
+
+    <div id="log"></div>
+
+    <div style="display: flex; gap: 10px">
+      <video id="local" title="local video" muted autoplay playsinline></video>
+      <!-- <video
+        id="local-video"
+        title="local video"
+        muted
+        autoplay
+        playsinline
+      ></video> -->
+
+      <video
+        id="video1"
+        title="1"
+        muted
+        autoplay
+        playsinline
+        onerror="console.log('video1 error')"
+        onplaying="console.log('Video đang chạy thành công!')"
+        onloadedmetadata="
+          (res) => {
+            console.log('Video đã tải xong!', res);
+            console.log('Video đã tải xong!');
+          }
+        "
+      ></video>
+      <video id="mpt-body"></video>
+      <video
+        id="screen"
+        title="screen"
+        muted
+        autoplay
+        onplaying="console.log('Video đang chạy thành công!')"
+      ></video>
+      <video
+        id="video2"
+        title="2"
+        muted
+        autoplay
+        onplaying="console.log('Video đang chạy thành công!')"
+        style="width: 0px"
+      ></video>
+      <video
+        id="video3"
+        title="3"
+        muted
+        autoplay
+        onplaying="console.log('Video đang chạy thành công!')"
+        style="width: 0px"
+      ></video>
+      <video
+        id="video4"
+        title="4"
+        muted
+        autoplay
+        onplaying="console.log('Video đang chạy thành công!')"
+        style="width: 0px"
+      ></video>
+      <video id="video5" title="5" muted autoplay style="width: 0px"></video>
+      <video id="video6" title="6" muted autoplay style="width: 0px"></video>
+      <video id="video7" title="7" muted autoplay style="width: 0px"></video>
+    </div>
+    <div class="example-container">
+      <div id="sdk-container"></div>
+      <div
+        style="display: flex; align-items: center; gap: 10px; margin-top: 20px"
+      >
+        <button class="btn-call" id="mute">mute</button>
+        <button class="btn-call" id="un mute">un mute</button>
+        <button class="btn-call" id="make">make</button>
+        <button class="btn-call" id="hangup">end</button>
+        <button class="btn-call" id="cameraOn">cameraOn</button>
+        <button class="btn-call" id="cameraOff">cameraOff</button>
+        <button class="btn-call" id="blurBackground">blurBackground</button>
+        <button class="btn-call" id="unblurBackground">unblurBackground</button>
+        <button class="btn-call" id="switchCamera">switchCamera</button>
+        <button class="btn-call" id="resetRegistration">
+          resetRegistration
+        </button>
+        <button class="btn-call" id="changeText">Change Text</button>
+        <label for="resolutionSelect">Resolution:</label>
+        <select id="resolutionSelect" class="btn-call" style="width: auto">
+          <option value="">Default</option>
+          <option value="1920x1080">1080p (1920x1080)</option>
+          <option value="1280x720" selected>720p (1280x720)</option>
+          <option value="854x480">480p (854x480)</option>
+          <option value="640x360">360p (640x360)</option>
+        </select>
+      </div>
+
+      <div
+        style="display: flex; align-items: center; gap: 10px; margin-top: 20px"
+      >
+        <input
+          type="text"
+          id="messageInput"
+          placeholder="Nhập tin nhắn..."
+          style="
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+          "
+        />
+        <button class="btn-call" id="sendMessage">Gửi</button>
+      </div>
+
+      <div
+        style="display: flex; align-items: center; gap: 10px; margin-top: 10px"
+      >
+        <input type="file" id="fileInput" multiple style="font-size: 14px" />
+        <button class="btn-call" id="sendFile">Gửi file</button>
+        <span id="fileStatus" style="font-size: 13px; color: #666"></span>
+      </div>
+
+      <audio
+        id="audio1"
+        onplaying="console.log('audio đang chạy thành công!')"
+      ></audio>
+      <audio id="audio2"></audio>
+      <audio id="audio3"></audio>
+      <audio id="audio4"></audio>
+      <audio id="audio5"></audio>
+      <audio id="audio6"></audio>
+      <audio id="audio7"></audio>
+    </div>
+    <div>
+      <video
+        id="inputVideo"
+        autoplay
+        playsinline
+        muted
+        style="display: none"
+      ></video>
+      <!-- <canvas id="outputCanvas" width="640" height="480"></canvas> -->
+      <video id="outVideo" autoplay playsinline muted></video>
+    </div>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js"></script>
+    <script>
+      const video = document.getElementById("inputVideo");
+      const outVideo = document.getElementById("outVideo");
+      const canvas = document.getElementById("outputCanvas");
+      const ctx = canvas.getContext("2d");
+      canvas.style.transform = "scale(-1, 1)";
+
+      // ✅ chỉ cần gọi trực tiếp
+      const segmenter = new SelfieSegmentation({
+        locateFile: (file) => {
+          console.log("file", file);
+          return `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`;
+        },
+      });
+      segmenter.setOptions({ modelSelection: 1 });
+
+      // ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // // 👉 chỉ vẽ video gốc
+      // ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
+
+      // // 👉 thêm text overlay
+      // ctx.globalCompositeOperation = "source-over";
+      // ctx.font = "20px Arial";
+      // ctx.fillStyle = "white";
+      // ctx.strokeStyle = "black";
+      // ctx.lineWidth = 3;
+
+      segmenter.onResults((results) => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // mask
+        ctx.drawImage(
+          results.segmentationMask,
+          0,
+          0,
+          canvas.width,
+          canvas.height
+        );
+
+        // blur background
+        ctx.globalCompositeOperation = "source-out";
+        ctx.filter = "blur(8px)";
+        ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
+
+        // vẽ lại người
+        ctx.globalCompositeOperation = "destination-over";
+        ctx.filter = "none";
+        ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
+        // 👉 Thêm text overlay
+        ctx.globalCompositeOperation = "source-over"; // đảm bảo text đè lên
+        ctx.font = "20px Arial";
+        ctx.fillStyle = "white";
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = 3;
+
+        const text = "hoang nguyen";
+        // Tính vị trí giữa
+        const textMetrics = ctx.measureText(text);
+        const textWidth = textMetrics.width;
+        const x = (canvas.width - textWidth) / 2;
+        const y = 20;
+
+        // Stroke để chữ rõ hơn trên nền
+        ctx.strokeText(text, x, y);
+        ctx.fillText(text, x, y);
+
+        ctx.restore();
+      });
+
+      async function start() {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+        });
+        video.srcObject = stream;
+        video.onloadedmetadata = () => {
+          video.play();
+          loop();
+        };
+        outVideo.srcObject = canvas.captureStream(30);
+      }
+
+      async function loop() {
+        await segmenter.send({ image: video });
+        requestAnimationFrame(loop);
+      }
+
+      start();
+    </script> -->
+    <script type="module">
+      console.log("module load!", new Date());
+      let facingMode = "environment";
+
+      // For this example, we're importing from the local build
+      import { OmiGuestSDK } from "../dist/omisdk.es.js";
+      const autoConnected = localStorage.getItem("autoConnected");
+      window.addEventListener("load", (ev) => {
+        console.log("document on load!", new Date());
+        const urlParams = new URLSearchParams(window.location.search);
+        const appId = urlParams.get("appId");
+        console.log("appId", appId);
+        document.getElementById("appIdInput").value = appId;
+
+        const guest = new OmiGuestSDK({
+          baseUrl: "https://crm-dev-v2.metechvn.com",
+          apiKey: "0c16d4aa-abe7-4098-b47a-7b914f9b7444",
+          appId: appId,
+          mediaIds: {
+            localVideoID: "local",
+            remoteVideoID: "video1",
+            remoteAudioID: "audio1",
+            remoteScreenID: "mpt-body",
+          },
+          enableMediapipe: true,
+          model: "medium",
+        });
+        function randomPhone10Starting0() {
+          let s = "0";
+          for (let i = 1; i < 10; i++) {
+            s += Math.floor(Math.random() * 10);
+          }
+          return s;
+        }
+
+        document.getElementById("make").addEventListener("click", () => {
+          // guest
+          guest
+            .makeCall(randomPhone10Starting0(), {
+              enableVideo: true,
+              extraInfo: "guest call demo",
+              requestDelegate: {
+                onAccept: (sessionId, record) => {
+                  console.log("onAccept", sessionId, record);
+                },
+                onHangup: (sessionId, record) => {
+                  console.log("onHangup", sessionId, record);
+                },
+                onConnection: () => {
+                  console.log("onConnection");
+                },
+                onConnectedSuccessfully: (sessionId) => {
+                  console.log("onConnectedSuccessfully", sessionId);
+                },
+                onTranscript: (sessionId, data, type) => {
+                  console.log("onTranscript", sessionId, data, type);
+                },
+                onCaptureSnapshot: (sessionId, status) => {
+                  console.log("onCaptureSnapshot", sessionId, status);
+                },
+              },
+            })
+            .then((res) => {
+              console.log("make call success", res);
+            });
+        });
+        // document.getElementById("updateCall").addEventListener("click", () => {
+        //   // guest
+        //   guest.switchVideoCall();
+        // });
+
+        document.getElementById("mute").addEventListener("click", () => {
+          console.log("mute clicked");
+          guest.mute().then((res) => {
+            console.log("mute success", res);
+          });
+        });
+        document
+          .getElementById("appIdInput")
+          .addEventListener("change", (e) => {
+            // Nếu muốn set trực tiếp vào sdk thì có thể:
+            guest.AppId = e.target.value;
+          });
+        document.getElementById("un mute").addEventListener("click", () => {
+          console.log("unmute clicked");
+          guest.unmute().then((res) => {
+            console.log("unmute success", res);
+          });
+        });
+        document.getElementById("hangup").addEventListener("click", () => {
+          guest.hangup();
+        });
+        document.getElementById("cameraOn").addEventListener("click", () => {
+          guest.cameraOn();
+        });
+        document.getElementById("cameraOff").addEventListener("click", () => {
+          guest.cameraOff();
+        });
+        document
+          .getElementById("resolutionSelect")
+          .addEventListener("change", (e) => {
+            const value = e.target.value;
+            if (!value) return;
+            const [w, h] = value.split("x").map(Number);
+            console.log("w", w);
+            console.log("h", h);
+            try {
+              guest.videoResolution(w, h);
+              console.log("Set resolution:", w, h);
+            } catch (err) {
+              console.log("Set resolution error:", err);
+            }
+          });
+        document
+          .getElementById("resetRegistration")
+          .addEventListener("click", () => {
+            guest.resetRegistration();
+          });
+        guest.on("GuestEvent", (event) => {
+          console.log("CallEvent received:", event, new Date().getTime());
+        });
+        document
+          .getElementById("switchCamera")
+          .addEventListener("click", () => {
+            guest
+              .switchCamera(facingMode)
+              .then((res) => {
+                console.log("switchCamera success", res);
+                facingMode = facingMode === "user" ? "environment" : "user";
+              })
+              .catch((err) => {
+                console.log("switchCamera error", err);
+              });
+          });
+        document
+          .getElementById("blurBackground")
+          .addEventListener("click", () => {
+            guest.blurBackground(true);
+          });
+        document
+          .getElementById("unblurBackground")
+          .addEventListener("click", () => {
+            guest.blurBackground(false);
+          });
+        let changeTextInterval = null;
+        const changeTextBtn = document.getElementById("changeText");
+        changeTextBtn.addEventListener("click", () => {
+          if (changeTextInterval) {
+            clearInterval(changeTextInterval);
+            changeTextInterval = null;
+            changeTextBtn.style.backgroundColor = "#4caf50";
+            changeTextBtn.textContent = "Change Text";
+            return;
+          }
+          changeTextBtn.style.backgroundColor = "#f44336";
+          changeTextBtn.textContent = "Stop Text";
+          changeTextInterval = setInterval(() => {
+            const now = new Date();
+            const pad = (n) => String(n).padStart(2, "0");
+            const timeString = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())} ${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()}`;
+            // Không truyền position → vị trí giữ nguyên, chỉ thay đổi text
+            guest.setOverlayText(0, timeString);
+          }, 1000);
+        });
+
+        document.getElementById("sendMessage").addEventListener("click", () => {
+          const input = document.getElementById("messageInput");
+          const message = input.value.trim();
+          if (!message) return;
+          console.log("Send message:", message);
+          guest.sendMessage(message);
+          input.value = "";
+        });
+
+        document
+          .getElementById("messageInput")
+          .addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+              document.getElementById("sendMessage").click();
+            }
+          });
+
+        document.getElementById("sendFile").addEventListener("click", () => {
+          const fileInput = document.getElementById("fileInput");
+          const status = document.getElementById("fileStatus");
+          if (!fileInput.files || fileInput.files.length === 0) {
+            status.textContent = "Chưa chọn file";
+            return;
+          }
+          const files = fileInput.files;
+          const attachments = [];
+          let processed = 0;
+          guest.upLoadFile(files);
+          Array.from(files).forEach((file, i) => {
+            const reader = new FileReader();
+            reader.readAsArrayBuffer(file);
+            reader.onloadend = () => {
+              if (reader.result instanceof ArrayBuffer) {
+                const base64 = guest.arrayBufferToBase64(
+                  reader.result,
+                  file.type,
+                );
+                attachments.push({
+                  id: "23423",
+                  url: base64,
+                  type: file.type,
+                  fileName: file.name,
+                  size: file.size,
+                });
+                processed++;
+                if (processed === files.length) {
+                  console.log("Send attachments:", attachments);
+                  guest.sendAttachments(attachments);
+                  status.textContent = `Đã gửi ${attachments.length} file`;
+                  fileInput.value = "";
+                }
+              }
+            };
+          });
+        });
+
+        document
+          .getElementById("video1")
+          .addEventListener("loadedmetadata", (event) => {
+            const video = document.getElementById("video1");
+            video?.srcObject?.getVideoTracks().forEach((track) => {
+              console.log("track", track);
+              track.enabled = true;
+            });
+          });
+
+        guest.on("InteractionGuestEvent", (event) => {
+          console.log("InteractionGuestEvent received:", event);
+          const text = event?.message?.text || "";
+          const from = event?.message?.sendFrom || "Agent";
+          const sendFrom = event?.message?.sendFrom || "unknown";
+          if (text) {
+            const isCustomer = sendFrom === "CUSTOMER";
+            const msgEl = document.createElement("div");
+            msgEl.style.cssText = `padding:8px 12px;margin:4px 0;border-radius:12px;font-size:13px;max-width:75%;word-break:break-word;${
+              isCustomer
+                ? "align-self:flex-end;background:#4CAF50;color:#fff;margin-left:auto;border-bottom-right-radius:4px"
+                : "align-self:flex-start;background:#e8e8e8;color:#333;margin-right:auto;border-bottom-left-radius:4px"
+            }`;
+            msgEl.innerHTML = `<div style="font-size:10px;font-weight:700;opacity:0.7;margin-bottom:2px">${from}</div>${text}`;
+            document.getElementById("messageInput").parentElement.before(msgEl);
+          }
+        });
+
+        // Set up UI controls
+      });
+
+      // Example of making a call after 3 seconds
+      setTimeout(() => {}, 3000);
+    </script>
+  </body>
+</html>

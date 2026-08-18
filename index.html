@@ -12,8 +12,6 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css"
     />
-    <!-- MediaPipe Selfie Segmentation (blur background) -->
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js"></script>
 
     <style>
       :root {
@@ -1040,16 +1038,7 @@
     <video id="screen" style="display: none"></video>
     <video id="video2" style="display: none"></video>
 
-    <!-- Hidden elements for blur processing -->
-    <video
-      id="blurInputVideo"
-      autoplay
-      playsinline
-      muted
-      style="display: none"
-    ></video>
-    <canvas id="blurCanvas" style="display: none"></canvas>
-    <video id="video3" style="display: none"></video>
+        <video id="video3" style="display: none"></video>
     <video id="video4" style="display: none"></video>
     <video id="video5" style="display: none"></video>
     <video id="video6" style="display: none"></video>
@@ -1079,9 +1068,6 @@
       // Blur and overlay state
       let blurEnabled = false;
       let overlayText = "";
-      let originalStream = null;
-      let segmenter = null;
-      let blurAnimationFrame = null;
 
       // DOM Elements
       const callBtn = document.getElementById("make");
@@ -1251,6 +1237,8 @@
               remoteAudioID: "audio1",
               remoteScreenID: "screen",
             },
+            enableMediapipe: true,
+            model: "medium",
           });
           // Setup event listeners
           setupSDKEventListeners();
@@ -1348,29 +1336,26 @@
         }
       }
 
-      async function handleSwitchCamera() {
+      function handleSwitchCamera() {
         if (!guest) return;
 
-        // Tắt blur trước khi đổi camera (stream cũ sẽ không còn hợp lệ)
-        const reenableBlur = blurEnabled;
-        if (blurEnabled) {
-          await disableBlur();
-        }
-
-        try {
-          const res = await guest.switchCamera(facingMode);
-          console.log("switchCamera success", res);
-          facingMode = facingMode === "user" ? "environment" : "user";
-          switchCameraBtn.classList.add("active");
-          setTimeout(() => {
-            switchCameraBtn.classList.remove("active");
-          }, 1000);
-          notyf.success("Đã chuyển camera!");
-          if (reenableBlur) await enableBlur();
-        } catch (err) {
-          console.log("switchCamera error", err);
-          notyf.error("Không thể chuyển camera!" + err?.message || "");
-        }
+        // SDK tự giữ blur khi đổi camera (mediaPipeML.switchSource)
+        guest
+          .switchCamera(facingMode)
+          .then((res) => {
+            console.log("switchCamera success", res);
+            facingMode = facingMode === "user" ? "environment" : "user";
+            switchCameraBtn.classList.add("active");
+            setTimeout(() => {
+              switchCameraBtn.classList.remove("active");
+            }, 1000);
+            notyf.success("Đã chuyển camera!");
+          })
+          .catch((err) => {
+            console.log("switchCamera error", err);
+            notyf.error("Không thể chuyển camera!" + err?.message || "");
+          });
+        console.log("Switching camera");
       }
 
       function handleZoom() {
@@ -1392,130 +1377,34 @@
       }
 
       // ===== Blur background & overlay text =====
-      function drawOverlayText(ctx, canvas) {
-        if (!overlayText) return;
-        ctx.save();
-        ctx.font = "bold 28px Arial";
-        ctx.fillStyle = "#fff";
-        ctx.strokeStyle = "rgba(0,0,0,0.7)";
-        ctx.lineWidth = 4;
-        ctx.textBaseline = "top";
-        ctx.strokeText(overlayText, 24, 24);
-        ctx.fillText(overlayText, 24, 24);
-        ctx.restore();
-      }
-
-      async function handleBlurToggle() {
+      function handleBlurToggle() {
         if (!guest) {
           notyf.error("Chưa có cuộc gọi nào!");
           return;
         }
-        if (blurEnabled) {
-          await disableBlur();
-        } else {
-          await enableBlur();
-        }
-      }
-
-      async function enableBlur() {
-        const localVideo = document.getElementById("local");
-        if (!localVideo || !localVideo.srcObject) {
-          notyf.error("Chưa có stream camera!");
-          return;
-        }
-        if (typeof SelfieSegmentation === "undefined") {
-          notyf.error("Chưa load được MediaPipe!");
-          return;
-        }
-
-        originalStream = localVideo.srcObject;
-        const blurInputVideo = document.getElementById("blurInputVideo");
-        const blurCanvas = document.getElementById("blurCanvas");
-
-        blurInputVideo.srcObject = originalStream;
-        await blurInputVideo.play().catch(() => {});
-
-        blurCanvas.width = blurInputVideo.videoWidth || 640;
-        blurCanvas.height = blurInputVideo.videoHeight || 480;
-        const ctx = blurCanvas.getContext("2d");
-
-        if (!segmenter) {
-          segmenter = new SelfieSegmentation({
-            locateFile: (file) =>
-              `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`,
-          });
-          segmenter.setOptions({ modelSelection: 1 });
-        }
-
-        segmenter.onResults((results) => {
-          ctx.clearRect(0, 0, blurCanvas.width, blurCanvas.height);
-          // Background blur: mask → person kept sharp, background blurred
-          ctx.globalCompositeOperation = "source-over";
-          ctx.filter = "none";
-          ctx.drawImage(
-            results.segmentationMask,
-            0,
-            0,
-            blurCanvas.width,
-            blurCanvas.height
-          );
-          ctx.globalCompositeOperation = "source-out";
-          ctx.filter = "blur(8px)";
-          ctx.drawImage(results.image, 0, 0, blurCanvas.width, blurCanvas.height);
-          ctx.globalCompositeOperation = "destination-over";
-          ctx.filter = "none";
-          ctx.drawImage(results.image, 0, 0, blurCanvas.width, blurCanvas.height);
-          ctx.globalCompositeOperation = "source-over";
-          // Overlay text on top (visible only while blur is on)
-          drawOverlayText(ctx, blurCanvas);
-        });
-
-        const loop = async () => {
-          if (!blurEnabled) return;
-          if (blurInputVideo.videoWidth > 0) {
-            await segmenter.send({ image: blurInputVideo });
-          }
-          blurAnimationFrame = requestAnimationFrame(loop);
-        };
-
-        blurEnabled = true;
-        blurAnimationFrame = requestAnimationFrame(loop);
-
-        // Send canvas stream
-        localVideo.srcObject = blurCanvas.captureStream(30);
-        await guest.blurBackground(true);
-        document.getElementById("blurToggleText").textContent = "Tắt blur";
-        notyf.success("Đã bật blur nền");
-      }
-
-      async function disableBlur() {
-        blurEnabled = false;
-        if (blurAnimationFrame) {
-          cancelAnimationFrame(blurAnimationFrame);
-          blurAnimationFrame = null;
-        }
-        const localVideo = document.getElementById("local");
-        const blurInputVideo = document.getElementById("blurInputVideo");
-        if (localVideo && originalStream) {
-          localVideo.srcObject = originalStream;
-        }
-        blurInputVideo.srcObject = null;
-        await guest.blurBackground(false);
-        document.getElementById("blurToggleText").textContent = "Bật blur";
-        notyf.success("Đã tắt blur nền");
+        blurEnabled = !blurEnabled;
+        guest.blurBackground(blurEnabled);
+        document.getElementById("blurToggleText").textContent = blurEnabled
+          ? "Tắt blur"
+          : "Bật blur";
+        notyf.success(blurEnabled ? "Đã bật blur nền" : "Đã tắt blur nền");
       }
 
       function handleChangeOverlayText() {
-        if (!blurEnabled) {
-          notyf.error("Chỉ đổi text khi blur đang bật!");
+        if (!guest) {
+          notyf.error("Chưa có cuộc gọi nào!");
           return;
         }
         const newText = prompt("Nhập text overlay:", overlayText || "");
         if (newText === null) return;
         overlayText = newText;
-        notyf.success(
-          overlayText ? "Đã đổi text overlay" : "Đã xóa text overlay"
-        );
+        if (overlayText) {
+          guest.setOverlayText(0, overlayText);
+          notyf.success("Đã đặt text overlay");
+        } else {
+          guest.clearOverlayText();
+          notyf.success("Đã xóa text overlay");
+        }
       }
 
       function handleHangup() {
@@ -1530,10 +1419,10 @@
       function handleCallEnded() {
         console.log("Call ended");
         stopCallTimer();
-        // Reset blur state when call ends
-        if (blurEnabled) {
-          disableBlur().catch(() => {});
-        }
+        // Reset local blur state (SDK tự cleanup)
+        blurEnabled = false;
+        overlayText = "";
+        document.getElementById("blurToggleText").textContent = "Bật blur";
         showScreen("ended");
       }
 
