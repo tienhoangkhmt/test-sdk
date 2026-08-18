@@ -90014,6 +90014,9 @@ class Mediapipe {
     __publicField(this, "animationId", null);
     // Cache background image để tránh nháy (load 1 lần thay vì mỗi frame)
     __publicField(this, "imageId", 0);
+    // true khi mediapipe tự getUserMedia — chỉ khi này mới được stop track khi reset
+    // (tránh stop nhầm stream camera của cuộc gọi → frame treo trên mobile)
+    __publicField(this, "ownsStream", false);
     // Optional consumer-provided base path pointing at the locally-served
     // `dist/mediapipe/` assets folder. When unset, MediaPipe falls back to CDN.
     __publicField(this, "mapImages", /* @__PURE__ */ new Map());
@@ -90097,6 +90100,9 @@ class Mediapipe {
     createInputVideo.width = SCREEN_RESOLUTION.get("FULL_HD").width.ideal;
     createInputVideo.height = SCREEN_RESOLUTION.get("FULL_HD").height.ideal;
     createInputVideo.id = elIdVideoInput$1;
+    createInputVideo.muted = true;
+    createInputVideo.autoplay = true;
+    createInputVideo.setAttribute("playsinline", "true");
     document.body.appendChild(createInputVideo);
     document.body.appendChild(createCanvas);
   }
@@ -90124,7 +90130,7 @@ class Mediapipe {
     });
     this.segmenter.setOptions({ modelSelection: 1 });
   }
-  async start(imageId) {
+  async start(imageId, stream) {
     this.imageId = imageId;
     const video = document.getElementById(elIdVideoInput$1);
     let canvas = document.getElementById(elIdCanvas$1);
@@ -90140,10 +90146,26 @@ class Mediapipe {
       mode: ModeBlur.image,
       imageId: this.imageId
     });
-    const stream = await navigator.mediaDevices.getUserMedia({
+    if (stream) {
+      this.ownsStream = false;
+      video.srcObject = stream;
+      await video.play().catch(() => {
+      });
+      if (this.animationId === null) {
+        const c2 = document.getElementById(elIdCanvas$1);
+        if (c2) {
+          c2.width = 640;
+          c2.height = 480;
+        }
+        this.loop();
+      }
+      return;
+    }
+    this.ownsStream = true;
+    const newStream = await navigator.mediaDevices.getUserMedia({
       video: true
     });
-    video.srcObject = stream;
+    video.srcObject = newStream;
     video.onloadedmetadata = () => {
       const c2 = document.getElementById(elIdCanvas$1);
       if (c2) {
@@ -90165,7 +90187,9 @@ class Mediapipe {
     if (!video) return;
     video.onloadedmetadata = null;
     const old = video.srcObject;
-    old == null ? void 0 : old.getTracks().forEach((t2) => t2.stop());
+    old == null ? void 0 : old.getTracks().forEach((t2) => {
+      if (t2.kind === "video") t2.stop();
+    });
     video.srcObject = stream;
     await video.play().catch((e2) => console.log("play error", e2));
   }
@@ -90176,12 +90200,16 @@ class Mediapipe {
     const canvas = document.getElementById(elIdCanvas$1);
     const video = document.getElementById(elIdVideoInput$1);
     if (video.srcObject) {
-      video.srcObject.getTracks().forEach((t2) => t2.stop());
+      if (this.ownsStream) {
+        video.srcObject.getTracks().forEach((t2) => t2.stop());
+      }
       video == null ? void 0 : video.pause();
+      video.srcObject = null;
     }
     if (canvas) {
       canvas.captureStream(30).getTracks().forEach((tr2) => tr2.stop());
     }
+    this.ownsStream = false;
   }
   async sendBackgroundBlur({ mode = ModeBlur.none, imageId = 0 }, callback) {
     const getBgImage = this.mapImages.get(imageId);
@@ -93882,6 +93910,8 @@ class TaskVision {
     __publicField(this, "wasmFileset");
     __publicField(this, "initPromise");
     __publicField(this, "overlayText", /* @__PURE__ */ new Map());
+    // true khi tự getUserMedia — chỉ khi này mới được stop track khi reset
+    __publicField(this, "ownsStream", false);
     __publicField(this, "loop", async () => {
       var _a2;
       const video = document.getElementById(elIdVideoInput);
@@ -94077,7 +94107,7 @@ class TaskVision {
     tempCtx.putImageData(imageData, 0, 0);
     return tempCanvas;
   }
-  async start(imageId) {
+  async start(imageId, stream) {
     this.imageId = imageId;
     await this.initPromise;
     const video = document.getElementById(elIdVideoInput);
@@ -94094,10 +94124,26 @@ class TaskVision {
       mode: ModeBlur.image,
       imageId: this.imageId
     });
-    const stream = await navigator.mediaDevices.getUserMedia({
+    if (stream) {
+      this.ownsStream = false;
+      video.srcObject = stream;
+      await video.play().catch(() => {
+      });
+      if (this.animationId === null) {
+        const c2 = document.getElementById(elIdCanvas);
+        if (c2) {
+          c2.width = 640;
+          c2.height = 480;
+        }
+        this.loop();
+      }
+      return;
+    }
+    this.ownsStream = true;
+    const newStream = await navigator.mediaDevices.getUserMedia({
       video: true
     });
-    video.srcObject = stream;
+    video.srcObject = newStream;
     video.onloadedmetadata = () => {
       const c2 = document.getElementById(elIdCanvas);
       if (c2) {
@@ -94119,7 +94165,9 @@ class TaskVision {
     if (!video) return;
     video.onloadedmetadata = null;
     const old = video.srcObject;
-    old == null ? void 0 : old.getTracks().forEach((t2) => t2.stop());
+    old == null ? void 0 : old.getTracks().forEach((t2) => {
+      if (t2.kind === "video") t2.stop();
+    });
     video.srcObject = stream;
     await video.play().catch((e2) => console.log("play error", e2));
   }
@@ -94129,12 +94177,16 @@ class TaskVision {
     const canvas = document.getElementById(elIdCanvas);
     const video = document.getElementById(elIdVideoInput);
     if (video.srcObject) {
-      video.srcObject.getTracks().forEach((t2) => t2.stop());
+      if (this.ownsStream) {
+        video.srcObject.getTracks().forEach((t2) => t2.stop());
+      }
       video == null ? void 0 : video.pause();
+      video.srcObject = null;
     }
     if (canvas) {
       canvas.captureStream(30).getTracks().forEach((tr2) => tr2.stop());
     }
+    this.ownsStream = false;
   }
   async sendBackgroundBlur({ mode = ModeBlur.none, imageId = 0 }, callback) {
     const getBgImage = this.mapImages.get(imageId);
@@ -100324,7 +100376,8 @@ class GuestSwitchBoard {
         if (!this.originalVideoTrack && sender.track) {
           this.originalVideoTrack = sender.track;
         }
-        this.mediaPipeML.start(0);
+        const existingStream = localVideo.srcObject;
+        await this.mediaPipeML.start(0, existingStream || void 0);
         const canvas = document.getElementById(elIdCanvas$1);
         const processedStream = canvas.captureStream(30);
         const newTrack = processedStream.getVideoTracks()[0];
