@@ -90110,7 +90110,10 @@ class Mediapipe {
     createCanvas.id = elIdCanvas$1;
     createCanvas.width = SCREEN_RESOLUTION.get("FULL_HD").width.ideal;
     createCanvas.height = SCREEN_RESOLUTION.get("FULL_HD").height.ideal;
-    createCanvas.style.display = "none";
+    createCanvas.style.position = "absolute";
+    createCanvas.style.top = "-9999px";
+    createCanvas.style.left = "-9999px";
+    createCanvas.style.pointerEvents = "none";
     createInputVideo.style.display = "none";
     createInputVideo.width = SCREEN_RESOLUTION.get("FULL_HD").width.ideal;
     createInputVideo.height = SCREEN_RESOLUTION.get("FULL_HD").height.ideal;
@@ -90155,7 +90158,10 @@ class Mediapipe {
       canvas.id = elIdCanvas$1;
       canvas.width = SCREEN_RESOLUTION.get("FULL_HD").width.ideal;
       canvas.height = SCREEN_RESOLUTION.get("FULL_HD").height.ideal;
-      canvas.style.display = "none";
+      canvas.style.position = "absolute";
+      canvas.style.top = "-9999px";
+      canvas.style.left = "-9999px";
+      canvas.style.pointerEvents = "none";
       document.body.appendChild(canvas);
     }
     this.sendBackgroundBlur({
@@ -94078,7 +94084,10 @@ class TaskVision {
     createCanvas.id = elIdCanvas;
     createCanvas.width = SCREEN_RESOLUTION.get("FULL_HD").width.ideal;
     createCanvas.height = SCREEN_RESOLUTION.get("FULL_HD").height.ideal;
-    createCanvas.style.display = "none";
+    createCanvas.style.position = "absolute";
+    createCanvas.style.top = "-9999px";
+    createCanvas.style.left = "-9999px";
+    createCanvas.style.pointerEvents = "none";
     createInputVideo.style.display = "none";
     createInputVideo.width = SCREEN_RESOLUTION.get("FULL_HD").width.ideal;
     createInputVideo.height = SCREEN_RESOLUTION.get("FULL_HD").height.ideal;
@@ -94165,7 +94174,10 @@ class TaskVision {
       canvas.id = elIdCanvas;
       canvas.width = SCREEN_RESOLUTION.get("FULL_HD").width.ideal;
       canvas.height = SCREEN_RESOLUTION.get("FULL_HD").height.ideal;
-      canvas.style.display = "none";
+      canvas.style.position = "absolute";
+      canvas.style.top = "-9999px";
+      canvas.style.left = "-9999px";
+      canvas.style.pointerEvents = "none";
       document.body.appendChild(canvas);
     }
     this.sendBackgroundBlur({
