@@ -2678,18 +2678,14 @@ function requireReact_development() {
   })(react_development, react_development.exports);
   return react_development.exports;
 }
-var hasRequiredReact;
-function requireReact() {
-  if (hasRequiredReact) return react.exports;
-  hasRequiredReact = 1;
-  var define_process_env_default2 = {};
-  if (define_process_env_default2.NODE_ENV === "production") {
-    react.exports = requireReact_production_min();
-  } else {
-    react.exports = requireReact_development();
-  }
-  return react.exports;
+var define_process_env_default$g = {};
+if (define_process_env_default$g.NODE_ENV === "production") {
+  react.exports = requireReact_production_min();
+} else {
+  react.exports = requireReact_development();
 }
+var reactExports = react.exports;
+const React__default$1 = /* @__PURE__ */ getDefaultExportFromCjs(reactExports);
 /**
  * @license React
  * react-jsx-runtime.production.min.js
@@ -2703,7 +2699,7 @@ var hasRequiredReactJsxRuntime_production_min;
 function requireReactJsxRuntime_production_min() {
   if (hasRequiredReactJsxRuntime_production_min) return reactJsxRuntime_production_min;
   hasRequiredReactJsxRuntime_production_min = 1;
-  var f2 = requireReact(), k2 = Symbol.for("react.element"), l2 = Symbol.for("react.fragment"), m2 = Object.prototype.hasOwnProperty, n2 = f2.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactCurrentOwner, p2 = { key: true, ref: true, __self: true, __source: true };
+  var f2 = reactExports, k2 = Symbol.for("react.element"), l2 = Symbol.for("react.fragment"), m2 = Object.prototype.hasOwnProperty, n2 = f2.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactCurrentOwner, p2 = { key: true, ref: true, __self: true, __source: true };
   function q2(c2, a2, g2) {
     var b2, d2 = {}, e2 = null, h2 = null;
     void 0 !== g2 && (e2 = "" + g2);
@@ -2735,7 +2731,7 @@ function requireReactJsxRuntime_development() {
    */
   if (define_process_env_default2.NODE_ENV !== "production") {
     (function() {
-      var React2 = requireReact();
+      var React2 = reactExports;
       var REACT_ELEMENT_TYPE = Symbol.for("react.element");
       var REACT_PORTAL_TYPE = Symbol.for("react.portal");
       var REACT_FRAGMENT_TYPE = Symbol.for("react.fragment");
@@ -4337,7 +4333,7 @@ var hasRequiredReactDom_production_min;
 function requireReactDom_production_min() {
   if (hasRequiredReactDom_production_min) return reactDom_production_min;
   hasRequiredReactDom_production_min = 1;
-  var aa2 = requireReact(), ca2 = requireScheduler();
+  var aa2 = reactExports, ca2 = requireScheduler();
   function p2(a2) {
     for (var b2 = "https://reactjs.org/docs/error-decoder.html?invariant=" + a2, c2 = 1; c2 < arguments.length; c2++) b2 += "&args[]=" + encodeURIComponent(arguments[c2]);
     return "Minified React error #" + a2 + "; visit " + b2 + " for the full message or use the non-minified dev environment for full errors and additional helpful warnings.";
@@ -10756,7 +10752,7 @@ function requireReactDom_development() {
       if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ !== "undefined" && typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart === "function") {
         __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(new Error());
       }
-      var React2 = requireReact();
+      var React2 = reactExports;
       var Scheduler = requireScheduler();
       var ReactSharedInternals = React2.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
       var suppressWarning = false;
@@ -31891,8 +31887,6 @@ if (define_process_env_default$d.NODE_ENV === "production") {
     }
   };
 }
-var reactExports = requireReact();
-const React__default$1 = /* @__PURE__ */ getDefaultExportFromCjs(reactExports);
 var lib = {};
 var uaParser_min = { exports: {} };
 (function(module, exports) {
@@ -32089,7 +32083,7 @@ Object.defineProperty(lib, "__esModule", { value: true });
 function _interopDefault(ex) {
   return ex && typeof ex === "object" && "default" in ex ? ex["default"] : ex;
 }
-var React = requireReact();
+var React = reactExports;
 var React__default = _interopDefault(React);
 var UAParser = uaParser_minExports;
 var ClientUAInstance = new UAParser();
@@ -35515,7 +35509,7 @@ var hasRequiredUseSyncExternalStoreWithSelector_production;
 function requireUseSyncExternalStoreWithSelector_production() {
   if (hasRequiredUseSyncExternalStoreWithSelector_production) return useSyncExternalStoreWithSelector_production;
   hasRequiredUseSyncExternalStoreWithSelector_production = 1;
-  var React2 = requireReact();
+  var React2 = reactExports;
   function is2(x2, y2) {
     return x2 === y2 && (0 !== x2 || 1 / x2 === 1 / y2) || x2 !== x2 && y2 !== y2;
   }
@@ -35593,7 +35587,7 @@ function requireUseSyncExternalStoreWithSelector_development() {
       return x2 === y2 && (0 !== x2 || 1 / x2 === 1 / y2) || x2 !== x2 && y2 !== y2;
     }
     "undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-    var React2 = requireReact(), objectIs = "function" === typeof Object.is ? Object.is : is2, useSyncExternalStore = React2.useSyncExternalStore, useRef = React2.useRef, useEffect = React2.useEffect, useMemo = React2.useMemo, useDebugValue = React2.useDebugValue;
+    var React2 = reactExports, objectIs = "function" === typeof Object.is ? Object.is : is2, useSyncExternalStore = React2.useSyncExternalStore, useRef = React2.useRef, useEffect = React2.useEffect, useMemo = React2.useMemo, useDebugValue = React2.useDebugValue;
     useSyncExternalStoreWithSelector_development.useSyncExternalStoreWithSelector = function(subscribe, getSnapshot, getServerSnapshot, selector, isEqual) {
       var instRef = useRef(null);
       if (null === instRef.current) {
@@ -90033,10 +90027,10 @@ class Mediapipe {
       }
       try {
         await this.segmenter.send({ image: video });
+        this.animationId = requestAnimationFrame(this.loop);
       } catch (error) {
         console.error("Mediapipe send error:", error);
       }
-      this.animationId = requestAnimationFrame(this.loop);
     });
     this.createElement();
     this.initMediapipe({ mediapipeBasePath: "" });
@@ -90048,7 +90042,10 @@ class Mediapipe {
   }
   setOverlayText(index, text, position) {
     const current2 = this.overlayText.get(index);
-    this.overlayText.set(index, { text, position: position ?? (current2 == null ? void 0 : current2.position) });
+    this.overlayText.set(index, {
+      text,
+      position: position ?? (current2 == null ? void 0 : current2.position)
+    });
   }
   updateOverlayText(text, index) {
     if (this.overlayText.has(index)) {
@@ -90158,7 +90155,8 @@ class Mediapipe {
       if (this.animationId === null) {
         const c2 = document.getElementById(elIdCanvas$1);
         if (c2) {
-          c2.width = 640;
+          c2.width = Math.min(video.videoWidth || 640, 1280);
+          c2.height = Math.min(video.videoHeight || 480, 720);
           c2.height = 480;
         }
         this.loop();
@@ -90173,10 +90171,8 @@ class Mediapipe {
     video.onloadedmetadata = () => {
       const c2 = document.getElementById(elIdCanvas$1);
       if (c2) {
-        const vw = 640;
-        const vh = 480;
-        c2.width = vw;
-        c2.height = vh;
+        c2.width = Math.min(video.videoWidth || 640, 1280);
+        c2.height = Math.min(video.videoHeight || 480, 720);
       }
       video.play();
       this.loop();
@@ -90195,6 +90191,18 @@ class Mediapipe {
       if (t2.kind === "video") t2.stop();
     });
     video.srcObject = stream;
+    await new Promise((resolve) => {
+      if (video.readyState >= 1) return resolve();
+      video.onloadedmetadata = () => {
+        video.onloadedmetadata = null;
+        resolve();
+      };
+    });
+    const canvas = document.getElementById(elIdCanvas$1);
+    if (canvas) {
+      canvas.width = Math.min(video.videoWidth || 640, 1280);
+      canvas.height = Math.min(video.videoHeight || 480, 720);
+    }
     await video.play().catch((e2) => console.log("play error", e2));
   }
   async resetMediapipe() {
@@ -94136,8 +94144,8 @@ class TaskVision {
       if (this.animationId === null) {
         const c2 = document.getElementById(elIdCanvas);
         if (c2) {
-          c2.width = 640;
-          c2.height = 480;
+          c2.width = Math.min(video.videoWidth || 640, 1280);
+          c2.height = Math.min(video.videoHeight || 480, 720);
         }
         this.loop();
       }
@@ -94151,10 +94159,8 @@ class TaskVision {
     video.onloadedmetadata = () => {
       const c2 = document.getElementById(elIdCanvas);
       if (c2) {
-        const vw = 640;
-        const vh = 480;
-        c2.width = vw;
-        c2.height = vh;
+        c2.width = Math.min(video.videoWidth || 640, 1280);
+        c2.height = Math.min(video.videoHeight || 480, 720);
       }
       video.play();
       this.loop();
@@ -94173,6 +94179,18 @@ class TaskVision {
       if (t2.kind === "video") t2.stop();
     });
     video.srcObject = stream;
+    await new Promise((resolve) => {
+      if (video.readyState >= 1) return resolve();
+      video.onloadedmetadata = () => {
+        video.onloadedmetadata = null;
+        resolve();
+      };
+    });
+    const canvas = document.getElementById(elIdCanvas);
+    if (canvas) {
+      canvas.width = Math.min(video.videoWidth || 640, 1280);
+      canvas.height = Math.min(video.videoHeight || 480, 720);
+    }
     await video.play().catch((e2) => console.log("play error", e2));
   }
   async resetMediapipe() {
