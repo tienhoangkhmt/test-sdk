@@ -90011,25 +90011,34 @@ class Mediapipe {
     // true khi mediapipe tự getUserMedia — chỉ khi này mới được stop track khi reset
     // (tránh stop nhầm stream camera của cuộc gọi → frame treo trên mobile)
     __publicField(this, "ownsStream", false);
+    // Guard chống chồng frame khi send chậm hơn rAF
+    __publicField(this, "sending", false);
+    // Flag dừng loop — nested rAF không cancel được hoàn toàn bằng cancelAnimationFrame
+    __publicField(this, "running", false);
     // Optional consumer-provided base path pointing at the locally-served
     // `dist/mediapipe/` assets folder. When unset, MediaPipe falls back to CDN.
     __publicField(this, "mapImages", /* @__PURE__ */ new Map());
     __publicField(this, "overlayText", /* @__PURE__ */ new Map());
     __publicField(this, "loop", async () => {
+      if (!this.running) return;
       const video = document.getElementById(elIdVideoInput$1);
       if (!video) {
-        this.animationId = requestAnimationFrame(this.loop);
+        this.animationId = requestAnimationFrame(() => requestAnimationFrame(this.loop));
         return;
       }
       if (video.videoWidth === 0 || video.videoHeight === 0) {
-        this.animationId = requestAnimationFrame(this.loop);
+        this.animationId = requestAnimationFrame(() => requestAnimationFrame(this.loop));
         return;
       }
+      this.animationId = requestAnimationFrame(() => requestAnimationFrame(this.loop));
+      if (this.sending) return;
+      this.sending = true;
       try {
         await this.segmenter.send({ image: video });
-        this.animationId = requestAnimationFrame(this.loop);
       } catch (error) {
         console.error("Mediapipe send error:", error);
+      } finally {
+        this.sending = false;
       }
     });
     this.createElement();
@@ -90133,6 +90142,7 @@ class Mediapipe {
   }
   async start(imageId, stream) {
     this.imageId = imageId;
+    this.running = true;
     const video = document.getElementById(elIdVideoInput$1);
     let canvas = document.getElementById(elIdCanvas$1);
     if (!canvas) {
@@ -90155,8 +90165,8 @@ class Mediapipe {
       if (this.animationId === null) {
         const c2 = document.getElementById(elIdCanvas$1);
         if (c2) {
-          c2.width = Math.min(video.videoWidth || 640, 1280);
-          c2.height = Math.min(video.videoHeight || 480, 720);
+          c2.width = video.videoWidth || 640;
+          c2.height = video.videoHeight || 480;
           c2.height = 480;
         }
         this.loop();
@@ -90165,14 +90175,14 @@ class Mediapipe {
     }
     this.ownsStream = true;
     const newStream = await navigator.mediaDevices.getUserMedia({
-      video: true
+      video: { width: { ideal: 1920 }, height: { ideal: 1080 } }
     });
     video.srcObject = newStream;
     video.onloadedmetadata = () => {
       const c2 = document.getElementById(elIdCanvas$1);
       if (c2) {
-        c2.width = Math.min(video.videoWidth || 640, 1280);
-        c2.height = Math.min(video.videoHeight || 480, 720);
+        c2.width = video.videoWidth || 640;
+        c2.height = video.videoHeight || 480;
       }
       video.play();
       this.loop();
@@ -90200,12 +90210,14 @@ class Mediapipe {
     });
     const canvas = document.getElementById(elIdCanvas$1);
     if (canvas) {
-      canvas.width = Math.min(video.videoWidth || 640, 1280);
-      canvas.height = Math.min(video.videoHeight || 480, 720);
+      canvas.width = video.videoWidth || 640;
+      canvas.height = video.videoHeight || 480;
     }
     await video.play().catch((e2) => console.log("play error", e2));
   }
   async resetMediapipe() {
+    this.running = false;
+    this.sending = false;
     this.segmenter.reset();
     cancelAnimationFrame(this.animationId);
     this.animationId = null;
@@ -93924,17 +93936,25 @@ class TaskVision {
     __publicField(this, "overlayText", /* @__PURE__ */ new Map());
     // true khi tự getUserMedia — chỉ khi này mới được stop track khi reset
     __publicField(this, "ownsStream", false);
+    // Guard chống chồng frame khi xử lý chậm hơn rAF
+    __publicField(this, "sending", false);
+    // Flag dừng loop — nested rAF không cancel được hoàn toàn bằng cancelAnimationFrame
+    __publicField(this, "running", false);
     __publicField(this, "loop", async () => {
       var _a2;
+      if (!this.running) return;
       const video = document.getElementById(elIdVideoInput);
       if (!video || !video.srcObject) {
-        this.animationId = requestAnimationFrame(this.loop);
+        this.animationId = requestAnimationFrame(() => requestAnimationFrame(this.loop));
         return;
       }
       if (video.videoWidth === 0 || video.videoHeight === 0) {
-        this.animationId = requestAnimationFrame(this.loop);
+        this.animationId = requestAnimationFrame(() => requestAnimationFrame(this.loop));
         return;
       }
+      this.animationId = requestAnimationFrame(() => requestAnimationFrame(this.loop));
+      if (this.sending) return;
+      this.sending = true;
       try {
         const currentMode = this.mode;
         const result = await this.segmenter.segmentForVideo(
@@ -93975,8 +93995,9 @@ class TaskVision {
         (_a2 = result.categoryMask) == null ? void 0 : _a2.close();
       } catch (error) {
         console.error("Processing error:", error);
+      } finally {
+        this.sending = false;
       }
-      this.animationId = requestAnimationFrame(this.loop);
     });
     this.createElement();
     this.initPromise = this.initMediapipe({ mediapipeBasePath: "" });
@@ -94121,6 +94142,7 @@ class TaskVision {
   }
   async start(imageId, stream) {
     this.imageId = imageId;
+    this.running = true;
     await this.initPromise;
     const video = document.getElementById(elIdVideoInput);
     let canvas = document.getElementById(elIdCanvas);
@@ -94144,8 +94166,8 @@ class TaskVision {
       if (this.animationId === null) {
         const c2 = document.getElementById(elIdCanvas);
         if (c2) {
-          c2.width = Math.min(video.videoWidth || 640, 1280);
-          c2.height = Math.min(video.videoHeight || 480, 720);
+          c2.width = video.videoWidth || 640;
+          c2.height = video.videoHeight || 480;
         }
         this.loop();
       }
@@ -94159,8 +94181,8 @@ class TaskVision {
     video.onloadedmetadata = () => {
       const c2 = document.getElementById(elIdCanvas);
       if (c2) {
-        c2.width = Math.min(video.videoWidth || 640, 1280);
-        c2.height = Math.min(video.videoHeight || 480, 720);
+        c2.width = video.videoWidth || 640;
+        c2.height = video.videoHeight || 480;
       }
       video.play();
       this.loop();
@@ -94188,12 +94210,14 @@ class TaskVision {
     });
     const canvas = document.getElementById(elIdCanvas);
     if (canvas) {
-      canvas.width = Math.min(video.videoWidth || 640, 1280);
-      canvas.height = Math.min(video.videoHeight || 480, 720);
+      canvas.width = video.videoWidth || 640;
+      canvas.height = video.videoHeight || 480;
     }
     await video.play().catch((e2) => console.log("play error", e2));
   }
   async resetMediapipe() {
+    this.running = false;
+    this.sending = false;
     cancelAnimationFrame(this.animationId);
     this.animationId = null;
     const canvas = document.getElementById(elIdCanvas);
