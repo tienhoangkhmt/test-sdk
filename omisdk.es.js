@@ -33299,6 +33299,7 @@ const CAPTURE_SNAPSHOT_RESPONSE = {
   SUCCESS: "SUCCESS_CAPTURE_SNAPSHOT",
   ERROR: "ERROR_CAPTURE_SNAPSHOT"
 };
+const TYPE_SEND_VIDEO = "TYPE_SEND_VIDEO";
 const SCREEN_RESOLUTION = /* @__PURE__ */ new Map([
   [
     "SD",
@@ -86961,7 +86962,7 @@ class PortSipSdk {
       ), s3 = "string" == typeof t3 ? t3 : null == t3 ? void 0 : t3.id;
       let o3 = null;
       try {
-        console.log("setupRemoteMedia audio element id:", s3), o3 = document.querySelector(`#${s3}`);
+        o3 = document.querySelector(`#${s3}`);
       } catch (e3) {
         console.error(e3);
       }
@@ -90010,6 +90011,7 @@ class Mediapipe {
     // Optional consumer-provided base path pointing at the locally-served
     // `dist/mediapipe/` assets folder. When unset, MediaPipe falls back to CDN.
     __publicField(this, "mapImages", /* @__PURE__ */ new Map());
+    __publicField(this, "overlayText", /* @__PURE__ */ new Map());
     __publicField(this, "loop", async () => {
       const video = document.getElementById(elIdVideoInput$1);
       if (!video) {
@@ -90026,6 +90028,36 @@ class Mediapipe {
     this.createElement();
     this.initMediapipe({ mediapipeBasePath: "" });
     this.createImage();
+    this.setDefaultOverlayText([
+      { text: "Welcome to OmiSDK", position: { x: 50, y: 50 } },
+      { text: "Powered by MediaPipe", position: { x: 100, y: 100 } }
+    ]);
+  }
+  setOverlayText(index, text, position) {
+    const current2 = this.overlayText.get(index);
+    this.overlayText.set(index, { text, position: position ?? (current2 == null ? void 0 : current2.position) });
+  }
+  updateOverlayText(text, index) {
+    if (this.overlayText.has(index)) {
+      this.overlayText.set(index, { ...this.overlayText.get(index), text });
+    }
+  }
+  get getOverlayText() {
+    return this.overlayText;
+  }
+  setDefaultOverlayText(ArrayText) {
+    this.overlayText.clear();
+    ArrayText.forEach((i2, k2) => {
+      this.overlayText.set(k2, i2);
+    });
+  }
+  // Xóa một text khỏi overlay
+  removeOverlayText(index) {
+    this.overlayText.delete(index);
+  }
+  // Xóa toàn bộ text overlay
+  clearOverlayText() {
+    this.overlayText.clear();
   }
   async createImage(data = config_url_image) {
     if (!(data == null ? void 0 : data.length)) return;
@@ -90121,6 +90153,16 @@ class Mediapipe {
   async stop() {
     this.segmenter.close();
   }
+  /** Đổi nguồn camera (switch camera) mà không khởi động lại loop */
+  async switchSource(stream) {
+    const video = document.getElementById(elIdVideoInput$1);
+    if (!video) return;
+    video.onloadedmetadata = null;
+    const old = video.srcObject;
+    old == null ? void 0 : old.getTracks().forEach((t2) => t2.stop());
+    video.srcObject = stream;
+    await video.play().catch((e2) => console.log("play error", e2));
+  }
   async resetMediapipe() {
     this.segmenter.reset();
     cancelAnimationFrame(this.animationId);
@@ -90163,7 +90205,7 @@ class Mediapipe {
             canvas.height
           );
           ctx.globalCompositeOperation = "source-out";
-          ctx.filter = "blur(8px)";
+          ctx.filter = "none";
           ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
           ctx.globalCompositeOperation = "destination-over";
           ctx.filter = "none";
@@ -90191,6 +90233,20 @@ class Mediapipe {
       }
       ctx.globalCompositeOperation = "source-over";
       ctx.filter = "none";
+      ctx.font = "20px Arial";
+      ctx.fillStyle = "white";
+      ctx.strokeStyle = "black";
+      ctx.lineWidth = 3;
+      this.overlayText.forEach((item) => {
+        const text = item.text;
+        const position = item.position;
+        const textMetrics = ctx.measureText(text);
+        const textWidth = textMetrics.width;
+        const x2 = (position == null ? void 0 : position.x) || (canvas.width - textWidth) / 2;
+        const y2 = (position == null ? void 0 : position.y) || 20;
+        ctx.strokeText(text, x2, y2);
+        ctx.fillText(text, x2, y2);
+      });
     });
     setTimeout(() => {
       callback && callback();
@@ -93822,6 +93878,7 @@ class TaskVision {
     __publicField(this, "mapImages", /* @__PURE__ */ new Map());
     __publicField(this, "wasmFileset");
     __publicField(this, "initPromise");
+    __publicField(this, "overlayText", /* @__PURE__ */ new Map());
     __publicField(this, "loop", async () => {
       var _a2;
       const video = document.getElementById(elIdVideoInput);
@@ -93879,6 +93936,36 @@ class TaskVision {
     this.createElement();
     this.initPromise = this.initMediapipe({ mediapipeBasePath: "" });
     this.createImage();
+    this.setDefaultOverlayText([
+      { text: "Welcome to OmiSDK", position: { x: 50, y: 50 } },
+      { text: "Powered by MediaPipe", position: { x: 100, y: 100 } }
+    ]);
+  }
+  setOverlayText(index, text, position) {
+    const current2 = this.overlayText.get(index);
+    this.overlayText.set(index, { text, position: position ?? (current2 == null ? void 0 : current2.position) });
+  }
+  updateOverlayText(text, index) {
+    if (this.overlayText.has(index)) {
+      this.overlayText.set(index, { ...this.overlayText.get(index), text });
+    }
+  }
+  get getOverlayText() {
+    return this.overlayText;
+  }
+  setDefaultOverlayText(ArrayText) {
+    this.overlayText.clear();
+    ArrayText.forEach((i2, k2) => {
+      this.overlayText.set(k2, i2);
+    });
+  }
+  // Xóa một text khỏi overlay
+  removeOverlayText(index) {
+    this.overlayText.delete(index);
+  }
+  // Xóa toàn bộ text overlay
+  clearOverlayText() {
+    this.overlayText.clear();
   }
   async createImage(data = config_url_image) {
     if (!(data == null ? void 0 : data.length)) return;
@@ -94023,6 +94110,16 @@ class TaskVision {
   async stop() {
     this.segmenter.close();
   }
+  /** Đổi nguồn camera (switch camera) mà không khởi động lại loop */
+  async switchSource(stream) {
+    const video = document.getElementById(elIdVideoInput);
+    if (!video) return;
+    video.onloadedmetadata = null;
+    const old = video.srcObject;
+    old == null ? void 0 : old.getTracks().forEach((t2) => t2.stop());
+    video.srcObject = stream;
+    await video.play().catch((e2) => console.log("play error", e2));
+  }
   async resetMediapipe() {
     cancelAnimationFrame(this.animationId);
     this.animationId = null;
@@ -94063,6 +94160,67 @@ class TaskVision {
     }
   }
 }
+class QueueService {
+  constructor(tenantId, userId) {
+    __publicField(this, "dataSourceQueue", []);
+    __publicField(this, "queueBySessionId", /* @__PURE__ */ new Map());
+    this.tenantId = tenantId;
+    this.userId = userId;
+    this.getAgentByQueue();
+  }
+  setQueueBySessionId(sessionId, queueExtension) {
+    this.queueBySessionId.set(
+      sessionId,
+      this.filterQueuesByExtension(queueExtension)
+    );
+  }
+  deleteQueueBySessionId(sessionId) {
+    this.queueBySessionId.delete(sessionId);
+  }
+  getQueueBySessionId(sessionId) {
+    return this.queueBySessionId.get(sessionId);
+  }
+  getDataSourceQueue() {
+    return this.dataSourceQueue;
+  }
+  filterQueuesByExtension(queue_extension) {
+    var _a2;
+    if (!((_a2 = this.dataSourceQueue) == null ? void 0 : _a2.length)) return void 0;
+    return this.dataSourceQueue.find(
+      (q2) => q2.queue_extension === queue_extension
+    );
+  }
+  async getAgentByQueue() {
+    var _a2, _b;
+    try {
+      const response = await getGroupsAgents({ tenantId: this.tenantId });
+      if ((_b = (_a2 = response.data) == null ? void 0 : _a2.data) == null ? void 0 : _b.length) {
+        this.dataSourceQueue = response.data.data;
+      } else {
+        this.dataSourceQueue = [];
+      }
+    } catch (error) {
+      this.dataSourceQueue = [];
+    }
+  }
+}
+class UpdateVideoQueueService {
+  constructor() {
+    __publicField(this, "queue_session", /* @__PURE__ */ new Map());
+  }
+  get(sessionId) {
+    return this.queue_session.get(sessionId);
+  }
+  set(sessionId) {
+    this.queue_session.set(sessionId, sessionId);
+  }
+  delete(sessionId) {
+    this.queue_session.delete(sessionId);
+  }
+  deleteAll() {
+    this.queue_session.clear();
+  }
+}
 class Port_Sip {
   constructor() {
     __publicField(this, "port_sip_sdk");
@@ -94080,6 +94238,7 @@ class Port_Sip {
     __publicField(this, "inComingVideoCallExtensions", /* @__PURE__ */ new Map());
     __publicField(this, "transcriptIntegration", null);
     __publicField(this, "mediaPipeML", null);
+    __publicField(this, "updateVideoService");
     __publicField(this, "attemptReconnection", (reconnectionAttempt = 1, agentId) => {
       var _a2, _b;
       if (!this.shouldBeConnected) {
@@ -94140,6 +94299,7 @@ class Port_Sip {
         reconnectionAttempt === 1 ? 0 : this.reconnectionDelay * 1e3
       );
     });
+    this.updateVideoService = new UpdateVideoQueueService();
     if (config_video_call.enable_media_pipe) {
       const model = MappingModel[config_video_call.model] || ModelBackground.selfie_segmentation;
       if (model === ModelBackground.task_vision) {
@@ -94720,6 +94880,7 @@ class Port_Sip {
                   "✅ PeerConnection is stable, upgrading to video call"
                 );
                 await this.port_sip_sdk.updateCall(id, true, true);
+                await this.port_sip_sdk.sendVideo(id, true);
               } catch (error) {
                 console.log("error enableVideo", error);
               }
@@ -95442,6 +95603,7 @@ class Port_Sip {
       postAcceptTransfer({ ...body, sessionId: this.main_id }).then((response) => {
         var _a2, _b, _c2;
         if ((_a2 = response == null ? void 0 : response.data) == null ? void 0 : _a2.success) {
+          this.updateVideoService.deleteAll();
           traceLog(
             "sip_Accept_Transfer success",
             {},
@@ -95746,7 +95908,7 @@ class Port_Sip {
     }
   }
   switchCaseSendMessageVideoCall(values) {
-    var _a2, _b, _c2, _d, _e2, _f, _g, _h, _i2;
+    var _a2, _b, _c2, _d, _e2, _f, _g, _h, _i2, _j;
     switch (values == null ? void 0 : values.type) {
       case "add_conf_res":
         const getDelegate = this.extJoinRooms.get((_a2 = values == null ? void 0 : values.payload) == null ? void 0 : _a2.uuid);
@@ -95804,6 +95966,10 @@ class Port_Sip {
           reason: values == null ? void 0 : values.reason,
           data: null
         });
+        break;
+      case TYPE_SEND_VIDEO:
+        const sessionId = this.getDataCallId((values == null ? void 0 : values.sessionId) || this.main_id);
+        (_j = this.port_sip_sdk) == null ? void 0 : _j.sendVideo(sessionId, true);
         break;
       default:
         return;
@@ -95959,6 +96125,10 @@ class Port_Sip {
     } catch (error) {
       console.log("checkLogPC", error);
     }
+  }
+  updateOverlayText(index, text) {
+    var _a2;
+    (_a2 = this.mediaPipeML) == null ? void 0 : _a2.updateOverlayText(text, index);
   }
 }
 const { fetchRestful, callApiNotAuth } = new AxiosExternal();
@@ -96258,50 +96428,6 @@ class AIAssistant {
         message: "",
         error
       });
-    }
-  }
-}
-class QueueService {
-  constructor(tenantId, userId) {
-    __publicField(this, "dataSourceQueue", []);
-    __publicField(this, "queueBySessionId", /* @__PURE__ */ new Map());
-    this.tenantId = tenantId;
-    this.userId = userId;
-    this.getAgentByQueue();
-  }
-  setQueueBySessionId(sessionId, queueExtension) {
-    this.queueBySessionId.set(
-      sessionId,
-      this.filterQueuesByExtension(queueExtension)
-    );
-  }
-  deleteQueueBySessionId(sessionId) {
-    this.queueBySessionId.delete(sessionId);
-  }
-  getQueueBySessionId(sessionId) {
-    return this.queueBySessionId.get(sessionId);
-  }
-  getDataSourceQueue() {
-    return this.dataSourceQueue;
-  }
-  filterQueuesByExtension(queue_extension) {
-    var _a2;
-    if (!((_a2 = this.dataSourceQueue) == null ? void 0 : _a2.length)) return void 0;
-    return this.dataSourceQueue.find(
-      (q2) => q2.queue_extension === queue_extension
-    );
-  }
-  async getAgentByQueue() {
-    var _a2, _b;
-    try {
-      const response = await getGroupsAgents({ tenantId: this.tenantId });
-      if ((_b = (_a2 = response.data) == null ? void 0 : _a2.data) == null ? void 0 : _b.length) {
-        this.dataSourceQueue = response.data.data;
-      } else {
-        this.dataSourceQueue = [];
-      }
-    } catch (error) {
-      this.dataSourceQueue = [];
     }
   }
 }
@@ -96653,40 +96779,25 @@ class Socket_SDK extends Port_Sip {
       this.answer(
         sessionId,
         (sessionId2, state, callId, dynamic = {}) => {
-          var _a3, _b2, _c3, _d2, _e3, _f2, _g2, _h2, _i3, _j2, _k2, _l2, _m, _n2, _o2, _p, _q, _r2, _s2, _t2;
+          var _a3, _b2, _c3, _d2, _e3, _f2, _g2, _h2, _i3, _j2, _k2;
           if (requests == null ? void 0 : requests.enableVideo) {
             this.startTranscriptIntegration(sessionId2);
-            const payload = {
-              answered: true,
-              isInternal: (record == null ? void 0 : record.dnis) === ((_b2 = (_a3 = this.info) == null ? void 0 : _a3.user) == null ? void 0 : _b2.extension) ? true : false,
-              agentInfo: {
-                agentId: (_d2 = (_c3 = this.info) == null ? void 0 : _c3.user) == null ? void 0 : _d2.id,
-                tenantId: (_f2 = (_e3 = this.info) == null ? void 0 : _e3.tenant) == null ? void 0 : _f2.id
-              },
-              ...dynamic || {}
-            };
-            (_i3 = this.port_sip_sdk) == null ? void 0 : _i3.sendMessage(
-              JSON.stringify({
-                sessionId: sessionId2,
-                extension: (_h2 = (_g2 = this.info) == null ? void 0 : _g2.user) == null ? void 0 : _h2.extension,
-                type: "call_state",
-                payload
-              }),
-              callId,
-              false
-            );
+            setTimeout(() => {
+              if (!this.updateVideoService.get(sessionId2))
+                this.updateVoiceToVideo(sessionId2, record == null ? void 0 : record.dnis, true, dynamic);
+            }, 4e3);
           }
           this.checkTabSession(sessionId2, state);
           const find = (this.msgs ?? []).find(
             (r2) => (r2 == null ? void 0 : r2.sessionId) === sessionId2
           );
-          (_r2 = this.socket) == null ? void 0 : _r2.emit(
+          (_i3 = this.socket) == null ? void 0 : _i3.emit(
             send_message,
             {
               rooms: [
-                `private_${(_k2 = (_j2 = this.info) == null ? void 0 : _j2.tenant) == null ? void 0 : _k2.id}_${(_m = (_l2 = this.info) == null ? void 0 : _l2.user) == null ? void 0 : _m.id}`
+                `private_${(_b2 = (_a3 = this.info) == null ? void 0 : _a3.tenant) == null ? void 0 : _b2.id}_${(_d2 = (_c3 = this.info) == null ? void 0 : _c3.user) == null ? void 0 : _d2.id}`
               ],
-              event: `private_platform_${(_o2 = (_n2 = this.info) == null ? void 0 : _n2.tenant) == null ? void 0 : _o2.id}_${(_q = (_p = this.info) == null ? void 0 : _p.user) == null ? void 0 : _q.id}`,
+              event: `private_platform_${(_f2 = (_e3 = this.info) == null ? void 0 : _e3.tenant) == null ? void 0 : _f2.id}_${(_h2 = (_g2 = this.info) == null ? void 0 : _g2.user) == null ? void 0 : _h2.id}`,
               data: {
                 platform: PlatformType.WEB,
                 sessionId: sessionId2
@@ -96695,7 +96806,7 @@ class Socket_SDK extends Port_Sip {
             () => {
             }
           );
-          ((_s2 = requests == null ? void 0 : requests.requestDelegate) == null ? void 0 : _s2.onAccept) && ((_t2 = requests == null ? void 0 : requests.requestDelegate) == null ? void 0 : _t2.onAccept(sessionId2, {
+          ((_j2 = requests == null ? void 0 : requests.requestDelegate) == null ? void 0 : _j2.onAccept) && ((_k2 = requests == null ? void 0 : requests.requestDelegate) == null ? void 0 : _k2.onAccept(sessionId2, {
             senderId: find == null ? void 0 : find.ani,
             applicationId: find == null ? void 0 : find.dnis,
             sessionId: find == null ? void 0 : find.sessionId,
@@ -96882,9 +96993,20 @@ class Socket_SDK extends Port_Sip {
       }
       if (message2.state === EVENT_ABLY_NAME.ANSWER_CALL) {
         if (message2 == null ? void 0 : message2.extraInfo) {
+          console.log("messa answer", message2);
           const { type } = this.parseExtraInfo((message2 == null ? void 0 : message2.extraInfo) ?? "");
           if (type === CALL_TYPE.VIDEO && message2.direction === DIRECTION.OUTBOUND) {
             this.startTranscriptIntegration(message2 == null ? void 0 : message2.sessionId);
+          }
+          if (type === CALL_TYPE.VIDEO && !this.updateVideoService.get(message2 == null ? void 0 : message2.sessionId)) {
+            setTimeout(() => {
+              this.updateVoiceToVideo(
+                message2 == null ? void 0 : message2.sessionId,
+                message2 == null ? void 0 : message2.dnis,
+                true,
+                {}
+              );
+            }, 1500);
           }
         }
         this.pushCallEventEmitter(CallEventType.CALL_ANSWERED, {
@@ -97179,6 +97301,7 @@ class Socket_SDK extends Port_Sip {
     if (message2.state === EVENT_ABLY_NAME.END_CALL) {
       (_B = this.queue_service) == null ? void 0 : _B.deleteQueueBySessionId(message2.sessionId);
       this.clearMainId(message2.sessionId ?? "");
+      this.updateVideoService.delete(message2 == null ? void 0 : message2.sessionId);
       if (SIP_SDK.sessionIds.includes(message2.sessionId)) {
         this.msgs = this.msgs.filter((i2) => i2.sessionId !== message2.sessionId);
         if (message2.sessionId === this.SesId) {
@@ -97360,6 +97483,43 @@ class Socket_SDK extends Port_Sip {
         data: [],
         error
       });
+    }
+  }
+  updateVoiceToVideo(sessionId, dnis, sendVideo = false, dynamic) {
+    var _a2, _b, _c2, _d, _e2, _f, _g, _h, _i2, _j, _k, _l, _m;
+    try {
+      if (!sessionId) throw new Error("session not found");
+      if (this.updateVideoService.get(sessionId))
+        throw new Error("Đang xử lý video");
+      const _id = this.getDataCallId(sessionId);
+      if (sendVideo) this.sendCamera(sessionId, true);
+      this.updateVideoService.set(sessionId);
+      const payload = {
+        answered: true,
+        isInternal: dnis === ((_b = (_a2 = this.info) == null ? void 0 : _a2.user) == null ? void 0 : _b.extension) ? true : false,
+        agentInfo: {
+          agentId: (_d = (_c2 = this.info) == null ? void 0 : _c2.user) == null ? void 0 : _d.id,
+          tenantId: (_f = (_e2 = this.info) == null ? void 0 : _e2.tenant) == null ? void 0 : _f.id
+        },
+        ...dynamic || {}
+      };
+      (_i2 = this.port_sip_sdk) == null ? void 0 : _i2.sendMessage(
+        JSON.stringify({
+          sessionId,
+          extension: (_h = (_g = this.info) == null ? void 0 : _g.user) == null ? void 0 : _h.extension,
+          type: "call_state",
+          payload
+        }),
+        _id,
+        false
+      );
+    } catch (error) {
+      traceLog(
+        "updateVoiceToVideo",
+        { sessionId, error: error == null ? void 0 : error.message },
+        { tenantId: (_k = (_j = this.info) == null ? void 0 : _j.tenant) == null ? void 0 : _k.id, agentId: (_m = (_l = this.info) == null ? void 0 : _l.user) == null ? void 0 : _m.id }
+      );
+      console.log("update call error", error);
     }
   }
 }
@@ -98885,6 +99045,10 @@ const _BubbleSDK = class _BubbleSDK {
       return (_i2 = this.socket) == null ? void 0 : _i2.blurBackground((_h = this.socket) == null ? void 0 : _h.main_id, imageId);
     }
   }
+  updateOverlayText_sdk(index, text) {
+    var _a2;
+    (_a2 = this.socket) == null ? void 0 : _a2.updateOverlayText(index, text);
+  }
   joinVideo_sdk(extension, delegate) {
     if (this.socket) {
       this.socket.addConfluenceVideo(extension, delegate);
@@ -99151,6 +99315,9 @@ class OmiSDK extends BubbleSDK {
   }
   switchVideo() {
     this.updateCall_sdk();
+  }
+  updateOverlayText(index, text) {
+    this.updateOverlayText_sdk(index, text);
   }
   sendBackgroundBlur(enable = false, imageId) {
     return this.sendBackgroundBlur_sdk(enable, imageId);
@@ -99515,7 +99682,6 @@ class GuestSwitchBoard {
   }) {
     __publicField(this, "port_sip_sdk");
     __publicField(this, "ext", "");
-    __publicField(this, "ext_agent", "");
     __publicField(this, "data", /* @__PURE__ */ new Map());
     __publicField(this, "mediaElement");
     __publicField(this, "usingFront", false);
@@ -99523,7 +99689,18 @@ class GuestSwitchBoard {
     __publicField(this, "iceReset", 0);
     __publicField(this, "socket_transcript", null);
     __publicField(this, "delegate");
+    __publicField(this, "mediaPipeML", null);
+    __publicField(this, "originalVideoTrack", null);
+    __publicField(this, "blurEnabled", false);
     this.count = 0;
+    if (config_video_call.enable_media_pipe) {
+      const model = MappingModel[config_video_call.model] || ModelBackground.selfie_segmentation;
+      if (model === ModelBackground.task_vision) {
+        this.mediaPipeML = new TaskVision();
+      } else {
+        this.mediaPipeML = new Mediapipe();
+      }
+    }
     this.connectSwitchboard({
       server,
       ext,
@@ -99719,7 +99896,7 @@ class GuestSwitchBoard {
           var _a2;
           console.log("onInviteConnected", id, hasVideo);
           const session2 = (_a2 = this.port_sip_sdk) == null ? void 0 : _a2.sessions.get(id);
-          if (!session2) return;
+          if (!(session2 == null ? void 0 : session2.session)) return;
           session2.session.stateChange.addListener((state) => {
             if (state === SessionState$2.Established) {
               console.log("✅ Call established (queue answered by agent)");
@@ -99730,7 +99907,7 @@ class GuestSwitchBoard {
           console.log("onRecvInfo", ext2, message2);
         },
         onInviteClosed: async (id) => {
-          var _a2;
+          var _a2, _b;
           const sessionId = this.getDataSessionId(id);
           this.deleteDataKey(id);
           this.releaseExtension(ext ?? "");
@@ -99738,6 +99915,7 @@ class GuestSwitchBoard {
           console.log("onInviteClosed", id);
           (_a2 = requestDelegate == null ? void 0 : requestDelegate.onHangup) == null ? void 0 : _a2.call(requestDelegate, sessionId, {});
           this.clearSessionStreams(id);
+          (_b = this.mediaPipeML) == null ? void 0 : _b.resetMediapipe();
         },
         onInviteUpdated: (id, existsAudio, existsVideo, existsScreen) => {
           console.log(
@@ -99784,7 +99962,6 @@ class GuestSwitchBoard {
                 );
                 await this.port_sip_sdk.updateCall(id, true, true);
                 await ((_e2 = this.port_sip_sdk) == null ? void 0 : _e2.sendVideo(id, true));
-                this.ext_agent = values == null ? void 0 : values.extension;
                 this.onTranscriptSocket(
                   ((_g = (_f = values == null ? void 0 : values.payload) == null ? void 0 : _f.agentInfo) == null ? void 0 : _g.agentId) ?? 0,
                   ((_i2 = (_h = values == null ? void 0 : values.payload) == null ? void 0 : _h.agentInfo) == null ? void 0 : _i2.tenantId) ?? 0,
@@ -99890,7 +100067,8 @@ class GuestSwitchBoard {
         pc2.onconnectionstatechange = () => {
           console.log("onconnectionstatechange");
           if (pc2.iceConnectionState === "disconnected") {
-            if (!this.iceReset) this.restartIce(pc2, session2.session);
+            if (!this.iceReset && (session2.session !== null || session2.session !== void 0))
+              this.restartIce(pc2, session2.session);
           }
         };
       }
@@ -99963,7 +100141,7 @@ class GuestSwitchBoard {
     return 0;
   }
   async hangupSDK() {
-    var _a2;
+    var _a2, _b;
     try {
       const callId = this.getSessionMain();
       await ((_a2 = this.port_sip_sdk) == null ? void 0 : _a2.hangUp(callId));
@@ -99971,6 +100149,7 @@ class GuestSwitchBoard {
       this.releaseExtension(this.ext ?? "");
       this.disconnectSwitchBoard_sdk();
       this.deleteDataKey(callId);
+      (_b = this.mediaPipeML) == null ? void 0 : _b.resetMediapipe();
       return Promise.resolve({ success: true, message: "hang up success" });
     } catch (error) {
       console.log("Hangup error:", error);
@@ -100124,7 +100303,7 @@ class GuestSwitchBoard {
     }
   }
   async blurBackground(enable = false) {
-    var _a2, _b, _c2, _d;
+    var _a2, _b, _c2, _d, _e2;
     const callId = this.getSessionMain();
     const localVideo = document.getElementById(
       ((_a2 = this.mediaElement) == null ? void 0 : _a2.localVideoID) ?? ""
@@ -100133,21 +100312,44 @@ class GuestSwitchBoard {
       const session2 = (_b = this.port_sip_sdk) == null ? void 0 : _b.sessions.get(callId);
       if (!session2) throw new Error("session does not exti");
       const pc2 = (_d = (_c2 = session2.session) == null ? void 0 : _c2.sessionDescriptionHandler) == null ? void 0 : _d.peerConnection;
-      const newTrack = localVideo.srcObject;
       session2.constraints.video = true;
       const sender = pc2.getSenders().find((sender2) => {
         var _a3;
         return ((_a3 = sender2.track) == null ? void 0 : _a3.kind) === "video";
       });
-      if (sender) {
-        if (enable && newTrack) {
-          await sender.replaceTrack(newTrack.getVideoTracks()[0]);
+      if (!sender) throw new Error("sender not found");
+      if (enable && this.mediaPipeML) {
+        this.blurEnabled = true;
+        if (!this.originalVideoTrack && sender.track) {
+          this.originalVideoTrack = sender.track;
+        }
+        this.mediaPipeML.start(0);
+        const canvas = document.getElementById(elIdCanvas$1);
+        const processedStream = canvas.captureStream(30);
+        const newTrack = processedStream.getVideoTracks()[0];
+        if (newTrack) {
+          if (localVideo) {
+            localVideo.srcObject = processedStream;
+            localVideo.play().catch((e2) => console.log("local play error", e2));
+          }
+          await sender.replaceTrack(newTrack);
+          console.log("✅ Replaced video track with blurred stream");
+        }
+      } else {
+        this.blurEnabled = false;
+        (_e2 = this.mediaPipeML) == null ? void 0 : _e2.resetMediapipe();
+        if (this.originalVideoTrack) {
+          await sender.replaceTrack(this.originalVideoTrack);
+          if (localVideo) {
+            localVideo.srcObject = new MediaStream([this.originalVideoTrack]);
+            localVideo.play().catch((e2) => console.log("local play error", e2));
+          }
+          this.originalVideoTrack = null;
         } else {
           const remoteLocalStream = localVideo.srcObject;
           const originalTrack = remoteLocalStream.getVideoTracks()[0];
           await (sender == null ? void 0 : sender.replaceTrack(originalTrack));
         }
-        console.log("✅ Replaced video track with blurred stream");
       }
     } catch (error) {
       console.log("error blurBackground", error);
@@ -100168,6 +100370,25 @@ class GuestSwitchBoard {
         }
       );
       if (videoDevices.length > 1) {
+        const newStream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: facingMode2,
+            height: { ideal: 1080 },
+            width: { ideal: 1920 }
+          }
+        });
+        this.usingFront = !this.usingFront;
+        if (this.blurEnabled && this.mediaPipeML) {
+          const newTrack2 = newStream.getVideoTracks()[0];
+          if (newTrack2) {
+            this.originalVideoTrack = newTrack2;
+          }
+          await this.mediaPipeML.switchSource(newStream);
+          return Promise.resolve({
+            success: true,
+            message: "switchCamera success (blur preserved)"
+          });
+        }
         const video = document.getElementById(
           ((_a2 = this.mediaElement) == null ? void 0 : _a2.localVideoID) ?? ""
         );
@@ -100182,15 +100403,7 @@ class GuestSwitchBoard {
         const session2 = (_b = this.port_sip_sdk) == null ? void 0 : _b.sessions.get(callId);
         if (!session2) throw new Error("session does not exist");
         const pc2 = (_d = (_c2 = session2.session) == null ? void 0 : _c2.sessionDescriptionHandler) == null ? void 0 : _d.peerConnection;
-        const newStream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: facingMode2,
-            height: { ideal: 1080 },
-            width: { ideal: 1920 }
-          }
-        });
         video.srcObject = newStream;
-        this.usingFront = !this.usingFront;
         const newTrack = newStream.getVideoTracks()[0];
         const sender = pc2.getSenders().find((s2) => {
           var _a3;
@@ -100631,6 +100844,7 @@ class GuestSwitchBoard {
       });
       const stats = await pc2.getStats();
       stats.forEach((r2) => {
+        console.log("log");
         if (r2.type === "candidate-pair" && r2.state === "succeeded") {
           console.log("SELECTED CANDIDATE PAIR", {
             state: r2.state,
@@ -100653,6 +100867,7 @@ class GuestSwitchBoard {
 }
 class GuestService extends GuestSocket {
   constructor(options) {
+    var _a2;
     super();
     __publicField(this, "instance", {
       base_url: "",
@@ -100678,6 +100893,15 @@ class GuestService extends GuestSocket {
     apiConfig.init({ base_url: options.baseUrl, api_key: options.apiKey });
     this.eventEmitter = new SimpleEventEmitter();
     this.sdkId = (options == null ? void 0 : options.sdkId) ?? "";
+    if ((options == null ? void 0 : options.enableMediapipe) !== void 0) {
+      config_video_call.enable_media_pipe = options.enableMediapipe;
+    }
+    if (options == null ? void 0 : options.model) {
+      config_video_call.model = options.model;
+    }
+    if ((_a2 = options == null ? void 0 : options.backgroundImages) == null ? void 0 : _a2.length) {
+      config_url_image.splice(0, config_url_image.length, ...options.backgroundImages);
+    }
   }
   /** 
     Listener event socket
@@ -100876,6 +101100,16 @@ class GuestService extends GuestSocket {
     var _a2;
     if (!this.sip) return this.notConnected();
     (_a2 = this.sip) == null ? void 0 : _a2.blurBackground(enable);
+  }
+  /**
+   * Thay đổi text overlay và vị trí trên khung hình MediaPipe/TaskVision.
+   * @param index - Vị trí của text trong danh sách overlay
+   * @param text - Nội dung text mới
+   * @param position - Vị trí hiển thị (x, y) trên canvas
+   */
+  setOverlayText(index, text, position) {
+    var _a2, _b;
+    (_b = (_a2 = this.sip) == null ? void 0 : _a2.mediaPipeML) == null ? void 0 : _b.setOverlayText(index, text, position);
   }
   switchCamera(facingMode2) {
     var _a2;
