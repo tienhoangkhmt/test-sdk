@@ -90030,6 +90030,11 @@ class Mediapipe {
         this.animationId = requestAnimationFrame(() => requestAnimationFrame(this.loop));
         return;
       }
+      const canvas = document.getElementById(elIdCanvas$1);
+      if (canvas && (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight)) {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+      }
       this.animationId = requestAnimationFrame(() => requestAnimationFrame(this.loop));
       if (this.sending) return;
       this.sending = true;
@@ -90167,7 +90172,6 @@ class Mediapipe {
         if (c2) {
           c2.width = video.videoWidth || 640;
           c2.height = video.videoHeight || 480;
-          c2.height = 480;
         }
         this.loop();
       }
@@ -90237,7 +90241,7 @@ class Mediapipe {
   }
   async sendBackgroundBlur({ mode = ModeBlur.none, imageId = 0 }, callback) {
     const getBgImage = this.mapImages.get(imageId);
-    if (ModeBlur.image) {
+    if (mode === ModeBlur.image) {
       if (!imageId || !getBgImage) {
         mode = ModeBlur.blur;
       }
@@ -93952,6 +93956,11 @@ class TaskVision {
         this.animationId = requestAnimationFrame(() => requestAnimationFrame(this.loop));
         return;
       }
+      const guardCanvas = document.getElementById(elIdCanvas);
+      if (guardCanvas && (guardCanvas.width !== video.videoWidth || guardCanvas.height !== video.videoHeight)) {
+        guardCanvas.width = video.videoWidth;
+        guardCanvas.height = video.videoHeight;
+      }
       this.animationId = requestAnimationFrame(() => requestAnimationFrame(this.loop));
       if (this.sending) return;
       this.sending = true;
@@ -93983,7 +93992,9 @@ class TaskVision {
             break;
           }
           case ModeBlur.blur:
-            this.drawBlurBackground(ctx, maskCanvas, video, canvas);
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            ctx.globalCompositeOperation = "destination-over";
+            ctx.filter = "none";
             break;
           case ModeBlur.none:
           default:
@@ -93992,6 +94003,20 @@ class TaskVision {
         }
         ctx.globalCompositeOperation = "source-over";
         ctx.filter = "none";
+        ctx.font = "20px Arial";
+        ctx.fillStyle = "white";
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = 3;
+        this.overlayText.forEach((item) => {
+          const text = item.text;
+          const position = item.position;
+          const textMetrics = ctx.measureText(text);
+          const textWidth = textMetrics.width;
+          const x2 = (position == null ? void 0 : position.x) || (canvas.width - textWidth) / 2;
+          const y2 = (position == null ? void 0 : position.y) || 20;
+          ctx.strokeText(text, x2, y2);
+          ctx.fillText(text, x2, y2);
+        });
         (_a2 = result.categoryMask) == null ? void 0 : _a2.close();
       } catch (error) {
         console.error("Processing error:", error);
@@ -94236,7 +94261,7 @@ class TaskVision {
   }
   async sendBackgroundBlur({ mode = ModeBlur.none, imageId = 0 }, callback) {
     const getBgImage = this.mapImages.get(imageId);
-    if (ModeBlur.image) {
+    if (mode === ModeBlur.image) {
       if (!imageId || !getBgImage) {
         mode = ModeBlur.blur;
       }
