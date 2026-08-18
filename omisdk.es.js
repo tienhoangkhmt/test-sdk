@@ -90031,7 +90031,11 @@ class Mediapipe {
         this.animationId = requestAnimationFrame(this.loop);
         return;
       }
-      await this.segmenter.send({ image: video });
+      try {
+        await this.segmenter.send({ image: video });
+      } catch (error) {
+        console.error("Mediapipe send error:", error);
+      }
       this.animationId = requestAnimationFrame(this.loop);
     });
     this.createElement();

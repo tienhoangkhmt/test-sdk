@@ -969,6 +969,33 @@
               Đổi text overlay
             </button>
 
+            <!-- Overlay text input (non-blocking, mobile-safe) -->
+            <div
+              id="overlayTextInput"
+              style="
+                display: none;
+                align-items: center;
+                gap: 8px;
+                margin-top: 10px;
+              "
+            >
+              <input
+                type="text"
+                id="overlayInput"
+                placeholder="Nhập text overlay..."
+                style="
+                  flex: 1;
+                  padding: 8px 12px;
+                  border: 1px solid var(--border-color);
+                  border-radius: 6px;
+                  font-size: 14px;
+                "
+              />
+              <button class="btn-call btn-primary" id="overlaySaveBtn">
+                Lưu
+              </button>
+            </div>
+
             <button class="btn-call btn-primary" id="kt">kiểm tra</button>
 
             <div
@@ -1130,6 +1157,14 @@
         hangupBtn.addEventListener("click", handleHangup);
         blurToggleBtn.addEventListener("click", handleBlurToggle);
         overlayTextBtn.addEventListener("click", handleChangeOverlayText);
+        document
+          .getElementById("overlaySaveBtn")
+          .addEventListener("click", handleSaveOverlayText);
+        document
+          .getElementById("overlayInput")
+          .addEventListener("keydown", (e) => {
+            if (e.key === "Enter") handleSaveOverlayText();
+          });
         document.getElementById("kt").addEventListener("click", () => {
           guest.kt();
         });
@@ -1395,16 +1430,30 @@
           notyf.error("Chưa có cuộc gọi nào!");
           return;
         }
-        const newText = prompt("Nhập text overlay:", overlayText || "");
-        if (newText === null) return;
-        overlayText = newText;
-        if (overlayText) {
-          guest.setOverlayText(0, overlayText);
+        const inputDiv = document.getElementById("overlayTextInput");
+        const input = document.getElementById("overlayInput");
+        if (inputDiv.style.display === "none") {
+          inputDiv.style.display = "flex";
+          input.value = overlayText || "";
+          input.focus();
+        } else {
+          inputDiv.style.display = "none";
+        }
+      }
+
+      function handleSaveOverlayText() {
+        if (!guest) return;
+        const input = document.getElementById("overlayInput");
+        const text = input.value.trim();
+        overlayText = text;
+        if (text) {
+          guest.setOverlayText(0, text);
           notyf.success("Đã đặt text overlay");
         } else {
           guest.clearOverlayText();
           notyf.success("Đã xóa text overlay");
         }
+        document.getElementById("overlayTextInput").style.display = "none";
       }
 
       function handleHangup() {
