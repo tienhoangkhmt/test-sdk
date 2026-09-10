@@ -56,6 +56,7 @@ var InteractionEventType$1 = /* @__PURE__ */ ((InteractionEventType2) => {
   InteractionEventType2["MESSAGE_DELIVERED"] = "message_delivered";
   InteractionEventType2["MESSAGE_READ"] = "message_read";
   InteractionEventType2["CONVERSATION_ENDED"] = "conversation_ended";
+  InteractionEventType2["MESSAGE_SDK"] = "message_sdk";
   return InteractionEventType2;
 })(InteractionEventType$1 || {});
 var ModeBlur = /* @__PURE__ */ ((ModeBlur2) => {
@@ -2678,18 +2679,14 @@ function requireReact_development() {
   })(react_development, react_development.exports);
   return react_development.exports;
 }
-var hasRequiredReact;
-function requireReact() {
-  if (hasRequiredReact) return react.exports;
-  hasRequiredReact = 1;
-  var define_process_env_default2 = {};
-  if (define_process_env_default2.NODE_ENV === "production") {
-    react.exports = requireReact_production_min();
-  } else {
-    react.exports = requireReact_development();
-  }
-  return react.exports;
+var define_process_env_default$g = {};
+if (define_process_env_default$g.NODE_ENV === "production") {
+  react.exports = requireReact_production_min();
+} else {
+  react.exports = requireReact_development();
 }
+var reactExports = react.exports;
+const React__default$1 = /* @__PURE__ */ getDefaultExportFromCjs(reactExports);
 /**
  * @license React
  * react-jsx-runtime.production.min.js
@@ -2703,7 +2700,7 @@ var hasRequiredReactJsxRuntime_production_min;
 function requireReactJsxRuntime_production_min() {
   if (hasRequiredReactJsxRuntime_production_min) return reactJsxRuntime_production_min;
   hasRequiredReactJsxRuntime_production_min = 1;
-  var f2 = requireReact(), k2 = Symbol.for("react.element"), l2 = Symbol.for("react.fragment"), m2 = Object.prototype.hasOwnProperty, n2 = f2.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactCurrentOwner, p2 = { key: true, ref: true, __self: true, __source: true };
+  var f2 = reactExports, k2 = Symbol.for("react.element"), l2 = Symbol.for("react.fragment"), m2 = Object.prototype.hasOwnProperty, n2 = f2.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactCurrentOwner, p2 = { key: true, ref: true, __self: true, __source: true };
   function q2(c2, a2, g2) {
     var b2, d2 = {}, e2 = null, h2 = null;
     void 0 !== g2 && (e2 = "" + g2);
@@ -2735,7 +2732,7 @@ function requireReactJsxRuntime_development() {
    */
   if (define_process_env_default2.NODE_ENV !== "production") {
     (function() {
-      var React2 = requireReact();
+      var React2 = reactExports;
       var REACT_ELEMENT_TYPE = Symbol.for("react.element");
       var REACT_PORTAL_TYPE = Symbol.for("react.portal");
       var REACT_FRAGMENT_TYPE = Symbol.for("react.fragment");
@@ -4337,7 +4334,7 @@ var hasRequiredReactDom_production_min;
 function requireReactDom_production_min() {
   if (hasRequiredReactDom_production_min) return reactDom_production_min;
   hasRequiredReactDom_production_min = 1;
-  var aa2 = requireReact(), ca2 = requireScheduler();
+  var aa2 = reactExports, ca2 = requireScheduler();
   function p2(a2) {
     for (var b2 = "https://reactjs.org/docs/error-decoder.html?invariant=" + a2, c2 = 1; c2 < arguments.length; c2++) b2 += "&args[]=" + encodeURIComponent(arguments[c2]);
     return "Minified React error #" + a2 + "; visit " + b2 + " for the full message or use the non-minified dev environment for full errors and additional helpful warnings.";
@@ -10756,7 +10753,7 @@ function requireReactDom_development() {
       if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ !== "undefined" && typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart === "function") {
         __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(new Error());
       }
-      var React2 = requireReact();
+      var React2 = reactExports;
       var Scheduler = requireScheduler();
       var ReactSharedInternals = React2.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
       var suppressWarning = false;
@@ -31891,8 +31888,6 @@ if (define_process_env_default$d.NODE_ENV === "production") {
     }
   };
 }
-var reactExports = requireReact();
-const React__default$1 = /* @__PURE__ */ getDefaultExportFromCjs(reactExports);
 var lib = {};
 var uaParser_min = { exports: {} };
 (function(module, exports) {
@@ -32089,7 +32084,7 @@ Object.defineProperty(lib, "__esModule", { value: true });
 function _interopDefault(ex) {
   return ex && typeof ex === "object" && "default" in ex ? ex["default"] : ex;
 }
-var React = requireReact();
+var React = reactExports;
 var React__default = _interopDefault(React);
 var UAParser = uaParser_minExports;
 var ClientUAInstance = new UAParser();
@@ -33114,6 +33109,7 @@ var InteractionEventType = /* @__PURE__ */ ((InteractionEventType2) => {
   InteractionEventType2["MESSAGE_DELIVERED"] = "message_delivered";
   InteractionEventType2["MESSAGE_READ"] = "message_read";
   InteractionEventType2["CONVERSATION_ENDED"] = "conversation_ended";
+  InteractionEventType2["MESSAGE_SDK"] = "message_sdk";
   return InteractionEventType2;
 })(InteractionEventType || {});
 var USER_ACTION = /* @__PURE__ */ ((USER_ACTION2) => {
@@ -33300,12 +33296,16 @@ const CALL_TYPE = {
   VOICE: "VOICE"
 };
 const CAPTURE_SNAPSHOT = "CAPTURE_SNAPSHOT";
-const MESSAGE_SDK = "MESSAGE_SDK";
 const CAPTURE_SNAPSHOT_RESPONSE = {
   SUCCESS: "SUCCESS_CAPTURE_SNAPSHOT",
   ERROR: "ERROR_CAPTURE_SNAPSHOT"
 };
-const TYPE_SEND_VIDEO = "TYPE_SEND_VIDEO";
+const TYPE_MESAGE = {
+  TYPE_INFO: "TYPE_INFO",
+  TYPE_SEND_VIDEO: "TYPE_SEND_VIDEO",
+  MESSAGE_SDK: "MESSAGE_SDK",
+  SEND_BLACKGROUND: "SEND_BLACKGROUND"
+};
 const SCREEN_RESOLUTION = /* @__PURE__ */ new Map([
   [
     "SD",
@@ -35515,7 +35515,7 @@ var hasRequiredUseSyncExternalStoreWithSelector_production;
 function requireUseSyncExternalStoreWithSelector_production() {
   if (hasRequiredUseSyncExternalStoreWithSelector_production) return useSyncExternalStoreWithSelector_production;
   hasRequiredUseSyncExternalStoreWithSelector_production = 1;
-  var React2 = requireReact();
+  var React2 = reactExports;
   function is2(x2, y2) {
     return x2 === y2 && (0 !== x2 || 1 / x2 === 1 / y2) || x2 !== x2 && y2 !== y2;
   }
@@ -35593,7 +35593,7 @@ function requireUseSyncExternalStoreWithSelector_development() {
       return x2 === y2 && (0 !== x2 || 1 / x2 === 1 / y2) || x2 !== x2 && y2 !== y2;
     }
     "undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ && "function" === typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart && __REACT_DEVTOOLS_GLOBAL_HOOK__.registerInternalModuleStart(Error());
-    var React2 = requireReact(), objectIs = "function" === typeof Object.is ? Object.is : is2, useSyncExternalStore = React2.useSyncExternalStore, useRef = React2.useRef, useEffect = React2.useEffect, useMemo = React2.useMemo, useDebugValue = React2.useDebugValue;
+    var React2 = reactExports, objectIs = "function" === typeof Object.is ? Object.is : is2, useSyncExternalStore = React2.useSyncExternalStore, useRef = React2.useRef, useEffect = React2.useEffect, useMemo = React2.useMemo, useDebugValue = React2.useDebugValue;
     useSyncExternalStoreWithSelector_development.useSyncExternalStoreWithSelector = function(subscribe, getSnapshot, getServerSnapshot, selector, isEqual) {
       var instRef = useRef(null);
       if (null === instRef.current) {
@@ -85916,7 +85916,11 @@ class PortSipSdk {
       id: e3,
       isPlaying: false,
       sessionID: 0
-    })), this.remoteVideoID = "string" == typeof t2.remoteVideoID ? t2.remoteVideoID : t2.remoteVideoID ? t2.remoteVideoID.map((e3) => ({ id: e3, isPlaying: false, sessionID: 0 })) : t2.remoteVideoID, this.remoteScreenID = t2.remoteScreenID, this.localVideoID = t2.localVideoID;
+    })), this.remoteVideoID = "string" == typeof t2.remoteVideoID ? t2.remoteVideoID : t2.remoteVideoID ? t2.remoteVideoID.map((e3) => ({
+      id: e3,
+      isPlaying: false,
+      sessionID: 0
+    })) : t2.remoteVideoID, this.remoteScreenID = t2.remoteScreenID, this.localVideoID = t2.localVideoID;
   }
   async createUserAgent(e2, t2, s2, i2, o2 = "", n2 = "", r2, a2 = false, d2 = 300, c2 = "") {
     try {
@@ -86191,7 +86195,11 @@ class PortSipSdk {
               }), s3;
             };
             this.setElementSrc(e4, t3(), n2), __classPrivateFieldGet(this, _PortSipSdk_audioOutput, "f") && (null == e4 || e4.setSinkId(
-              __classPrivateFieldGet(this, _PortSipSdk_audioOutput, "f")
+              __classPrivateFieldGet(
+                this,
+                _PortSipSdk_audioOutput,
+                "f"
+              )
             ).catch((e5) => console.error(e5))), v2 = false;
           }
           180 === e3.message.statusCode && this.event.onInviteRinging(n2);
@@ -86463,7 +86471,7 @@ class PortSipSdk {
       }
     }).catch((e3) => (this.event.onACTVTransferFailure(t2), e3)) : (this.event.onACTVTransferFailure(t2), Promise.reject("refer target not established.")) : Promise.reject("refer target not a Session.");
   }
-  updateCall(e2, t2, s2) {
+  updateCall(e2, t2, s2, callback) {
     var i2, o2, n2, r2, a2;
     const d2 = this.sessions.get(e2);
     if (!d2) return Promise.reject("session not exist");
@@ -86498,6 +86506,7 @@ class PortSipSdk {
             this.setSessionMediaProperty(e2, t4.message.body);
             try {
               this.setupLocalMedia(e2), this.setupRemoteMedia(e2);
+              callback && callback();
             } catch (e3) {
               console.error(e3);
             }
@@ -86545,6 +86554,7 @@ class PortSipSdk {
             this.setSessionMediaProperty(e2, t4.message.body);
             try {
               this.setupRemoteMedia(e2);
+              callback && callback();
             } catch (e3) {
               console.warn(e3);
             }
@@ -90025,6 +90035,8 @@ class Mediapipe {
     // `dist/mediapipe/` assets folder. When unset, MediaPipe falls back to CDN.
     __publicField(this, "mapImages", /* @__PURE__ */ new Map());
     __publicField(this, "overlayText", /* @__PURE__ */ new Map());
+    __publicField(this, "overlayTextInterval", null);
+    __publicField(this, "locationWatchId", null);
     __publicField(this, "loop", async () => {
       if (!this.running) return;
       const video = document.getElementById(elIdVideoInput$1);
@@ -90055,16 +90067,13 @@ class Mediapipe {
     this.createElement();
     this.initMediapipe({ mediapipeBasePath: "" });
     this.createImage();
-    this.setDefaultOverlayText([
-      { text: "Welcome to OmiSDK", position: { x: 50, y: 50 } },
-      { text: "Powered by MediaPipe", position: { x: 100, y: 100 } }
-    ]);
   }
-  setOverlayText(index, text, position) {
+  setOverlayText(index, text, position, align) {
     const current2 = this.overlayText.get(index);
     this.overlayText.set(index, {
       text,
-      position: position ?? (current2 == null ? void 0 : current2.position)
+      position: position ?? (current2 == null ? void 0 : current2.position),
+      align: align ?? (current2 == null ? void 0 : current2.align)
     });
   }
   updateOverlayText(text, index) {
@@ -90088,6 +90097,54 @@ class Mediapipe {
   // Xóa toàn bộ text overlay
   clearOverlayText() {
     this.overlayText.clear();
+  }
+  // Đồng hồ overlay — thời gian (index 0) mỗi giây, ghép location nếu có
+  startOverlayTextTimer() {
+    if (this.overlayTextInterval) return;
+    this.overlayTextInterval = setInterval(() => {
+      const now = /* @__PURE__ */ new Date();
+      const pad = (n2) => String(n2).padStart(2, "0");
+      const timeString = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())} ${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()}`;
+      this.setOverlayText(0, timeString, void 0, "bottom-right");
+    }, 1e3);
+  }
+  // Location overlay (index 1) — watchPosition tự push khi vị trí đổi
+  startLocationTimer() {
+    if (this.locationWatchId !== null || !navigator.geolocation) return;
+    this.locationWatchId = navigator.geolocation.watchPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        const locationString = `📍 ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+        this.setOverlayText(1, locationString, void 0, "bottom-right");
+      },
+      (error) => console.log("Location watch error:", error),
+      {
+        enableHighAccuracy: false,
+        timeout: 1e4,
+        maximumAge: 5e3
+      }
+    );
+  }
+  // Text tùy chỉnh ở góc dưới bên trái (index 9 — không đụng slot thời gian/location)
+  setBottomLeftText(text) {
+    if (!text) {
+      this.overlayText.delete(9);
+      return;
+    }
+    this.setOverlayText(9, text, void 0, "bottom-left");
+  }
+  stopOverlayTextTimer() {
+    if (this.overlayTextInterval) {
+      clearInterval(this.overlayTextInterval);
+      this.overlayTextInterval = null;
+    }
+    if (this.locationWatchId !== null) {
+      navigator.geolocation.clearWatch(this.locationWatchId);
+      this.locationWatchId = null;
+    }
+    this.overlayText.delete(0);
+    this.overlayText.delete(1);
+    this.overlayText.delete(9);
   }
   async createImage(data = config_url_image) {
     if (!(data == null ? void 0 : data.length)) return;
@@ -90116,7 +90173,10 @@ class Mediapipe {
     createCanvas.id = elIdCanvas$1;
     createCanvas.width = SCREEN_RESOLUTION.get("FULL_HD").width.ideal;
     createCanvas.height = SCREEN_RESOLUTION.get("FULL_HD").height.ideal;
-    createCanvas.style.display = "none";
+    createCanvas.style.position = "absolute";
+    createCanvas.style.top = "-9999px";
+    createCanvas.style.left = "-9999px";
+    createCanvas.style.pointerEvents = "none";
     createInputVideo.style.display = "none";
     createInputVideo.width = SCREEN_RESOLUTION.get("FULL_HD").width.ideal;
     createInputVideo.height = SCREEN_RESOLUTION.get("FULL_HD").height.ideal;
@@ -90154,6 +90214,8 @@ class Mediapipe {
   async start(imageId, stream) {
     this.imageId = imageId;
     this.running = true;
+    this.startOverlayTextTimer();
+    this.startLocationTimer();
     const video = document.getElementById(elIdVideoInput$1);
     let canvas = document.getElementById(elIdCanvas$1);
     if (!canvas) {
@@ -90161,7 +90223,10 @@ class Mediapipe {
       canvas.id = elIdCanvas$1;
       canvas.width = SCREEN_RESOLUTION.get("FULL_HD").width.ideal;
       canvas.height = SCREEN_RESOLUTION.get("FULL_HD").height.ideal;
-      canvas.style.display = "none";
+      canvas.style.position = "absolute";
+      canvas.style.top = "-9999px";
+      canvas.style.left = "-9999px";
+      canvas.style.pointerEvents = "none";
       document.body.appendChild(canvas);
     }
     this.sendBackgroundBlur({
@@ -90191,8 +90256,8 @@ class Mediapipe {
     video.onloadedmetadata = () => {
       const c2 = document.getElementById(elIdCanvas$1);
       if (c2) {
-        c2.width = video.videoWidth || 640;
-        c2.height = video.videoHeight || 480;
+        c2.width = video.videoWidth;
+        c2.height = video.videoHeight;
       }
       video.play();
       this.loop();
@@ -90220,12 +90285,13 @@ class Mediapipe {
     });
     const canvas = document.getElementById(elIdCanvas$1);
     if (canvas) {
-      canvas.width = video.videoWidth || 640;
-      canvas.height = video.videoHeight || 480;
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
     }
     await video.play().catch((e2) => console.log("play error", e2));
   }
   async resetMediapipe() {
+    this.stopOverlayTextTimer();
     this.running = false;
     this.sending = false;
     this.segmenter.reset();
@@ -90265,19 +90331,9 @@ class Mediapipe {
       this.mode = mode;
       switch (mode) {
         case ModeBlur.blur:
-          ctx.drawImage(
-            results.segmentationMask,
-            0,
-            0,
-            canvas.width,
-            canvas.height
-          );
-          ctx.globalCompositeOperation = "source-out";
-          ctx.filter = "blur(12px)";
           ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
           ctx.globalCompositeOperation = "destination-over";
           ctx.filter = "none";
-          ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
           break;
         case ModeBlur.image:
           ctx.drawImage(
@@ -90301,17 +90357,51 @@ class Mediapipe {
       }
       ctx.globalCompositeOperation = "source-over";
       ctx.filter = "none";
-      ctx.font = "20px Arial";
+      ctx.font = "bold 24px Arial";
       ctx.fillStyle = "white";
       ctx.strokeStyle = "black";
       ctx.lineWidth = 3;
+      const OVERLAY_PADDING = 20;
+      const OVERLAY_LINE_HEIGHT = 32;
+      const alignCounts = /* @__PURE__ */ new Map();
+      this.overlayText.forEach((item) => {
+        if (item.align) {
+          alignCounts.set(item.align, (alignCounts.get(item.align) ?? 0) + 1);
+        }
+      });
+      const alignSlots = /* @__PURE__ */ new Map();
       this.overlayText.forEach((item) => {
         const text = item.text;
         const position = item.position;
         const textMetrics = ctx.measureText(text);
         const textWidth = textMetrics.width;
-        const x2 = (position == null ? void 0 : position.x) || (canvas.width - textWidth) / 2;
-        const y2 = (position == null ? void 0 : position.y) || 20;
+        let x2 = (position == null ? void 0 : position.x) || (canvas.width - textWidth) / 2;
+        let y2 = (position == null ? void 0 : position.y) || 20;
+        switch (item.align) {
+          case "top-left":
+            x2 = OVERLAY_PADDING;
+            y2 = OVERLAY_PADDING;
+            break;
+          case "top-right":
+            x2 = canvas.width - textWidth - OVERLAY_PADDING;
+            y2 = OVERLAY_PADDING;
+            break;
+          case "bottom-left":
+            x2 = OVERLAY_PADDING;
+            y2 = canvas.height - OVERLAY_PADDING;
+            break;
+          case "bottom-right":
+            x2 = canvas.width - textWidth - OVERLAY_PADDING;
+            y2 = canvas.height - OVERLAY_PADDING;
+            break;
+        }
+        if (item.align) {
+          const slot = alignSlots.get(item.align) ?? 0;
+          alignSlots.set(item.align, slot + 1);
+          const total = alignCounts.get(item.align) ?? 1;
+          const offset = (total - 1 - slot) * OVERLAY_LINE_HEIGHT;
+          y2 -= offset;
+        }
         ctx.strokeText(text, x2, y2);
         ctx.fillText(text, x2, y2);
       });
@@ -93947,6 +94037,8 @@ class TaskVision {
     __publicField(this, "wasmFileset");
     __publicField(this, "initPromise");
     __publicField(this, "overlayText", /* @__PURE__ */ new Map());
+    __publicField(this, "overlayTextInterval", null);
+    __publicField(this, "locationWatchId", null);
     // true khi tự getUserMedia — chỉ khi này mới được stop track khi reset
     __publicField(this, "ownsStream", false);
     // Guard chống chồng frame khi xử lý chậm hơn rAF
@@ -93990,7 +94082,7 @@ class TaskVision {
           case ModeBlur.image: {
             const getBgImage = this.mapImages.get(this.imageId);
             if (!getBgImage) {
-              this.drawBlurBackground(ctx, maskCanvas, video, canvas);
+              this.drawBlurBackground(ctx, video, canvas);
               break;
             }
             ctx.drawImage(maskCanvas, 0, 0, canvas.width, canvas.height);
@@ -94001,7 +94093,9 @@ class TaskVision {
             break;
           }
           case ModeBlur.blur:
-            this.drawBlurBackground(ctx, maskCanvas, video, canvas);
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            ctx.globalCompositeOperation = "destination-over";
+            ctx.filter = "none";
             break;
           case ModeBlur.none:
           default:
@@ -94010,17 +94104,51 @@ class TaskVision {
         }
         ctx.globalCompositeOperation = "source-over";
         ctx.filter = "none";
-        ctx.font = "20px Arial";
+        ctx.font = "bold 24px Arial";
         ctx.fillStyle = "white";
         ctx.strokeStyle = "black";
         ctx.lineWidth = 3;
+        const OVERLAY_PADDING = 20;
+        const OVERLAY_LINE_HEIGHT = 32;
+        const alignCounts = /* @__PURE__ */ new Map();
+        this.overlayText.forEach((item) => {
+          if (item.align) {
+            alignCounts.set(item.align, (alignCounts.get(item.align) ?? 0) + 1);
+          }
+        });
+        const alignSlots = /* @__PURE__ */ new Map();
         this.overlayText.forEach((item) => {
           const text = item.text;
           const position = item.position;
           const textMetrics = ctx.measureText(text);
           const textWidth = textMetrics.width;
-          const x2 = (position == null ? void 0 : position.x) || (canvas.width - textWidth) / 2;
-          const y2 = (position == null ? void 0 : position.y) || 20;
+          let x2 = (position == null ? void 0 : position.x) || (canvas.width - textWidth) / 2;
+          let y2 = (position == null ? void 0 : position.y) || 20;
+          switch (item.align) {
+            case "top-left":
+              x2 = OVERLAY_PADDING;
+              y2 = OVERLAY_PADDING;
+              break;
+            case "top-right":
+              x2 = canvas.width - textWidth - OVERLAY_PADDING;
+              y2 = OVERLAY_PADDING;
+              break;
+            case "bottom-left":
+              x2 = OVERLAY_PADDING;
+              y2 = canvas.height - OVERLAY_PADDING;
+              break;
+            case "bottom-right":
+              x2 = canvas.width - textWidth - OVERLAY_PADDING;
+              y2 = canvas.height - OVERLAY_PADDING;
+              break;
+          }
+          if (item.align) {
+            const slot = alignSlots.get(item.align) ?? 0;
+            alignSlots.set(item.align, slot + 1);
+            const total = alignCounts.get(item.align) ?? 1;
+            const offset = (total - 1 - slot) * OVERLAY_LINE_HEIGHT;
+            y2 -= offset;
+          }
           ctx.strokeText(text, x2, y2);
           ctx.fillText(text, x2, y2);
         });
@@ -94035,13 +94163,17 @@ class TaskVision {
     this.initPromise = this.initMediapipe({ mediapipeBasePath: "" });
     this.createImage();
     this.setDefaultOverlayText([
-      { text: "Welcome to OmiSDK", position: { x: 50, y: 50 } },
-      { text: "Powered by MediaPipe", position: { x: 100, y: 100 } }
+      { text: "", position: { x: 50, y: 50 } },
+      { text: "", position: { x: 100, y: 100 } }
     ]);
   }
-  setOverlayText(index, text, position) {
+  setOverlayText(index, text, position, align) {
     const current2 = this.overlayText.get(index);
-    this.overlayText.set(index, { text, position: position ?? (current2 == null ? void 0 : current2.position) });
+    this.overlayText.set(index, {
+      text,
+      position: position ?? (current2 == null ? void 0 : current2.position),
+      align: align ?? (current2 == null ? void 0 : current2.align)
+    });
   }
   updateOverlayText(text, index) {
     if (this.overlayText.has(index)) {
@@ -94064,6 +94196,54 @@ class TaskVision {
   // Xóa toàn bộ text overlay
   clearOverlayText() {
     this.overlayText.clear();
+  }
+  // Đồng hồ overlay — thời gian (index 0) mỗi giây
+  startOverlayTextTimer() {
+    if (this.overlayTextInterval) return;
+    this.overlayTextInterval = setInterval(() => {
+      const now = /* @__PURE__ */ new Date();
+      const pad = (n2) => String(n2).padStart(2, "0");
+      const timeString = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())} ${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()}`;
+      this.setOverlayText(0, timeString, void 0, "bottom-right");
+    }, 1e3);
+  }
+  // Location overlay (index 1) — watchPosition tự push khi vị trí đổi
+  startLocationTimer() {
+    if (this.locationWatchId !== null || !navigator.geolocation) return;
+    this.locationWatchId = navigator.geolocation.watchPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        const locationString = `📍 ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+        this.setOverlayText(1, locationString, void 0, "bottom-right");
+      },
+      (error) => console.log("Location watch error:", error),
+      {
+        enableHighAccuracy: false,
+        timeout: 1e4,
+        maximumAge: 5e3
+      }
+    );
+  }
+  // Text tùy chỉnh ở góc dưới bên trái (index 9 — không đụng slot thời gian/location)
+  setBottomLeftText(text) {
+    if (!text) {
+      this.overlayText.delete(9);
+      return;
+    }
+    this.setOverlayText(9, text, void 0, "bottom-left");
+  }
+  stopOverlayTextTimer() {
+    if (this.overlayTextInterval) {
+      clearInterval(this.overlayTextInterval);
+      this.overlayTextInterval = null;
+    }
+    if (this.locationWatchId !== null) {
+      navigator.geolocation.clearWatch(this.locationWatchId);
+      this.locationWatchId = null;
+    }
+    this.overlayText.delete(0);
+    this.overlayText.delete(1);
+    this.overlayText.delete(9);
   }
   async createImage(data = config_url_image) {
     if (!(data == null ? void 0 : data.length)) return;
@@ -94092,7 +94272,10 @@ class TaskVision {
     createCanvas.id = elIdCanvas;
     createCanvas.width = SCREEN_RESOLUTION.get("FULL_HD").width.ideal;
     createCanvas.height = SCREEN_RESOLUTION.get("FULL_HD").height.ideal;
-    createCanvas.style.display = "none";
+    createCanvas.style.position = "absolute";
+    createCanvas.style.top = "-9999px";
+    createCanvas.style.left = "-9999px";
+    createCanvas.style.pointerEvents = "none";
     createInputVideo.style.display = "none";
     createInputVideo.width = SCREEN_RESOLUTION.get("FULL_HD").width.ideal;
     createInputVideo.height = SCREEN_RESOLUTION.get("FULL_HD").height.ideal;
@@ -94138,13 +94321,9 @@ class TaskVision {
     }
   }
   // Vẽ person lên trên, background blur phía sau.
-  drawBlurBackground(ctx, maskCanvas, video, canvas) {
-    ctx.drawImage(maskCanvas, 0, 0, canvas.width, canvas.height);
-    ctx.globalCompositeOperation = "source-in";
+  drawBlurBackground(ctx, video, canvas) {
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
     ctx.globalCompositeOperation = "destination-over";
-    ctx.filter = "blur(12px)";
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
     ctx.filter = "none";
   }
   // Build a person mask from the category mask.
@@ -94175,6 +94354,8 @@ class TaskVision {
   async start(imageId, stream) {
     this.imageId = imageId;
     this.running = true;
+    this.startOverlayTextTimer();
+    this.startLocationTimer();
     await this.initPromise;
     const video = document.getElementById(elIdVideoInput);
     let canvas = document.getElementById(elIdCanvas);
@@ -94183,7 +94364,10 @@ class TaskVision {
       canvas.id = elIdCanvas;
       canvas.width = SCREEN_RESOLUTION.get("FULL_HD").width.ideal;
       canvas.height = SCREEN_RESOLUTION.get("FULL_HD").height.ideal;
-      canvas.style.display = "none";
+      canvas.style.position = "absolute";
+      canvas.style.top = "-9999px";
+      canvas.style.left = "-9999px";
+      canvas.style.pointerEvents = "none";
       document.body.appendChild(canvas);
     }
     this.sendBackgroundBlur({
@@ -94213,8 +94397,8 @@ class TaskVision {
     video.onloadedmetadata = () => {
       const c2 = document.getElementById(elIdCanvas);
       if (c2) {
-        c2.width = video.videoWidth || 640;
-        c2.height = video.videoHeight || 480;
+        c2.width = video.videoWidth;
+        c2.height = video.videoHeight;
       }
       video.play();
       this.loop();
@@ -94242,12 +94426,13 @@ class TaskVision {
     });
     const canvas = document.getElementById(elIdCanvas);
     if (canvas) {
-      canvas.width = video.videoWidth || 640;
-      canvas.height = video.videoHeight || 480;
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
     }
     await video.play().catch((e2) => console.log("play error", e2));
   }
   async resetMediapipe() {
+    this.stopOverlayTextTimer();
     this.running = false;
     this.sending = false;
     cancelAnimationFrame(this.animationId);
@@ -94354,6 +94539,83 @@ class UpdateVideoQueueService {
     this.queue_session.clear();
   }
 }
+const _LocationService = class _LocationService {
+  constructor() {
+    // watchId native → phục vụ clearWatch
+    __publicField(this, "activeWatches", /* @__PURE__ */ new Map());
+  }
+  static getInstance() {
+    if (!_LocationService.instance) {
+      _LocationService.instance = new _LocationService();
+    }
+    return _LocationService.instance;
+  }
+  /**
+   * Lấy vị trí hiện tại (một lần)
+   */
+  getCurrentLocation(options) {
+    return new Promise((resolve, reject) => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(resolve, reject, options || {});
+      } else {
+        reject(new Error("Geolocation is not supported by this browser."));
+      }
+    });
+  }
+  /**
+   * Theo dõi vị trí liên tục — trả về watchId để clearWatch sau này
+   */
+  watchPosition(onSuccess, onError, options) {
+    if (!navigator.geolocation) {
+      onError == null ? void 0 : onError(
+        new Error("Geolocation is not supported by this browser.")
+      );
+      return -1;
+    }
+    const watchId = navigator.geolocation.watchPosition(
+      onSuccess,
+      (error) => onError == null ? void 0 : onError(error),
+      options || {}
+    );
+    this.activeWatches.set(watchId, watchId);
+    return watchId;
+  }
+  /**
+   * Dừng theo dõi vị trí
+   */
+  clearWatch(watchId) {
+    const nativeWatchId = this.activeWatches.get(watchId);
+    if (nativeWatchId !== void 0) {
+      navigator.geolocation.clearWatch(nativeWatchId);
+      this.activeWatches.delete(watchId);
+    }
+  }
+  /**
+   * Dừng tất cả active watches
+   */
+  clearAllWatches() {
+    for (const nativeWatchId of this.activeWatches.values()) {
+      navigator.geolocation.clearWatch(nativeWatchId);
+    }
+    this.activeWatches.clear();
+  }
+  /**
+   * Format tọa độ thành string "Lat, Long"
+   */
+  formatCoordinates(position) {
+    const { latitude, longitude } = position.coords;
+    return `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+  }
+  /**
+   * Link Google Maps từ tọa độ
+   */
+  getGoogleMapsLink(position) {
+    const { latitude, longitude } = position.coords;
+    return `https://www.google.com/maps?q=${latitude},${longitude}`;
+  }
+};
+__publicField(_LocationService, "instance");
+let LocationService = _LocationService;
 class Port_Sip {
   constructor() {
     __publicField(this, "port_sip_sdk");
@@ -96100,10 +96362,20 @@ class Port_Sip {
           data: null
         });
         break;
-      case TYPE_SEND_VIDEO:
+      case TYPE_MESAGE.TYPE_SEND_VIDEO:
         const sessionId = this.getDataCallId((values == null ? void 0 : values.sessionId) || this.main_id);
         (_j = this.port_sip_sdk) == null ? void 0 : _j.sendVideo(sessionId, true);
         break;
+      case TYPE_MESAGE.MESSAGE_SDK: {
+        emitInteractionEvent(InteractionEventType$1.MESSAGE_SDK, {
+          data: values == null ? void 0 : values.data
+        });
+        break;
+      }
+      case TYPE_MESAGE.SEND_BLACKGROUND: {
+        this.blurBackground(values == null ? void 0 : values.sessionId, 0);
+        break;
+      }
       default:
         return;
     }
@@ -96141,7 +96413,7 @@ class Port_Sip {
       (_a2 = this.port_sip_sdk) == null ? void 0 : _a2.sendMessage(
         JSON.stringify({
           payload: {
-            type: MESSAGE_SDK,
+            type: TYPE_MESAGE.MESSAGE_SDK,
             data: payload
           }
         }),
@@ -96262,6 +96534,10 @@ class Port_Sip {
   updateOverlayText(index, text) {
     var _a2;
     (_a2 = this.mediaPipeML) == null ? void 0 : _a2.updateOverlayText(text, index);
+  }
+  setDefaultOverlayText(array) {
+    var _a2;
+    (_a2 = this.mediaPipeML) == null ? void 0 : _a2.setDefaultOverlayText(array);
   }
 }
 const { fetchRestful, callApiNotAuth } = new AxiosExternal();
@@ -99182,6 +99458,10 @@ const _BubbleSDK = class _BubbleSDK {
     var _a2;
     (_a2 = this.socket) == null ? void 0 : _a2.updateOverlayText(index, text);
   }
+  setDefaultOverlayText_sdk(array) {
+    var _a2;
+    (_a2 = this.socket) == null ? void 0 : _a2.setDefaultOverlayText(array);
+  }
   joinVideo_sdk(extension, delegate) {
     if (this.socket) {
       this.socket.addConfluenceVideo(extension, delegate);
@@ -99285,7 +99565,7 @@ const DEFAULT_OPTIONS = {
   baseUrl: config_url.base_url
 };
 const SDK_NAMESPACE = "OmiSDK";
-const SDK_VERSION = "1.0.22";
+const SDK_VERSION = "1.0.23";
 class OmiSDK extends BubbleSDK {
   /**
    * Creates a new SDK instance
@@ -99451,6 +99731,9 @@ class OmiSDK extends BubbleSDK {
   }
   updateOverlayText(index, text) {
     this.updateOverlayText_sdk(index, text);
+  }
+  setDefaultOverlayText(array) {
+    this.setDefaultOverlayText_sdk(array);
   }
   sendBackgroundBlur(enable = false, imageId) {
     return this.sendBackgroundBlur_sdk(enable, imageId);
@@ -100077,7 +100360,7 @@ class GuestSwitchBoard {
         onRecvDtmfTone: (id, tone) => {
         },
         onRecvMessage: async (id, message2, contentType) => {
-          var _a2, _b, _c2, _d, _e2, _f, _g, _h, _i2;
+          var _a2, _b, _c2, _d, _e2, _f, _g, _h;
           try {
             const values = JSON.parse(message2);
             if (((_a2 = values == null ? void 0 : values.payload) == null ? void 0 : _a2.answered) && isVideo) {
@@ -100091,11 +100374,26 @@ class GuestSwitchBoard {
                 console.log(
                   "✅ PeerConnection is stable, upgrading to video call"
                 );
-                await this.port_sip_sdk.updateCall(id, true, true);
-                await ((_d = this.port_sip_sdk) == null ? void 0 : _d.sendVideo(id, true));
+                await this.port_sip_sdk.updateCall(id, true, true, () => {
+                  var _a3;
+                  (_a3 = this.port_sip_sdk) == null ? void 0 : _a3.sendVideo(id, true).then(() => {
+                    var _a4;
+                    this.blurBackground(true);
+                    (_a4 = this.port_sip_sdk) == null ? void 0 : _a4.sendMessage(
+                      JSON.stringify({
+                        type: TYPE_MESAGE.SEND_BLACKGROUND,
+                        sessionId
+                      }),
+                      id,
+                      false
+                    );
+                  }).catch((e2) => {
+                    console.log("sender video");
+                  });
+                });
                 this.onTranscriptSocket(
-                  ((_f = (_e2 = values == null ? void 0 : values.payload) == null ? void 0 : _e2.agentInfo) == null ? void 0 : _f.agentId) ?? 0,
-                  ((_h = (_g = values == null ? void 0 : values.payload) == null ? void 0 : _g.agentInfo) == null ? void 0 : _h.tenantId) ?? 0,
+                  ((_e2 = (_d = values == null ? void 0 : values.payload) == null ? void 0 : _d.agentInfo) == null ? void 0 : _e2.agentId) ?? 0,
+                  ((_g = (_f = values == null ? void 0 : values.payload) == null ? void 0 : _f.agentInfo) == null ? void 0 : _g.tenantId) ?? 0,
                   sessionId,
                   (response) => {
                     var _a3;
@@ -100107,7 +100405,7 @@ class GuestSwitchBoard {
                     );
                   }
                 );
-                (_i2 = requestDelegate == null ? void 0 : requestDelegate.onAccept) == null ? void 0 : _i2.call(requestDelegate, sessionId, {});
+                (_h = requestDelegate == null ? void 0 : requestDelegate.onAccept) == null ? void 0 : _h.call(requestDelegate, sessionId, {});
               } catch (error) {
                 console.log("error enableVideo", error);
               }
@@ -100841,7 +101139,7 @@ class GuestSwitchBoard {
           );
         }
         break;
-      case MESSAGE_SDK: {
+      case TYPE_MESAGE.MESSAGE_SDK: {
         (_b = (_a2 = this.delegate) == null ? void 0 : _a2.onMessage) == null ? void 0 : _b.call(_a2, payload == null ? void 0 : payload.data);
         break;
       }
@@ -100996,6 +101294,22 @@ class GuestSwitchBoard {
       console.log("checkLogPC", error);
     }
   }
+  pushMsgCustom(payload) {
+    var _a2;
+    const id = this.getSessionMain();
+    try {
+      (_a2 = this.port_sip_sdk) == null ? void 0 : _a2.sendMessage(
+        JSON.stringify({
+          type: TYPE_MESAGE.MESSAGE_SDK,
+          data: payload
+        }),
+        id,
+        false
+      );
+    } catch (error) {
+      console.log("error push msg", error);
+    }
+  }
 }
 class GuestService extends GuestSocket {
   constructor(options) {
@@ -101032,7 +101346,11 @@ class GuestService extends GuestSocket {
       config_video_call.model = options.model;
     }
     if ((_a2 = options == null ? void 0 : options.backgroundImages) == null ? void 0 : _a2.length) {
-      config_url_image.splice(0, config_url_image.length, ...options.backgroundImages);
+      config_url_image.splice(
+        0,
+        config_url_image.length,
+        ...options.backgroundImages
+      );
     }
   }
   /** 
@@ -101243,6 +101561,17 @@ class GuestService extends GuestSocket {
     var _a2, _b;
     (_b = (_a2 = this.sip) == null ? void 0 : _a2.mediaPipeML) == null ? void 0 : _b.setOverlayText(index, text, position);
   }
+  setDefaultOverlayText(array) {
+    var _a2, _b;
+    (_b = (_a2 = this.sip) == null ? void 0 : _a2.mediaPipeML) == null ? void 0 : _b.setDefaultOverlayText(array);
+  }
+  /**
+   * Sửa text hiển thị ở góc dưới bên trái — truyền chuỗi rỗng để xóa
+   */
+  setBottomLeftText(text) {
+    var _a2, _b;
+    (_b = (_a2 = this.sip) == null ? void 0 : _a2.mediaPipeML) == null ? void 0 : _b.setBottomLeftText(text);
+  }
   switchCamera(facingMode2) {
     var _a2;
     if (!this.sip) return this.notConnected();
@@ -101400,6 +101729,46 @@ class GuestService extends GuestSocket {
       return;
     }
     this.sip.checkLogPC();
+  }
+  customPushMessage(payload) {
+    if (!this.sip) {
+      return;
+    }
+    this.sip.pushMsgCustom(payload);
+  }
+  /**
+   * Lấy vị trí hiện tại (một lần) qua Geolocation API
+   */
+  getCurrentLocation(options) {
+    return LocationService.getInstance().getCurrentLocation(options);
+  }
+  /**
+   * Theo dõi vị trí liên tục — trả về watchId
+   */
+  watchLocation(onSuccess, onError, options) {
+    return LocationService.getInstance().watchPosition(
+      onSuccess,
+      onError,
+      options
+    );
+  }
+  /**
+   * Dừng theo dõi vị trí
+   */
+  clearLocationWatch(watchId) {
+    LocationService.getInstance().clearWatch(watchId);
+  }
+  /**
+   * Format tọa độ thành string "Lat, Long"
+   */
+  formatLocationCoordinates(position) {
+    return LocationService.getInstance().formatCoordinates(position);
+  }
+  /**
+   * Link Google Maps từ tọa độ
+   */
+  getLocationMapsLink(position) {
+    return LocationService.getInstance().getGoogleMapsLink(position);
   }
 }
 class OmiGuestSDK extends GuestService {
