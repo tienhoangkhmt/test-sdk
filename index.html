@@ -845,6 +845,29 @@
                   "
                 />
               </div>
+
+              <div style="display: flex; gap: 10px; align-items: center">
+                <label
+                  for="cameraSelect"
+                  style="
+                    color: var(--text-muted);
+                    font-size: 14px;
+                    min-width: 80px;
+                  "
+                  >Camera:</label
+                >
+                <select
+                  id="cameraSelect"
+                  style="
+                    width: 200px;
+                    padding: 10px 12px;
+                    border: 1px solid var(--border-color);
+                    border-radius: 6px;
+                  "
+                >
+                  <option value="">Mặc định</option>
+                </select>
+              </div>
             </div>
 
             <button class="call-action-btn" id="make">
@@ -1028,6 +1051,33 @@
               </select>
             </div>
 
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                margin-top: 15px;
+              "
+            >
+              <label
+                for="callCameraSelect"
+                style="color: var(--text-muted); font-size: 14px"
+                >Camera:</label
+              >
+              <select
+                id="callCameraSelect"
+                style="
+                  padding: 8px 12px;
+                  border: 1px solid var(--border-color);
+                  border-radius: 6px;
+                  font-size: 14px;
+                  max-width: 220px;
+                "
+              >
+                <option value="">Mặc định</option>
+              </select>
+            </div>
+
             <button class="control-btn danger" id="hangup">
               <i class="fas fa-phone-slash"></i>
               Kết thúc
@@ -1082,7 +1132,7 @@
       let facingMode = "environment";
 
       // Import SDK
-      import { OmiGuestSDK } from "./omisdk.es.js";
+      import { DeviceService, OmiGuestSDK } from "./omisdk.es.js";
 
       // Global variables
       let guest = null;
@@ -1095,6 +1145,9 @@
       // Blur and overlay state
       let blurEnabled = false;
       let overlayText = "";
+
+      // Camera đang dùng theo select — rỗng = camera mặc định / theo facingMode
+      let selectedDeviceId = "";
 
       // DOM Elements
       const callBtn = document.getElementById("make");
@@ -1119,11 +1172,14 @@
       const hangupBtn = document.getElementById("hangup");
       const blurToggleBtn = document.getElementById("blurToggle");
       const overlayTextBtn = document.getElementById("overlayTextBtn");
+      const cameraSelect = document.getElementById("cameraSelect");
+      const callCameraSelect = document.getElementById("callCameraSelect");
 
       // Initialize when page loads
       window.addEventListener("load", () => {
         console.log("Page loaded, setting up event listeners");
         setupEventListeners();
+        loadCameraOptions();
 
         // Check URL parameters for appId
         const urlParams = new URLSearchParams(window.location.search);
@@ -1191,6 +1247,51 @@
                   `Không thể thay đổi độ phân giải: ${err?.message || ""}`,
                 );
               });
+          });
+
+        // Camera select trong cuộc gọi
+        callCameraSelect.addEventListener("change", handleSelectCamera);
+      }
+
+      // Đổ danh sách camera vào select trước và trong cuộc gọi
+      async function loadCameraOptions() {
+        try {
+          const cameras = await DeviceService.getCameraDevices();
+          [cameraSelect, callCameraSelect].forEach((select) => {
+            cameras.forEach((camera, index) => {
+              select.add(
+                new Option(
+                  camera.label || `Camera ${index + 1}`,
+                  camera.deviceId,
+                ),
+              );
+            });
+          });
+          console.log("Camera devices:", cameras);
+        } catch (err) {
+          console.log("getCameraDevices error:", err);
+          notyf.error("Không lấy được danh sách camera!");
+        }
+      }
+
+      function handleSelectCamera() {
+        const deviceId = callCameraSelect.value;
+        if (!guest || !deviceId) {
+          callCameraSelect.value = selectedDeviceId;
+          return;
+        }
+
+        guest
+          .switchCamera(facingMode, deviceId)
+          .then((res) => {
+            console.log("switchCamera by deviceId success", res);
+            selectedDeviceId = deviceId;
+            notyf.success("Đã chuyển camera!");
+          })
+          .catch((err) => {
+            console.log("switchCamera by deviceId error", err);
+            callCameraSelect.value = selectedDeviceId;
+            notyf.error("Không thể chuyển camera!");
           });
       }
 
@@ -1278,9 +1379,12 @@
           // Setup event listeners
           setupSDKEventListeners();
           facingMode = "environment";
+          selectedDeviceId = cameraSelect.value;
+          callCameraSelect.value = selectedDeviceId;
           // Make the call using the entered phone number
           const result = await guest.makeCall(phoneNumber, {
             enableVideo: true,
+            deviceId: selectedDeviceId || undefined,
             requestDelegate: {
               onAccept: (sessionId, record) => {
                 console.log("Call accepted", sessionId, record);
@@ -1380,6 +1484,8 @@
           .then((res) => {
             console.log("switchCamera success", res);
             facingMode = facingMode === "user" ? "environment" : "user";
+            selectedDeviceId = "";
+            callCameraSelect.value = "";
             switchCameraBtn.classList.add("active");
             setTimeout(() => {
               switchCameraBtn.classList.remove("active");
