@@ -1282,7 +1282,7 @@
         }
 
         guest
-          .switchCamera(facingMode, deviceId)
+          .switchCameraByDeviceId(deviceId)
           .then((res) => {
             console.log("switchCamera by deviceId success", res);
             selectedDeviceId = deviceId;
@@ -1484,8 +1484,6 @@
           .then((res) => {
             console.log("switchCamera success", res);
             facingMode = facingMode === "user" ? "environment" : "user";
-            selectedDeviceId = "";
-            callCameraSelect.value = "";
             switchCameraBtn.classList.add("active");
             setTimeout(() => {
               switchCameraBtn.classList.remove("active");
