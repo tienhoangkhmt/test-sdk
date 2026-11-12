@@ -96927,6 +96927,31 @@ const postMakeCall = (body) => {
     body
   });
 };
+const CAMERA_BUSY_ERRORS = [
+  "NotReadableError",
+  "TrackStartError",
+  "AbortError"
+];
+async function openCameraReleasingOld(video, oldTracks) {
+  var _a, _b;
+  try {
+    return { stream: await navigator.mediaDevices.getUserMedia({ video }) };
+  } catch (error) {
+    const name2 = error == null ? void 0 : error.name;
+    if (!CAMERA_BUSY_ERRORS.includes(name2) || !oldTracks.length) throw error;
+  }
+  const oldDeviceId = (_b = (_a = oldTracks[0]).getSettings) == null ? void 0 : _b.call(_a).deviceId;
+  oldTracks.forEach((t2) => t2.stop());
+  try {
+    return { stream: await navigator.mediaDevices.getUserMedia({ video }) };
+  } catch (error) {
+    if (!oldDeviceId) throw error;
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: oldDeviceId } } }).catch(() => {
+      throw error;
+    });
+    return { stream, error };
+  }
+}
 class GuestSwitchBoard {
   // Nhận nguyên object params và forward thẳng sang connectSwitchboard —
   // KHÔNG liệt kê tay từng field, vì liệt kê tay từng làm rụng field mới
@@ -97624,8 +97649,49 @@ class GuestSwitchBoard {
       console.log("error blurBackground", error);
     }
   }
+  // Track camera đang chạy — blur bật thì localVideo là canvas stream (không
+  // được stop), camera thật nằm ở originalVideoTrack
+  getActiveCameraTracks(localVideo) {
+    var _a, _b;
+    const tracks = this.blurEnabled && this.mediaPipeML ? [this.originalVideoTrack] : ((_b = (_a = localVideo == null ? void 0 : localVideo.srcObject) == null ? void 0 : _a.getVideoTracks) == null ? void 0 : _b.call(_a)) ?? [];
+    return tracks.filter(
+      (t2) => !!t2 && t2.readyState !== "ended"
+    );
+  }
+  // Đưa stream camera mới vào cuộc gọi (qua MediaPipe nếu đang blur)
+  async applyCameraStream(newStream, localVideo) {
+    var _a, _b, _c;
+    const newTrack = newStream.getVideoTracks()[0];
+    if (this.blurEnabled && this.mediaPipeML) {
+      if (newTrack) {
+        this.originalVideoTrack = newTrack;
+      }
+      await this.mediaPipeML.switchSource(newStream);
+      return "(blur preserved)";
+    }
+    if (localVideo == null ? void 0 : localVideo.srcObject) {
+      localVideo.srcObject.getTracks().forEach((track) => {
+        if (track.kind === "video") {
+          track.stop();
+        }
+      });
+    }
+    const callId = this.getSessionMain();
+    const session2 = (_a = this.port_sip_sdk) == null ? void 0 : _a.sessions.get(callId);
+    if (!session2) throw new Error("session does not exist");
+    const pc = (_c = (_b = session2.session) == null ? void 0 : _b.sessionDescriptionHandler) == null ? void 0 : _c.peerConnection;
+    if (localVideo) localVideo.srcObject = newStream;
+    const sender = pc.getSenders().find((s2) => {
+      var _a2;
+      return ((_a2 = s2.track) == null ? void 0 : _a2.kind) === "video";
+    });
+    if (sender && newTrack) {
+      await sender.replaceTrack(newTrack);
+    }
+    return "";
+  }
   async switchCamera(facingMode2 = "user") {
-    var _a, _b, _c, _d;
+    var _a;
     try {
       const devices = await navigator.mediaDevices.enumerateDevices();
       const videoDevices = devices.filter((d) => d.kind === "videoinput");
@@ -97639,55 +97705,23 @@ class GuestSwitchBoard {
         }
       );
       if (videoDevices.length > 1) {
-        const newStream = await navigator.mediaDevices.getUserMedia({
-          video: {
+        const localVideo = document.getElementById(
+          ((_a = this.mediaElement) == null ? void 0 : _a.localVideoID) ?? ""
+        );
+        const { stream: newStream, error } = await openCameraReleasingOld(
+          {
             facingMode: facingMode2,
             height: { ideal: 1080 },
             width: { ideal: 1920 }
-          }
-        });
-        this.usingFront = !this.usingFront;
-        if (this.blurEnabled && this.mediaPipeML) {
-          const newTrack2 = newStream.getVideoTracks()[0];
-          if (newTrack2) {
-            this.originalVideoTrack = newTrack2;
-          }
-          await this.mediaPipeML.switchSource(newStream);
-          return Promise.resolve({
-            success: true,
-            message: "switchCamera success (blur preserved)"
-          });
-        }
-        const video = document.getElementById(
-          ((_a = this.mediaElement) == null ? void 0 : _a.localVideoID) ?? ""
+          },
+          this.getActiveCameraTracks(localVideo)
         );
-        if (video.srcObject) {
-          video.srcObject.getTracks().forEach((track) => {
-            if (track.kind === "video") {
-              track.stop();
-            }
-          });
-        }
-        const callId = this.getSessionMain();
-        const session2 = (_b = this.port_sip_sdk) == null ? void 0 : _b.sessions.get(callId);
-        if (!session2) throw new Error("session does not exist");
-        const pc = (_d = (_c = session2.session) == null ? void 0 : _c.sessionDescriptionHandler) == null ? void 0 : _d.peerConnection;
-        video.srcObject = newStream;
-        const newTrack = newStream.getVideoTracks()[0];
-        const sender = pc.getSenders().find((s2) => {
-          var _a2;
-          return ((_a2 = s2.track) == null ? void 0 : _a2.kind) === "video";
-        });
-        if (sender && newTrack) {
-          await sender.replaceTrack(newTrack);
-          return Promise.resolve({
-            success: true,
-            message: "switchCamera success"
-          });
-        }
+        const note2 = await this.applyCameraStream(newStream, localVideo);
+        if (error) throw error;
+        this.usingFront = !this.usingFront;
         return Promise.resolve({
           success: true,
-          message: "switchCamera success"
+          message: `switchCamera success${note2 ? ` ${note2}` : ""}`
         });
       } else {
         throw new Error("Không có camera phụ");
@@ -97702,53 +97736,25 @@ class GuestSwitchBoard {
     }
   }
   async switchCameraByDeviceId(deviceId) {
-    var _a, _b, _c, _d, _e;
+    var _a, _b;
     try {
-      const newStream = await navigator.mediaDevices.getUserMedia({
-        video: {
+      const localVideo = document.getElementById(
+        ((_a = this.mediaElement) == null ? void 0 : _a.localVideoID) ?? ""
+      );
+      const { stream: newStream, error } = await openCameraReleasingOld(
+        {
           deviceId: { exact: deviceId },
           height: { ideal: 1080 },
           width: { ideal: 1920 }
-        }
-      });
-      (_a = this.port_sip_sdk) == null ? void 0 : _a.setCameraDev(deviceId);
-      if (this.blurEnabled && this.mediaPipeML) {
-        const newTrack2 = newStream.getVideoTracks()[0];
-        if (newTrack2) {
-          this.originalVideoTrack = newTrack2;
-        }
-        await this.mediaPipeML.switchSource(newStream);
-        return Promise.resolve({
-          success: true,
-          message: "switchCameraByDeviceId success (blur preserved)"
-        });
-      }
-      const video = document.getElementById(
-        ((_b = this.mediaElement) == null ? void 0 : _b.localVideoID) ?? ""
+        },
+        this.getActiveCameraTracks(localVideo)
       );
-      if (video.srcObject) {
-        video.srcObject.getTracks().forEach((track) => {
-          if (track.kind === "video") {
-            track.stop();
-          }
-        });
-      }
-      const callId = this.getSessionMain();
-      const session2 = (_c = this.port_sip_sdk) == null ? void 0 : _c.sessions.get(callId);
-      if (!session2) throw new Error("session does not exist");
-      const pc = (_e = (_d = session2.session) == null ? void 0 : _d.sessionDescriptionHandler) == null ? void 0 : _e.peerConnection;
-      video.srcObject = newStream;
-      const newTrack = newStream.getVideoTracks()[0];
-      const sender = pc.getSenders().find((s2) => {
-        var _a2;
-        return ((_a2 = s2.track) == null ? void 0 : _a2.kind) === "video";
-      });
-      if (sender && newTrack) {
-        await sender.replaceTrack(newTrack);
-      }
+      const note2 = await this.applyCameraStream(newStream, localVideo);
+      if (error) throw error;
+      (_b = this.port_sip_sdk) == null ? void 0 : _b.setCameraDev(deviceId);
       return Promise.resolve({
         success: true,
-        message: "switchCameraByDeviceId success"
+        message: `switchCameraByDeviceId success${note2 ? ` ${note2}` : ""}`
       });
     } catch (error) {
       console.log("error switchCameraByDeviceId", error);
