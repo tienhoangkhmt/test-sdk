@@ -96952,6 +96952,18 @@ async function openCameraReleasingOld(video, oldTracks) {
     return { stream, error };
   }
 }
+const BACK_LABEL = /back|rear|environment|mặt sau|arrière|trasera|rück|后|背面|후면/i;
+const FRONT_LABEL = /front|user|mặt trước|avant|frontal|vorder|前|전면/i;
+const AUX_LABEL = /ultra|wide|tele|dual|triple|macro|depth|kép|siêu rộng|góc rộng|ống kính/i;
+function pickCamera(devices, facingMode2, currentId) {
+  const [wanted, opposite] = facingMode2 === "environment" ? [BACK_LABEL, FRONT_LABEL] : [FRONT_LABEL, BACK_LABEL];
+  const matched = devices.filter((d) => wanted.test(d.label));
+  if (matched.length) {
+    return matched.find((d) => !AUX_LABEL.test(d.label)) ?? matched[0];
+  }
+  const others = devices.filter((d) => d.deviceId !== currentId);
+  return others.find((d) => !opposite.test(d.label)) ?? others[0];
+}
 class GuestSwitchBoard {
   // Nhận nguyên object params và forward thẳng sang connectSwitchboard —
   // KHÔNG liệt kê tay từng field, vì liệt kê tay từng làm rụng field mới
@@ -96961,7 +96973,6 @@ class GuestSwitchBoard {
     __publicField(this, "ext", "");
     __publicField(this, "data", /* @__PURE__ */ new Map());
     __publicField(this, "mediaElement");
-    __publicField(this, "usingFront", false);
     __publicField(this, "count", 0);
     __publicField(this, "iceReset", 0);
     __publicField(this, "socket_transcript", null);
@@ -97691,7 +97702,7 @@ class GuestSwitchBoard {
     return "";
   }
   async switchCamera(facingMode2 = "user") {
-    var _a;
+    var _a, _b, _c, _d, _e;
     try {
       const devices = await navigator.mediaDevices.enumerateDevices();
       const videoDevices = devices.filter((d) => d.kind === "videoinput");
@@ -97708,17 +97719,28 @@ class GuestSwitchBoard {
         const localVideo = document.getElementById(
           ((_a = this.mediaElement) == null ? void 0 : _a.localVideoID) ?? ""
         );
+        const oldTracks = this.getActiveCameraTracks(localVideo);
+        const currentId = (_c = (_b = oldTracks[0]) == null ? void 0 : _b.getSettings) == null ? void 0 : _c.call(_b).deviceId;
+        const target = pickCamera(videoDevices, facingMode2, currentId);
+        if (!target) throw new Error("Không tìm thấy camera phù hợp");
+        if (target.deviceId === currentId) {
+          (_d = this.port_sip_sdk) == null ? void 0 : _d.setCameraDev(target.deviceId);
+          return Promise.resolve({
+            success: true,
+            message: "switchCamera success (đang dùng camera này)"
+          });
+        }
         const { stream: newStream, error } = await openCameraReleasingOld(
           {
-            facingMode: facingMode2,
+            deviceId: { exact: target.deviceId },
             height: { ideal: 1080 },
             width: { ideal: 1920 }
           },
-          this.getActiveCameraTracks(localVideo)
+          oldTracks
         );
         const note2 = await this.applyCameraStream(newStream, localVideo);
         if (error) throw error;
-        this.usingFront = !this.usingFront;
+        (_e = this.port_sip_sdk) == null ? void 0 : _e.setCameraDev(target.deviceId);
         return Promise.resolve({
           success: true,
           message: `switchCamera success${note2 ? ` ${note2}` : ""}`
