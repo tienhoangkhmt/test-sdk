@@ -24282,19 +24282,19 @@ function requireReactDom_development() {
           digest: digest != null ? digest : null
         };
       }
-      function showErrorDialog(boundary, errorInfo) {
+      function showErrorDialog(boundary, errorInfo2) {
         return true;
       }
-      function logCapturedError(boundary, errorInfo) {
+      function logCapturedError(boundary, errorInfo2) {
         try {
-          var logError = showErrorDialog(boundary, errorInfo);
+          var logError = showErrorDialog(boundary, errorInfo2);
           if (logError === false) {
             return;
           }
-          var error2 = errorInfo.value;
+          var error2 = errorInfo2.value;
           if (true) {
-            var source = errorInfo.source;
-            var stack = errorInfo.stack;
+            var source = errorInfo2.source;
+            var stack = errorInfo2.stack;
             var componentStack = stack !== null ? stack : "";
             if (error2 != null && error2._suppressLogging) {
               if (boundary.tag === ClassComponent) {
@@ -24321,25 +24321,25 @@ function requireReactDom_development() {
         }
       }
       var PossiblyWeakMap$1 = typeof WeakMap === "function" ? WeakMap : Map;
-      function createRootErrorUpdate(fiber, errorInfo, lane) {
+      function createRootErrorUpdate(fiber, errorInfo2, lane) {
         var update = createUpdate(NoTimestamp, lane);
         update.tag = CaptureUpdate;
         update.payload = {
           element: null
         };
-        var error2 = errorInfo.value;
+        var error2 = errorInfo2.value;
         update.callback = function() {
           onUncaughtError(error2);
-          logCapturedError(fiber, errorInfo);
+          logCapturedError(fiber, errorInfo2);
         };
         return update;
       }
-      function createClassErrorUpdate(fiber, errorInfo, lane) {
+      function createClassErrorUpdate(fiber, errorInfo2, lane) {
         var update = createUpdate(NoTimestamp, lane);
         update.tag = CaptureUpdate;
         var getDerivedStateFromError = fiber.type.getDerivedStateFromError;
         if (typeof getDerivedStateFromError === "function") {
-          var error$1 = errorInfo.value;
+          var error$1 = errorInfo2.value;
           update.payload = function() {
             return getDerivedStateFromError(error$1);
           };
@@ -24347,7 +24347,7 @@ function requireReactDom_development() {
             {
               markFailedErrorBoundaryForHotReloading(fiber);
             }
-            logCapturedError(fiber, errorInfo);
+            logCapturedError(fiber, errorInfo2);
           };
         }
         var inst = fiber.stateNode;
@@ -24356,12 +24356,12 @@ function requireReactDom_development() {
             {
               markFailedErrorBoundaryForHotReloading(fiber);
             }
-            logCapturedError(fiber, errorInfo);
+            logCapturedError(fiber, errorInfo2);
             if (typeof getDerivedStateFromError !== "function") {
               markLegacyErrorBoundaryAsFailed(this);
             }
-            var error$12 = errorInfo.value;
-            var stack = errorInfo.stack;
+            var error$12 = errorInfo2.value;
+            var stack = errorInfo2.stack;
             this.componentDidCatch(error$12, {
               componentStack: stack !== null ? stack : ""
             });
@@ -24523,14 +24523,14 @@ function requireReactDom_development() {
               return;
             }
             case ClassComponent:
-              var errorInfo = value2;
+              var errorInfo2 = value2;
               var ctor = workInProgress2.type;
               var instance2 = workInProgress2.stateNode;
               if ((workInProgress2.flags & DidCapture) === NoFlags && (typeof ctor.getDerivedStateFromError === "function" || instance2 !== null && typeof instance2.componentDidCatch === "function" && !isAlreadyFailedLegacyErrorBoundary(instance2))) {
                 workInProgress2.flags |= ShouldCapture;
                 var _lane = pickArbitraryLane(rootRenderLanes);
                 workInProgress2.lanes = mergeLanes(workInProgress2.lanes, _lane);
-                var _update = createClassErrorUpdate(workInProgress2, errorInfo, _lane);
+                var _update = createClassErrorUpdate(workInProgress2, errorInfo2, _lane);
                 enqueueCapturedUpdate(workInProgress2, _update);
                 return;
               }
@@ -29816,8 +29816,8 @@ function requireReactDom_development() {
       }
       var onUncaughtError = prepareToThrowUncaughtError;
       function captureCommitPhaseErrorOnRoot(rootFiber, sourceFiber, error2) {
-        var errorInfo = createCapturedValueAtFiber(error2, sourceFiber);
-        var update = createRootErrorUpdate(rootFiber, errorInfo, SyncLane);
+        var errorInfo2 = createCapturedValueAtFiber(error2, sourceFiber);
+        var update = createRootErrorUpdate(rootFiber, errorInfo2, SyncLane);
         var root2 = enqueueUpdate(rootFiber, update, SyncLane);
         var eventTime = requestEventTime();
         if (root2 !== null) {
@@ -29846,8 +29846,8 @@ function requireReactDom_development() {
             var ctor = fiber.type;
             var instance2 = fiber.stateNode;
             if (typeof ctor.getDerivedStateFromError === "function" || typeof instance2.componentDidCatch === "function" && !isAlreadyFailedLegacyErrorBoundary(instance2)) {
-              var errorInfo = createCapturedValueAtFiber(error$1, sourceFiber);
-              var update = createClassErrorUpdate(fiber, errorInfo, SyncLane);
+              var errorInfo2 = createCapturedValueAtFiber(error$1, sourceFiber);
+              var update = createClassErrorUpdate(fiber, errorInfo2, SyncLane);
               var root2 = enqueueUpdate(fiber, update, SyncLane);
               var eventTime = requestEventTime();
               if (root2 !== null) {
@@ -96932,25 +96932,51 @@ const CAMERA_BUSY_ERRORS = [
   "TrackStartError",
   "AbortError"
 ];
-async function openCameraReleasingOld(video, oldTracks) {
+const CAMERA_RELEASE_RETRY_MS = [200, 500, 1e3];
+const trackInfo = (t2) => {
+  var _a;
+  return {
+    label: t2.label,
+    readyState: t2.readyState,
+    deviceId: (_a = t2.getSettings) == null ? void 0 : _a.call(t2).deviceId
+  };
+};
+const errorInfo = (e2) => ({
+  name: e2 == null ? void 0 : e2.name,
+  message: (e2 == null ? void 0 : e2.message) ?? String(e2)
+});
+async function openCameraReleasingOld(video, oldTracks, log = () => {
+}) {
   var _a, _b;
   try {
     return { stream: await navigator.mediaDevices.getUserMedia({ video }) };
   } catch (error) {
     const name2 = error == null ? void 0 : error.name;
+    log("openCamera lỗi lần đầu", {
+      error: errorInfo(error),
+      oldTracks: oldTracks.map(trackInfo)
+    });
     if (!CAMERA_BUSY_ERRORS.includes(name2) || !oldTracks.length) throw error;
   }
   const oldDeviceId = (_b = (_a = oldTracks[0]).getSettings) == null ? void 0 : _b.call(_a).deviceId;
   oldTracks.forEach((t2) => t2.stop());
-  try {
-    return { stream: await navigator.mediaDevices.getUserMedia({ video }) };
-  } catch (error) {
-    if (!oldDeviceId) throw error;
-    const stream = await navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: oldDeviceId } } }).catch(() => {
-      throw error;
-    });
-    return { stream, error };
+  let lastError;
+  for (const wait of CAMERA_RELEASE_RETRY_MS) {
+    await new Promise((r2) => setTimeout(r2, wait));
+    try {
+      return { stream: await navigator.mediaDevices.getUserMedia({ video }) };
+    } catch (error) {
+      lastError = error;
+      log("openCamera thử lại lỗi", { wait, error: errorInfo(error) });
+      if (!CAMERA_BUSY_ERRORS.includes(error == null ? void 0 : error.name)) break;
+    }
   }
+  log("openCamera bỏ cuộc, mở lại camera cũ", { oldDeviceId });
+  if (!oldDeviceId) throw lastError;
+  const stream = await navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: oldDeviceId } } }).catch(() => {
+    throw lastError;
+  });
+  return { stream, error: lastError };
 }
 const BACK_LABEL = /back|rear|environment|mặt sau|arrière|trasera|rück|后|背面|후면/i;
 const FRONT_LABEL = /front|user|mặt trước|avant|frontal|vorder|前|전면/i;
@@ -97662,11 +97688,36 @@ class GuestSwitchBoard {
   }
   // Track camera đang chạy — blur bật thì localVideo là canvas stream (không
   // được stop), camera thật nằm ở originalVideoTrack
+  logCamera(msg, data) {
+    traceLog(msg, data, {
+      isLogServer: true,
+      isLogClient: true,
+      sessionId: this.getDataSessionId(this.getSessionMain())
+    });
+  }
+  // Gom MỌI track camera còn sống (localVideo, input MediaPipe, sender,
+  // localMediaStream của SIP) — chỉ cần sót 1 track là Android không mở được
+  // camera kia (NotReadableError). Bỏ qua track canvas (blur).
   getActiveCameraTracks(localVideo) {
-    var _a, _b;
-    const tracks = this.blurEnabled && this.mediaPipeML ? [this.originalVideoTrack] : ((_b = (_a = localVideo == null ? void 0 : localVideo.srcObject) == null ? void 0 : _a.getVideoTracks) == null ? void 0 : _b.call(_a)) ?? [];
-    return tracks.filter(
-      (t2) => !!t2 && t2.readyState !== "ended"
+    var _a, _b, _c, _d;
+    const videoTracksOf = (el) => {
+      var _a2, _b2;
+      return ((_b2 = (_a2 = el == null ? void 0 : el.srcObject) == null ? void 0 : _a2.getVideoTracks) == null ? void 0 : _b2.call(_a2)) ?? [];
+    };
+    const session2 = (_b = (_a = this.port_sip_sdk) == null ? void 0 : _a.sessions) == null ? void 0 : _b.get(this.getSessionMain());
+    const sdh = (_c = session2 == null ? void 0 : session2.session) == null ? void 0 : _c.sessionDescriptionHandler;
+    const pc = sdh == null ? void 0 : sdh.peerConnection;
+    const tracks = [
+      this.originalVideoTrack,
+      ...videoTracksOf(localVideo),
+      ...videoTracksOf(
+        document.getElementById(elIdVideoInput$1)
+      ),
+      ...(pc == null ? void 0 : pc.getSenders().map((s2) => s2.track)) ?? [],
+      ...((_d = sdh == null ? void 0 : sdh.localMediaStream) == null ? void 0 : _d.getVideoTracks()) ?? []
+    ];
+    return [...new Set(tracks)].filter(
+      (t2) => !!t2 && t2.kind === "video" && t2.readyState !== "ended" && !("canvas" in t2)
     );
   }
   // Đưa stream camera mới vào cuộc gọi (qua MediaPipe nếu đang blur)
@@ -97722,6 +97773,12 @@ class GuestSwitchBoard {
         const oldTracks = this.getActiveCameraTracks(localVideo);
         const currentId = (_c = (_b = oldTracks[0]) == null ? void 0 : _b.getSettings) == null ? void 0 : _c.call(_b).deviceId;
         const target = pickCamera(videoDevices, facingMode2, currentId);
+        this.logCamera("switchCamera bắt đầu", {
+          facingMode: facingMode2,
+          target: target && { deviceId: target.deviceId, label: target.label },
+          oldTracks: oldTracks.map(trackInfo),
+          blurEnabled: this.blurEnabled
+        });
         if (!target) throw new Error("Không tìm thấy camera phù hợp");
         if (target.deviceId === currentId) {
           (_d = this.port_sip_sdk) == null ? void 0 : _d.setCameraDev(target.deviceId);
@@ -97736,7 +97793,8 @@ class GuestSwitchBoard {
             height: { ideal: 1080 },
             width: { ideal: 1920 }
           },
-          oldTracks
+          oldTracks,
+          (msg, data) => this.logCamera(`switchCamera ${msg}`, data)
         );
         const note2 = await this.applyCameraStream(newStream, localVideo);
         if (error) throw error;
@@ -97749,6 +97807,7 @@ class GuestSwitchBoard {
         throw new Error("Không có camera phụ");
       }
     } catch (error) {
+      this.logCamera("switchCamera lỗi", errorInfo(error));
       alert(`${error} error switchCamera`);
       return Promise.reject({
         success: false,
@@ -97763,13 +97822,20 @@ class GuestSwitchBoard {
       const localVideo = document.getElementById(
         ((_a = this.mediaElement) == null ? void 0 : _a.localVideoID) ?? ""
       );
+      const oldTracks = this.getActiveCameraTracks(localVideo);
+      this.logCamera("switchCameraByDeviceId bắt đầu", {
+        deviceId,
+        oldTracks: oldTracks.map(trackInfo),
+        blurEnabled: this.blurEnabled
+      });
       const { stream: newStream, error } = await openCameraReleasingOld(
         {
           deviceId: { exact: deviceId },
           height: { ideal: 1080 },
           width: { ideal: 1920 }
         },
-        this.getActiveCameraTracks(localVideo)
+        oldTracks,
+        (msg, data) => this.logCamera(`switchCameraByDeviceId ${msg}`, data)
       );
       const note2 = await this.applyCameraStream(newStream, localVideo);
       if (error) throw error;
@@ -97779,7 +97845,7 @@ class GuestSwitchBoard {
         message: `switchCameraByDeviceId success${note2 ? ` ${note2}` : ""}`
       });
     } catch (error) {
-      console.log("error switchCameraByDeviceId", error);
+      this.logCamera("switchCameraByDeviceId lỗi", errorInfo(error));
       return Promise.reject({
         success: false,
         message: "Lỗi switchCameraByDeviceId",
